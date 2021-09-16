@@ -3,6 +3,9 @@ __pycache__/
 .vscode/
 .idea/
 venv/
+.DS_Store
+node_modules
+/dist
 
 
 # 檔案
@@ -10,4 +13,21 @@ venv/
 .env
 db.sqlite3
 
-# 例外
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

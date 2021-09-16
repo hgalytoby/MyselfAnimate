@@ -140,3 +140,5 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+MEDIA_ROOT = Path(BASE_DIR, 'static/uploads')
