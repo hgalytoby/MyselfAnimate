@@ -1,0 +1,13 @@
+# 目錄
+__pycache__/
+.vscode/
+.idea/
+venv/
+
+
+# 檔案
+*.pyc
+.env
+db.sqlite3
+
+# 例外
