@@ -63,3 +63,10 @@ class AnimateEpisodeTs(models.Model):
 
     class Meta:
         db_table = 'AnimateEpisodeTs'
+
+
+class History(models.Model):
+    animate_website_name = models.CharField(max_length=32)
+    animate_name = models.CharField(max_length=128)
+    episode_name = models.CharField(max_length=64)
+    date = models.DateTimeField()
