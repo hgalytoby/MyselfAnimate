@@ -1,62 +1,62 @@
 <template>
-  <div></div>
   <div class="container-fluid">
     <div class="row">
       <div class="col-sm-auto bg-light sticky-top">
         <div class="d-flex flex-sm-column flex-row flex-nowrap bg-light align-items-center sticky-top">
-          <a href="/" class="d-block p-3 link-dark text-decoration-none" title="" data-bs-toggle="tooltip"
+          <a href="https://github.com/hgalytoby/MyselfAnimate" class="d-block p-3 link-dark text-decoration-none" title="" data-bs-toggle="tooltip"
              data-bs-placement="right" data-bs-original-title="Icon-only">
-            <BootstrapIcon icon="bootstrap"/>
+            <BootstrapIcon icon="github" size="2x"/>
           </a>
           <ul
-            class="nav nav-pills nav-flush flex-sm-column flex-row flex-nowrap mb-auto mx-auto text-center align-items-center">
+            class="nav nav-pills nav-flush flex-sm-column flex-row flex-nowrap mb-auto mx-auto text-center align-items-center items">
             <li class="nav-item">
-              <a href="#" class="nav-link py-3 px-2" title="" data-bs-toggle="tooltip" data-bs-placement="right"
-                 data-bs-original-title="Home">
-                <BootstrapIcon icon="house"/>
+              <router-link href="#" class="nav-link py-3 px-2" title="" to="/" data-bs-toggle="tooltip"
+                           data-bs-placement="right"
+                           data-bs-original-title="Home">
+                <BootstrapIcon icon="house" size="2x"/>
+              </router-link>
+            </li>
+            <div class="dropdown">
+              <a href="#"
+                 class="d-flex align-items-center justify-content-center p-3 link-dark text-decoration-none dropdown-toggle"
+                 data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="/animate/myself.ico" alt="Myself">
               </a>
+              <ul class="dropdown-menu" aria-labelledby="">
+                <li>
+                  <router-link class="dropdown-item" to="/Myself">本季新番</router-link>
+                </li>
+                <li><router-link class="dropdown-item" to="/Myself/Search">搜尋動漫</router-link></li>
+                <li><router-link class="dropdown-item" to="/Myself/Finish">完結動漫</router-link></li>
+              </ul>
+            </div>
+            <li>
+              <router-link href="#" class="nav-link py-3 px-2" title="" to="/MyDownload" data-bs-toggle="tooltip"
+                           data-bs-placement="right"
+                           data-bs-original-title="Orders">
+                <BootstrapIcon icon="cloud-download" size="2x"/>
+              </router-link>
             </li>
             <li>
-              <a href="#" class="nav-link py-3 px-2" title="" data-bs-toggle="tooltip" data-bs-placement="right"
-                 data-bs-original-title="Dashboard">
-                <BootstrapIcon icon="speedometer2"/>
-              </a>
+              <router-link href="#" class="nav-link py-3 px-2" title="" to="/MyLove" data-bs-toggle="tooltip"
+                           data-bs-placement="right"
+                           data-bs-original-title="Products">
+                <BootstrapIcon icon="suit-heart-fill" size="2x"/>
+              </router-link>
             </li>
             <li>
-              <a href="#" class="nav-link py-3 px-2" title="" data-bs-toggle="tooltip" data-bs-placement="right"
-                 data-bs-original-title="Orders">
-                <BootstrapIcon icon="table"/>
-              </a>
-            </li>
-            <li>
-              <a href="#" class="nav-link py-3 px-2" title="" data-bs-toggle="tooltip" data-bs-placement="right"
-                 data-bs-original-title="Products">
-                <BootstrapIcon icon="heart"/>
-              </a>
-            </li>
-            <li>
-              <a href="#" class="nav-link py-3 px-2" title="" data-bs-toggle="tooltip" data-bs-placement="right"
-                 data-bs-original-title="Customers">
-                <BootstrapIcon icon="people"/>
-              </a>
+              <router-link href="#" class="nav-link py-3 px-2" title="" to="/MySettings" data-bs-toggle="tooltip"
+                           data-bs-placement="right"
+                           data-bs-original-title="Products">
+                <BootstrapIcon icon="gear" size="2x"/>
+              </router-link>
             </li>
           </ul>
-          <div class="dropdown">
-            <a href="#"
-               class="d-flex align-items-center justify-content-center p-3 link-dark text-decoration-none dropdown-toggle"
-               id="dropdownUser3" data-bs-toggle="dropdown" aria-expanded="false">
-              <BootstrapIcon icon="person-circle"/>
-            </a>
-            <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser3">
-              <li><a class="dropdown-item" href="#">New project...</a></li>
-              <li><a class="dropdown-item" href="#">Settings</a></li>
-              <li><a class="dropdown-item" href="#">Profile</a></li>
-            </ul>
-          </div>
         </div>
       </div>
       <div class="col-sm p-3 min-vh-100">
         <!-- content -->
+        <router-view></router-view>
       </div>
     </div>
   </div>
@@ -68,6 +68,8 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+  .items a {
+    color: black;
+  }
 </style>

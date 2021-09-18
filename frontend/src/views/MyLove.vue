@@ -1,10 +1,10 @@
 <template>
-  <div></div>
+  <div>我的最愛區域</div>
 </template>
 
 <script>
 export default {
-  name: 'Home'
+  name: 'MyLove'
 }
 </script>
 
