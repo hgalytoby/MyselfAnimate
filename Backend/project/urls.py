@@ -18,6 +18,7 @@ from django.urls import path, include
 from project import settings
 
 urlpatterns = [
+    path('api/', include('Api.urls', namespace='api')),
 ]
 
 if settings.DEBUG:

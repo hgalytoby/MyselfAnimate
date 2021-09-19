@@ -4,10 +4,16 @@
 
 <script>
 import Sidebar from './components/Sidebar'
+import { connectSocket } from './hooks/useWS'
 
 export default {
   name: 'App',
-  components: { Sidebar }
+  components: { Sidebar },
+  setup () {
+    connectSocket()
+    return {
+    }
+  }
 }
 </script>
 
