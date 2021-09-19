@@ -2,14 +2,14 @@ import axios from 'axios'
 
 export const state = {
   weekAnimateData: {},
-  activeWeek: {}
+  activeWeek: {},
+  myselfAnimateInfo: {},
+  myselfAnimateInfoLoading: true
 }
 export const actions = {
   weekAnimateAction (context, value) {
-    console.log(1)
-    axios.get('/api/week-animate/').then(
+    axios.get('/api/myself/week-animate/').then(
       response => {
-        console.log(response.data)
         context.commit('addWeekAnimateDataMutation', response.data)
         // context.commit('changeActiveWeek', response.data)
       },
@@ -17,14 +17,23 @@ export const actions = {
         context.commit('addWeekAnimateDataMutation', error.msg)
       }
     )
+  },
+  myselfAnimateInfoAction (context, value) {
+    axios.get(`/api/myself/animate-info/?url=${value}`).then(
+      response => {
+        context.commit('addMyselfAnimateInfoMutation', response.data)
+        // context.commit('changeActiveWeek', response.data)
+      },
+      error => {
+        context.commit('addMyselfAnimateInfoMutation', error.msg)
+      }
+    )
   }
 }
 
 export const mutations = {
   addWeekAnimateDataMutation (state, value) {
-    console.log(value)
     if (value) {
-      console.log('state', state, 'this', this)
       state.weekAnimateData = value
       state.activeWeek = state.weekAnimateData.Monday
     } else {
@@ -32,8 +41,18 @@ export const mutations = {
     }
   },
   changeActiveWeek (state, value) {
-    console.log(value)
     state.activeWeek = state.weekAnimateData[value]
+  },
+  addMyselfAnimateInfoMutation (state, value) {
+    if (value) {
+      state.myselfAnimateInfo = value
+      state.myselfAnimateInfoLoading = false
+    } else {
+      alert('失敗')
+    }
+  },
+  initMyselfAnimateInfoLoading (state, value) {
+    state.myselfAnimateInfoLoading = true
   }
 }
 export const getters = {

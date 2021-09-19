@@ -10,7 +10,7 @@
           <ul
             class="nav nav-pills nav-flush flex-sm-column flex-row flex-nowrap mb-auto mx-auto text-center align-items-center items">
             <li class="nav-item">
-              <router-link href="#" class="nav-link py-3 px-2" title="" to="/" data-bs-toggle="tooltip"
+              <router-link class="nav-link py-3 px-2" title="" to="/" data-bs-toggle="tooltip"
                            data-bs-placement="right"
                            data-bs-original-title="Home">
                 <BootstrapIcon icon="house" size="2x"/>
@@ -31,21 +31,21 @@
               </ul>
             </div>
             <li>
-              <router-link href="#" class="nav-link py-3 px-2" title="" to="/MyDownload" data-bs-toggle="tooltip"
+              <router-link class="nav-link py-3 px-2" title="" to="/MyDownload" data-bs-toggle="tooltip"
                            data-bs-placement="right"
                            data-bs-original-title="Orders">
                 <BootstrapIcon icon="cloud-download" size="2x"/>
               </router-link>
             </li>
             <li>
-              <router-link href="#" class="nav-link py-3 px-2" title="" to="/MyLove" data-bs-toggle="tooltip"
+              <router-link class="nav-link py-3 px-2" title="" to="/MyLove" data-bs-toggle="tooltip"
                            data-bs-placement="right"
                            data-bs-original-title="Products">
                 <BootstrapIcon icon="suit-heart-fill" size="2x"/>
               </router-link>
             </li>
             <li>
-              <router-link href="#" class="nav-link py-3 px-2" title="" to="/MySettings" data-bs-toggle="tooltip"
+              <router-link class="nav-link py-3 px-2" title="" to="/MySettings" data-bs-toggle="tooltip"
                            data-bs-placement="right"
                            data-bs-original-title="Products">
                 <BootstrapIcon icon="gear" size="2x"/>

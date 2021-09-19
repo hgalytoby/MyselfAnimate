@@ -11,3 +11,13 @@ class WeekAnimateView(APIView):
         if data:
             return Response(data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class MyselfAnimateInfoView(APIView):
+    def get(self, request):
+        url = request.query_params.get('url')
+        animate_url = f'https://myself-bbs.com/{url}'
+        data = Myself.myself_animate_info(url=animate_url)
+        if data:
+            return Response(data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_404_NOT_FOUND)

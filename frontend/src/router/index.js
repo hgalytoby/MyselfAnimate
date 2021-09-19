@@ -8,6 +8,7 @@ import MySettings from '../views/MySettings'
 import Search from '../components/Search'
 import Week from '../views/Myself/Week'
 import Finish from '../views/Myself/Finish'
+import Animate from '../components/Animate'
 
 const routes = [
   {
@@ -43,6 +44,14 @@ const routes = [
         component: Finish
       }
     ]
+  },
+  {
+    path: '/Myself/Animate',
+    component: Animate,
+    name: 'MyselfAnimate',
+    props ($route) {
+      return { url: $route.query.url }
+    }
   },
   {
     path: '/MySettings',

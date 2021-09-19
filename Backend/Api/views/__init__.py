@@ -1,2 +1,2 @@
-from .myself import WeekAnimateView
+from .myself import WeekAnimateView, MyselfAnimateInfoView
 from .test import TestView
