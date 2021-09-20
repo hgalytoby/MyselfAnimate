@@ -1,6 +1,6 @@
 module.exports = {
   // 關閉語法檢查
-  lintOnSave: false,
+  lintOnSave: true,
   devServer: {
     proxy: {
       '/api': {
