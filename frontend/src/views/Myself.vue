@@ -16,10 +16,10 @@
           <li class="nav-item" v-on:mouseover="changeWeek('Thursday')">
             <span class="nav-link" :class="isActive('Thursday')" aria-current="page">星期四</span>
           </li>
-          <li class="nav-item"  v-on:mouseover="changeWeek('Friday')">
+          <li class="nav-item" v-on:mouseover="changeWeek('Friday')">
             <span class="nav-link" :class="isActive('Friday')" aria-current="page">星期五</span>
           </li>
-          <li class="nav-item"  v-on:mouseover="changeWeek('Saturday')">
+          <li class="nav-item" v-on:mouseover="changeWeek('Saturday')">
             <span class="nav-link" :class="isActive('Saturday')" aria-current="page">星期六</span>
           </li>
           <li class="nav-item" v-on:mouseover="changeWeek('Sunday')">
@@ -47,6 +47,12 @@
 <script>
 import { computed, onMounted, reactive } from 'vue'
 import { useStore } from 'vuex'
+import {
+  activeWeekState,
+  changeActiveWeekMutation,
+  weekAnimateAction,
+  weekAnimateState
+} from '../variables/variablesMyself'
 
 export default {
   name: 'Myself',
@@ -62,24 +68,25 @@ export default {
       isActive: 1
     })
     const store = useStore()
-    const activeWeek = computed(() => store.state.api.activeWeek)
-    const weekAnimateData = computed(() => store.state.api.weekAnimateData)
+    const activeWeek = computed(() => store.state.api[activeWeekState])
+    const weekAnimate = computed(() => store.state.api[weekAnimateState])
     onMounted(() => {
-      store.dispatch('api/weekAnimateAction')
+      store.dispatch(`api/${weekAnimateAction}`)
     })
+
     function changeWeek (status) {
-      store.commit('api/changeActiveWeek', status)
-      // isActive.value++
+      store.commit(`api/${changeActiveWeekMutation}`, status)
       weekDict.isActive = weekDict[status]
-      // console.log(isActive.value == 1)
     }
+
     function isActive (status) {
       return weekDict.isActive === weekDict[status] ? 'active' : ''
     }
+
     return {
       changeWeek,
       activeWeek,
-      weekAnimateData,
+      weekAnimate,
       isActive,
       weekDict
     }
@@ -89,8 +96,9 @@ export default {
 
 <style lang="scss" scoped>
   a {
-    text-decoration:none;
+    text-decoration: none;
   }
+
   li {
     list-style-type: none;
   }

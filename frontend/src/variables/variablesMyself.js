@@ -1,0 +1,15 @@
+export const weekAnimateState = 'weekAnimateState'
+export const activeWeekState = 'activeWeekState'
+export const animateInfoState = 'animateInfoState'
+export const loadingState = 'loadingState'
+export const finishListState = 'finishListState'
+
+export const weekAnimateAction = 'weekAnimateAction'
+export const animateInfoAction = 'animateInfoAction'
+export const finishListAction = 'finishListAction'
+
+export const addWeekAnimateMutation = 'addWeekAnimateMutation'
+export const changeActiveWeekMutation = 'changeActiveWeekMutation'
+export const addAnimateInfoMutation = 'addAnimateInfoMutation'
+export const loadingMutation = 'loadingMutation'
+export const addFinishListMutation = 'addFinishListMutation'

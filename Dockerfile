@@ -9,8 +9,7 @@ RUN npm run build
 FROM nginx:1.21.1
 WORKDIR /usr/src/app
 COPY --from=frontend /usr/src/app/dist ./frontend
-RUN apt install -y redis-server && apt-get update -y && apt-get install -y python3.7 && apt-get install -y python3-pip \
- && python3 -m pip install --upgrade pip && apt-get install -y libpq-dev python-dev
+RUN apt install -y redis-server && apt-get update && apt-get install -y python3-pip && python3.7 -m pip install --upgrade pip
 COPY backend .
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 WORKDIR /usr/src/app/backend

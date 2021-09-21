@@ -1,6 +1,6 @@
 import { createStore } from 'vuex'
 import ws from './ws'
-import api from './apiMyselfi'
+import api from './storeMyselfi'
 
 export default createStore({
   modules: {

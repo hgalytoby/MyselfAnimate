@@ -3,7 +3,7 @@ import json
 import random
 import time
 import threading
-from Tools.MyselfTool import Myself
+from Tools.myself import Myself
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 

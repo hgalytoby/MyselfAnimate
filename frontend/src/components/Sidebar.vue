@@ -26,8 +26,7 @@
                 <li>
                   <router-link class="dropdown-item" to="/Myself">本季新番</router-link>
                 </li>
-                <li><router-link class="dropdown-item" to="/Myself/Search">搜尋動漫</router-link></li>
-                <li><router-link class="dropdown-item" to="/Myself/Finish">完結動漫</router-link></li>
+                <li><router-link class="dropdown-item" to="/Myself/AnimateFinish">完結動漫</router-link></li>
               </ul>
             </div>
             <li>

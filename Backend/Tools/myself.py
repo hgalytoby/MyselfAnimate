@@ -1,9 +1,10 @@
 import asyncio
-from functools import reduce
 
 import requests
 import aiohttp
 from bs4 import BeautifulSoup
+
+from Tools.tools import badname
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Mobile Safari/537.36 Edg/93.0.961.52',
@@ -26,16 +27,6 @@ animate_table = {
     '官方網站': 'official_website',
     '備注': 'remarks',
 }
-
-
-def badname(name):
-    """
-    避免不正當名字出現導致資料夾或檔案無法創建。
-    :param name: str -> 名字。
-    :return: str -> 名字。
-    """
-    ban = r'\/:*?"<>|'
-    return reduce(lambda x, y: x + y if y not in ban else x + ' ', name).strip()
 
 
 class Myself:
@@ -63,12 +54,13 @@ class Myself:
                             'update': animate.find('span').find('font').text,
                         })
                     result.update({week[index]: animate_data})
+                # res.close()
                 return result
         except requests.exceptions.RequestException as error:
             return {}
 
     @staticmethod
-    def myself_animate_info(url: str) -> dict:
+    def animate_info(url: str) -> dict:
         """
         取得動漫資料。
         :param url: str -> 要爬的網址。
@@ -119,6 +111,36 @@ class Myself:
         except requests.exceptions.RequestException as error:
             return {}
 
+    @staticmethod
+    def finish_list():
+        """
+        爬完結列表頁面的動漫資訊
+        :return: Dict。
+        """
+        # url = 'https://myself-bbs.com/portal.php?mod=topic&topicid=8'
+        # res = requests.get(url=url, headers=headers)
+        with open('finish_list.html', 'r', encoding='utf-8') as f:
+            res = f.read()
+        # html = BeautifulSoup(res.text, features='lxml')
+        html = BeautifulSoup(res, features='lxml')
+        data = []
+        for index, elements in enumerate(html.find_all('div', {'class': 'tab-title title column cl'})):
+            year_list = []
+            for i, element in enumerate(elements.find_all('div', {'class': 'block move-span'})):
+                year_month_title = element.find('span', {'class': 'titletext'}).text
+                season_list = []
+                for k in element.find_all('a'):
+                    season_list.append({'name': k['title'], 'url': f"https://myself-bbs.com/{k['href']}"})
+                year_list.append({'title': year_month_title, 'data': season_list})
+            data.append({'data': year_list})
+        # res.close()
+        # for i in data:
+        #     for k, v in i.items():
+        #         for j in v:
+        #             for k1, v1 in j.items():
+        #                 print(k1, v1)
+        return {'data': data}
+
 
 async def main():
     tasks = [asyncio.create_task(Myself.week_animate())]
@@ -128,4 +150,6 @@ async def main():
 if __name__ == '__main__':
     # asyncio.run(main())
     # print(badname(r'\12/47:*8?9"<4>5|1'))
+    Myself.finish_list()
+
     pass

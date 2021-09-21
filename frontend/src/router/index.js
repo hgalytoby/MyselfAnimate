@@ -5,7 +5,6 @@ import MyDownload from '../views/MyDownload'
 import MyHistory from '../views/MyHistory'
 import Myself from '../views/Myself'
 import MySettings from '../views/MySettings'
-import Search from '../components/Search'
 import Week from '../views/Myself/Week'
 import Finish from '../views/Myself/Finish'
 import Animate from '../components/Animate'
@@ -34,14 +33,6 @@ const routes = [
       {
         path: 'Week',
         component: Week
-      },
-      {
-        path: 'Search',
-        component: Search
-      },
-      {
-        path: 'Finish',
-        component: Finish
       }
     ]
   },
@@ -52,6 +43,11 @@ const routes = [
     props ($route) {
       return { url: $route.query.url }
     }
+  },
+  {
+    path: '/Myself/AnimateFinish',
+    component: Finish,
+    name: 'MyselfAnimateFinish'
   },
   {
     path: '/MySettings',
