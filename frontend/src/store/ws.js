@@ -6,12 +6,12 @@ export const actions = {}
 
 export const mutations = {
   setWsRes (state, value) {
-    console.log('setWsRes', value)
-    if (value.type === 'while') {
-      state.wsWeekData = value.data
-    } else if (value.type === 'click') {
-      state.wsClick = value
-    }
+    console.log(value)
+    // if (value.type === 'connect') {
+    state.wsClick = value
+    // } else if (value.type === 'click') {
+    //   state.wsClick = value
+    // }
   }
 }
 export const getters = {}
