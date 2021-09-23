@@ -17,6 +17,7 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         await self.accept()
+        await self.send(text_data=json.dumps({'type': 'connect', 'msg': f'連線成功!!'}))
         # asyncio.create_task(self.test2())
 
     async def disconnect(self, close_code):
@@ -25,8 +26,9 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         data = json.loads(text_data)
         print(data)
-
-        await self.send(text_data=json.dumps({'type': 'click', 'msg': f'我按下去了?: {random.randint(1, 100)}'}))
+        # if data.get('msg'):
+        await self.send(text_data=json.dumps({'msg': f'你送的訊息是: {data["msg"]}'}))
+        # await self.send(text_data=json.dumps({'type': 'click', 'msg': f'我按下去了?: {random.randint(1, 100)}'}))
 
 
 """
