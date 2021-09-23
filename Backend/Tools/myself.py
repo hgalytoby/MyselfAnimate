@@ -1,5 +1,5 @@
 import asyncio
-
+import m3u8
 import requests
 import aiohttp
 from bs4 import BeautifulSoup
@@ -42,20 +42,20 @@ class Myself:
             with open('week.html', 'r', encoding='utf-8') as f:
                 res = f.read()
                 html = BeautifulSoup(res, features='lxml')
-                result = {}
+                data = {}
                 elements = html.find('div', id='tabSuCvYn')
-                for index, element in enumerate(elements.find_all('div', class_='module cl xl xl1')):
-                    animate_data = []
-                    for animate in element:
-                        animate_data.append({
-                            'name': animate.find('a')['title'],
-                            'url': animate.find('a')['href'],
-                            'update_color': animate.find('span').find('font').find('font')['style'],
-                            'update': animate.find('span').find('font').text,
+                for index, elements in enumerate(elements.find_all('div', class_='module cl xl xl1')):
+                    animates = []
+                    for element in elements:
+                        animates.append({
+                            'name': element.find('a')['title'],
+                            'url': element.find('a')['href'],
+                            'update_color': element.find('span').find('font').find('font')['style'],
+                            'update': element.find('span').find('font').text,
                         })
-                    result.update({week[index]: animate_data})
+                    data.update({week[index]: animates})
                 # res.close()
-                return result
+                return data
         except requests.exceptions.RequestException as error:
             return {}
 
@@ -124,9 +124,9 @@ class Myself:
         # html = BeautifulSoup(res.text, features='lxml')
         html = BeautifulSoup(res, features='lxml')
         data = []
-        for index, elements in enumerate(html.find_all('div', {'class': 'tab-title title column cl'})):
+        for elements in html.find_all('div', {'class': 'tab-title title column cl'}):
             year_list = []
-            for i, element in enumerate(elements.find_all('div', {'class': 'block move-span'})):
+            for element in elements.find_all('div', {'class': 'block move-span'}):
                 year_month_title = element.find('span', {'class': 'titletext'}).text
                 season_list = []
                 for k in element.find_all('a'):
@@ -134,15 +134,99 @@ class Myself:
                 year_list.append({'title': year_month_title, 'data': season_list})
             data.append({'data': year_list})
         # res.close()
-        # for i in data:
-        #     for k, v in i.items():
-        #         for j in v:
-        #             for k1, v1 in j.items():
-        #                 print(k1, v1)
         return {'data': data}
 
+    @staticmethod
+    def get_request_json(url):
+        res = requests.get(url=url, headers=headers)
+        try:
+            if res.ok:
+                return res.json()
+            return {}
+        except requests.exceptions.RequestException as error:
+            return {}
 
-async def main():
+    @staticmethod
+    def get_vpx_json(url):
+        res = requests.get(url=url, headers=headers)
+        try:
+            if res.ok:
+                return res.json()
+            return {}
+        except requests.exceptions.RequestException as error:
+            return {}
+
+    @staticmethod
+    def get_m3u8_data(url):
+        try:
+            res = requests.get(url=url, headers=headers)
+            if res.ok:
+                try:
+                    return m3u8.loads(res.text)
+                except BaseException as error:
+                    print(f'get_m3u8 error: {error}')
+                    return {}
+            return {}
+        except requests.exceptions.RequestException as error:
+            return {}
+
+    @staticmethod
+    def finish_animate_total_page(url, get_html=False):
+        """
+        爬完結動漫總頁數多少。
+        :param url: str -> 要爬的網址。
+        :param get_html: boor -> True = 將 requests.text 返回。
+        :return: dict -> 該頁的資料。
+        {
+            total_page: 總頁數,
+            html: 該頁面的資料。
+        }
+        """
+        try:
+            res = requests.get(url=url, headers=headers)
+            html = BeautifulSoup(res.text, 'lxml')
+            page_data = html.find('div', class_='pg').find('a', class_='last').text
+            if page_data and get_html:
+                return {'total_page': int(page_data.replace('... ', '')), 'html': res}
+            else:
+                return {'total_page': int(page_data.replace('... ', ''))}
+        except requests.exceptions.RequestException as error:
+            return {}
+
+    @staticmethod
+    def finish_animate_page_data(url, res=None):
+        """
+        完結動漫頁面的動漫資料。
+        :param url: str -> 要爬的網址。
+        :param res: str -> 給完結動漫某頁的HTML，就不用在 requests 了。
+        :return: dict -> 該頁的資料。
+        {
+            動漫名字:{
+                url: 動漫網址,
+                img: 圖片網址,
+            }
+        }
+        """
+
+        if not res:
+            try:
+                res = requests.get(url=url, headers=headers)
+                if not res.ok:
+                    return []
+            except requests.exceptions.RequestException as error:
+                return []
+        html = BeautifulSoup(res, 'lxml')
+        data = []
+        for elements in html.find_all('div', class_='c cl'):
+            data.append({
+                'url': f"https://myself-bbs.com/{elements.find('a')['href']}",
+                'name': badname(elements.find('a')['title']),
+                'img': f"https://myself-bbs.com/{elements.find('a').find('img')['src']}"
+            })
+        return data
+
+
+def main():
     tasks = [asyncio.create_task(Myself.week_animate())]
     await asyncio.wait(tasks)
 
@@ -150,6 +234,5 @@ async def main():
 if __name__ == '__main__':
     # asyncio.run(main())
     # print(badname(r'\12/47:*8?9"<4>5|1'))
-    Myself.finish_list()
-
+    # Myself.finish_list()
     pass
