@@ -1,0 +1,1 @@
+from .myself import FinishAnimateSerializer

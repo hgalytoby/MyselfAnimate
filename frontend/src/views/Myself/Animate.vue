@@ -21,7 +21,7 @@
 <script>
 import { onMounted, computed } from 'vue'
 import { useStore } from 'vuex'
-import { animateInfoAction, animateInfoState, loadingMutation, loadingState } from '../variables/variablesMyself'
+import { animateInfoAction, animateInfoState, loadingMutation, loadingState } from '../../variables/variablesMyself'
 
 export default {
   name: 'Animate',

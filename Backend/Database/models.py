@@ -5,10 +5,10 @@ def upload_path(instance, filename):
     """
     Profile name 為資料夾名字放入圖片。
     """
-    return f'{instance.from_website}/{instance.name}/{filename}'
+    return f'{instance.from_website}/{instance.name}/{instance.size}_{filename}'
 
 
-class AnimateWebsite(models.Model):
+class AnimateWebsiteModel(models.Model):
     name = models.CharField(max_length=32)
 
     class Meta:
@@ -18,7 +18,7 @@ class AnimateWebsite(models.Model):
         db_table = 'AnimateWebsite'
 
 
-class AnimateInfo(models.Model):
+class AnimateInfoModel(models.Model):
     """
     name: 名字
     animate_type: 作品類型
@@ -30,6 +30,7 @@ class AnimateInfo(models.Model):
     big_picture: 大圖
     synopsis: 簡介
     """
+    size = 'big'
     name = models.CharField(max_length=128)
     animate_type = models.CharField(max_length=32, blank=True, null=True)
     premiere_date = models.CharField(max_length=16, blank=True, null=True)
@@ -37,36 +38,51 @@ class AnimateInfo(models.Model):
     author = models.CharField(max_length=32, blank=True, null=True)
     official_website = models.URLField(blank=True, null=True)
     remarks = models.CharField(max_length=64, blank=True, null=True)
-    small_picture = models.ImageField(upload_to=upload_path, blank=True, null=True)
-    big_picture = models.ImageField(upload_to=upload_path, blank=True, null=True)
+    image = models.ImageField(upload_to=upload_path, blank=True, null=True)
     synopsis = models.TextField(blank=True, null=True)
-    from_website = models.ForeignKey(AnimateWebsite, on_delete=models.PROTECT)
+    from_website = models.ForeignKey(AnimateWebsiteModel, on_delete=models.PROTECT)
 
     class Meta:
         db_table = 'AnimateInfo'
 
 
-class AnimateEpisodeInfo(models.Model):
+class FinishAnimateModel(models.Model):
+    """
+    """
+    size = 'small'
+    name = models.CharField(max_length=128)
+    url = models.URLField(unique=True)
+    image = models.ImageField(upload_to=upload_path)
+    from_website = models.ForeignKey(AnimateWebsiteModel, on_delete=models.PROTECT)
+
+    class Meta:
+        db_table = 'MyselfFinishAnimate'
+
+
+class AnimateEpisodeInfoModel(models.Model):
     name = models.CharField(max_length=64)
     episode = models.URLField()
     done = models.BooleanField(default=False)
-    owner = models.ForeignKey(AnimateInfo, on_delete=models.CASCADE)
+    owner = models.ForeignKey(AnimateInfoModel, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'AnimateEpisodeInfo'
 
 
-class AnimateEpisodeTs(models.Model):
+class AnimateEpisodeTsModel(models.Model):
     ts_url = models.URLField()
     done = models.BooleanField(default=False)
-    owner = models.ForeignKey(AnimateEpisodeInfo, on_delete=models.CASCADE)
+    owner = models.ForeignKey(AnimateEpisodeInfoModel, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'AnimateEpisodeTs'
 
 
-class History(models.Model):
+class HistoryModel(models.Model):
     animate_website_name = models.CharField(max_length=32)
     animate_name = models.CharField(max_length=128)
     episode_name = models.CharField(max_length=64)
     date = models.DateTimeField()
+
+    class Meta:
+        db_table = 'History'

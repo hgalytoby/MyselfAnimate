@@ -3,7 +3,8 @@
     <div class="row">
       <div class="col-sm-auto bg-light sticky-top">
         <div class="d-flex flex-sm-column flex-row flex-nowrap bg-light align-items-center sticky-top">
-          <a href="https://github.com/hgalytoby/MyselfAnimate" class="d-block p-3 link-dark text-decoration-none" title="" data-bs-toggle="tooltip"
+          <a href="https://github.com/hgalytoby/MyselfAnimate" class="d-block p-3 link-dark text-decoration-none"
+             title="" data-bs-toggle="tooltip"
              data-bs-placement="right" data-bs-original-title="Icon-only">
             <BootstrapIcon icon="github" size="2x"/>
           </a>
@@ -26,7 +27,12 @@
                 <li>
                   <router-link class="dropdown-item" to="/Myself">本季新番</router-link>
                 </li>
-                <li><router-link class="dropdown-item" to="/Myself/AnimateFinish">完結動漫</router-link></li>
+                <li>
+                  <router-link class="dropdown-item" to="/Myself/AnimateSearch">搜尋動漫</router-link>
+                </li>
+                <li>
+                  <router-link class="dropdown-item" to="/Myself/AnimateFinish">完結動漫</router-link>
+                </li>
               </ul>
             </div>
             <li>
