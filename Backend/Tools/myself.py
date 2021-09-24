@@ -1,10 +1,16 @@
 import asyncio
+import io
+from PIL import Image
 import m3u8
 import requests
 import aiohttp
+from asgiref.sync import sync_to_async
 from bs4 import BeautifulSoup
 import django
 import os
+
+from channels.db import database_sync_to_async
+from django.core.files.base import ContentFile
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')
 django.setup()
@@ -231,65 +237,42 @@ class Myself:
         return data
 
     @staticmethod
-    def create_finish_animate_data(data):
-        myself_model = AnimateWebsiteModel.objects.get(name='Myself')
+    @database_sync_to_async
+    def save_finish_animate_data(animate):
+        image_io = io.BytesIO(animate['image'])
+        open_image = Image.open(image_io)
+        image_type = open_image.format.lower()
+        open_image.close()
+        image_io.close()
+        model = FinishAnimateModel()
+        model.name = animate['name']
+        model.url = animate['url']
+        model.from_website = animate['from_website']
+        model.image.save(f'{animate["name"]}.{image_type}', ContentFile(animate['image']))
+
+    @staticmethod
+    async def create_finish_animate_data_task(animate):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url=animate['image'], headers=headers, timeout=5) as res:
+                animate['image'] = await res.read()
+                await Myself.save_finish_animate_data(animate)
+
+    @staticmethod
+    async def create_finish_animate_data(data):
+        myself_model = await sync_to_async(AnimateWebsiteModel.objects.get)(name='Myself')
+        tasks = []
         for animate in data:
-            animate.update({'from_website': myself_model})
-            FinishAnimateModel.objects.get_or_create(url=animate['url'], defaults=animate)
+            if not await database_sync_to_async(list)(FinishAnimateModel.objects.filter(url=animate['url'])):
+                animate.update({'from_website': myself_model})
+                tasks.append(asyncio.create_task(Myself.create_finish_animate_data_task(animate)))
+        if tasks:
+            await asyncio.wait(tasks)
 
 
-async def main():
-    tasks = [asyncio.create_task(Myself.week_animate())]
-    await asyncio.wait(tasks)
+async def main(_):
+    await Myself.create_finish_animate_data(_)
 
 
 if __name__ == '__main__':
     # asyncio.run(main())
-    # print(badname(r'\12/47:*8?9"<4>5|1'))
-    # Myself.finish_list()
-    # print(Myself.finish_animate_page_data(url='https://myself-bbs.com/forum-113-1.html'))
-    _ = [{'url': 'https://myself-bbs.com/thread-47876-1-1.html', 'name': '喬瑟與虎與魚群／喬西的虎與魚／Jose與虎魚們',
-          'image': 'https://myself-bbs.com/./data/attachment/forum/threadcover/88/b6/47876.jpg'},
-         {'url': 'https://myself-bbs.com/thread-47863-1-1.html', 'name': '福音戰士新劇場版：終',
-          'image': 'https://myself-bbs.com/./data/attachment/forum/threadcover/e1/b8/47863.jpg'},
-         {'url': 'https://myself-bbs.com/thread-47861-1-1.html', 'name': '水星領航員 ARIA The ORIGINATION',
-          'image': 'https://myself-bbs.com/./data/attachment/forum/threadcover/ab/c8/47861.jpg'},
-         {'url': 'https://myself-bbs.com/thread-47816-1-1.html', 'name': '銀魂 THE FINAL',
-          'image': 'https://myself-bbs.com/./data/attachment/forum/threadcover/95/46/47816.jpg'},
-         {'url': 'https://myself-bbs.com/thread-47811-1-1.html', 'name': '全職法師 第五季',
-          'image': 'https://myself-bbs.com/./data/attachment/forum/threadcover/fd/8b/47811.jpg'},
-         {'url': 'https://myself-bbs.com/thread-47808-1-1.html', 'name': '言語如蘇打般湧現／言語如汽水般湧現',
-          'image': 'https://myself-bbs.com/./data/attachment/forum/threadcover/89/6f/47808.jpg'},
-         {'url': 'https://myself-bbs.com/thread-47787-1-1.html', 'name': '你在彼方／你是彼方／你在他方',
-          'image': 'https://myself-bbs.com/./data/attachment/forum/threadcover/4a/a2/47787.jpg'},
-         {'url': 'https://myself-bbs.com/thread-47783-1-1.html', 'name': '寵物小精靈／寶可夢 劇場版23：可可',
-          'image': 'https://myself-bbs.com/./data/attachment/forum/threadcover/1a/30/47783.jpg'},
-         {'url': 'https://myself-bbs.com/thread-47780-1-1.html', 'name': '女神宿舍的管理員',
-          'image': 'https://myself-bbs.com/./data/attachment/forum/threadcover/55/80/47780.jpg'},
-         {'url': 'https://myself-bbs.com/thread-47751-1-1.html', 'name': '生化危機  無盡黑暗／惡靈古堡  無盡闇黑',
-          'image': 'https://myself-bbs.com/./data/attachment/forum/threadcover/25/4b/47751.jpg'},
-         {'url': 'https://myself-bbs.com/thread-47731-1-1.html', 'name': '月光下的異世界之旅',
-          'image': 'https://myself-bbs.com/./data/attachment/forum/threadcover/31/7c/47731.jpg'},
-         {'url': 'https://myself-bbs.com/thread-47730-1-1.html', 'name': '開掛藥師的異世界悠閒生活',
-          'image': 'https://myself-bbs.com/./data/attachment/forum/threadcover/59/3f/47730.jpg'},
-         {'url': 'https://myself-bbs.com/thread-47724-1-1.html', 'name': '妄想學生會 劇場版 第二部',
-          'image': 'https://myself-bbs.com/./data/attachment/forum/threadcover/b3/13/47724.jpg'},
-         {'url': 'https://myself-bbs.com/thread-47717-1-1.html', 'name': '精靈幻想記',
-          'image': 'https://myself-bbs.com/./data/attachment/forum/threadcover/d6/9e/47717.jpg'},
-         {'url': 'https://myself-bbs.com/thread-47701-1-1.html', 'name': '叫我對大哥',
-          'image': 'https://myself-bbs.com/./data/attachment/forum/threadcover/08/f6/47701.jpg'},
-         {'url': 'https://myself-bbs.com/thread-47689-1-1.html', 'name': '瓦尼塔斯的手札／瓦尼塔斯的手記',
-          'image': 'https://myself-bbs.com/./data/attachment/forum/threadcover/24/4b/47689.jpg'},
-         {'url': 'https://myself-bbs.com/thread-47679-1-1.html', 'name': '轉生成女性向遊戲只有毀滅END的壞人大小姐 第二季',
-          'image': 'https://myself-bbs.com/./data/attachment/forum/threadcover/20/fb/47679.jpg'},
-         {'url': 'https://myself-bbs.com/thread-47628-1-1.html', 'name': '終末的女武神',
-          'image': 'https://myself-bbs.com/./data/attachment/forum/threadcover/41/29/47628.jpg'},
-         {'url': 'https://myself-bbs.com/thread-47618-1-1.html', 'name': '機動戰士鋼彈 閃光的哈薩維',
-          'image': 'https://myself-bbs.com/./data/attachment/forum/threadcover/a7/9c/47618.jpg'},
-         {'url': 'https://myself-bbs.com/thread-47613-1-1.html', 'name': '極道主夫／極主夫道',
-          'image': 'https://myself-bbs.com/./data/attachment/forum/threadcover/9b/de/47613.jpg'}]
-    # filter_not_exist = list(filter(lambda data: not FinishAnimateModel.objects.filter(url=data['url']), _))
-    # print(filter_not_exist)
-    # dict()
-    Myself.create_finish_animate_data(_)
     pass

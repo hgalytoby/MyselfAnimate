@@ -6,6 +6,7 @@ venv/
 .DS_Store
 node_modules
 /dist
+backend/static/uploads
 
 
 # 檔案

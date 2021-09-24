@@ -36,9 +36,8 @@ class FinishListView(APIView):
 
 class FinishAnimateView(ListAPIView):
     serializer_class = FinishAnimateSerializer
-    queryset = FinishAnimateModel.objects.all()
+    queryset = FinishAnimateModel.objects.select_related('from_website').all()
 
     def list(self, request, *args, **kwargs):
-        queryset = FinishAnimateModel.objects.select_related('from_website').all()
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = self.get_serializer(self.get_queryset(), many=True)
         return Response(serializer.data)

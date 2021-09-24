@@ -4,8 +4,11 @@ from Database.models import FinishAnimateModel
 
 
 class FinishAnimateSerializer(serializers.ModelSerializer):
-    owner_id = serializers.IntegerField(read_only=True)
+    image = serializers.SerializerMethodField()
+
+    def get_image(self, instance):
+        return f'http://127.0.0.1:8000/static/uploads{instance.image.url}'
 
     class Meta:
         model = FinishAnimateModel
-        fields = '__all__'
+        fields = ('id', 'name', 'url', 'image')

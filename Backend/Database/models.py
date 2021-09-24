@@ -5,7 +5,7 @@ def upload_path(instance, filename):
     """
     Profile name 為資料夾名字放入圖片。
     """
-    return f'{instance.from_website}/{instance.name}/{instance.size}_{filename}'
+    return f'{instance.from_website.name}/{instance.name}/{instance.size}_{filename}'
 
 
 class AnimateWebsiteModel(models.Model):
