@@ -1,20 +1,22 @@
 <template>
     <div>我是搜尋</div>
+    <button @click="updateFinishAnimateData">更新完結動漫資料</button>
 </template>
 
 <script>
-import { onMounted, computed } from 'vue'
-import { useStore } from 'vuex'
+
+import { sendSocketMessage } from '../../hooks/useWS'
 
 export default {
   name: 'Search',
   setup () {
-    onMounted () {
-
+    const updateFinishAnimateData = () => {
+      sendSocketMessage({
+        action: 'myself_finish_animate_update'
+      })
     }
-
     return {
-
+      updateFinishAnimateData
     }
   }
 }

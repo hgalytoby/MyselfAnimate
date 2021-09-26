@@ -13,8 +13,8 @@ export const connectSocket = () => {
     // sendSocketMessage(JSON.stringify({ msg1: '我要跟後端連線了!' }))
   }
   socket.onmessage = function (msg) {
-    store.commit('ws/setWsRes', JSON.parse(msg.data))
     console.log('onmessage', JSON.parse(msg.data))
+    store.commit('ws/setWsRes', JSON.parse(msg.data))
   }
   socket.onerror = function (err) {
     console.log('error', err)

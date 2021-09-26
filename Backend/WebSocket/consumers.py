@@ -27,10 +27,20 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         print(data)
         # if data.get('msg'):
-        await self.send(text_data=json.dumps({'msg': f'你送的訊息是: {data["msg"]}'}))
+        try:
+            if data.get('action'):
+                if data['action'] == 'myself_finish_animate_update':
+                    print('in myself_finish_animate_update')
+                    await self.send(text_data=json.dumps({'msg': f'{data["msg"]}'}))
+        except Exception  as error:
+            print(error)
+            await self.send(text_data=json.dumps({'msg': f'後端出錯了: {error}'}))
         # await self.send(text_data=json.dumps({'type': 'click', 'msg': f'我按下去了?: {random.randint(1, 100)}'}))
 
-
+    async def test(self):
+        _ = random.randint(1, 10)
+        await asyncio.sleep(_)
+        await self.send(text_data=json.dumps({'msg': f'{_}秒'}))
 """
 let ws1 = new WebSocket('ws://127.0.0.1:8000/')
 ws1.onmessage = function (e) {

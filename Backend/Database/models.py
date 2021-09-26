@@ -86,3 +86,10 @@ class HistoryModel(models.Model):
 
     class Meta:
         db_table = 'History'
+
+
+class LogModel(models.Model):
+    myself_finish_animate_last_update_date = models.DateTimeField()
+
+    class Meta:
+        db_table = 'Log'

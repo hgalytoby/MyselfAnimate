@@ -91,8 +91,7 @@ class Myself:
         try:
             res = requests.get(url=url, headers=headers, timeout=(5, 5))
             html = BeautifulSoup(res.text, features='lxml')
-            data = {'url': url}
-            data.update({'name': badname(html.find('title').text.split('【')[0])})
+            data = {'url': url, 'name': badname(html.find('title').text.split('【')[0])}
             permission = html.find('div', id='messagetext')
             if permission:
                 data.update({'permission': permission.text.strip()})
@@ -238,7 +237,7 @@ class Myself:
 
     @staticmethod
     @database_sync_to_async
-    def save_finish_animate_data(animate):
+    def _save_finish_animate_data(animate):
         image_io = io.BytesIO(animate['image'])
         open_image = Image.open(image_io)
         image_type = open_image.format.lower()
@@ -251,11 +250,11 @@ class Myself:
         model.image.save(f'{animate["name"]}.{image_type}', ContentFile(animate['image']))
 
     @staticmethod
-    async def create_finish_animate_data_task(animate):
+    async def _create_finish_animate_data_task(animate):
         async with aiohttp.ClientSession() as session:
             async with session.get(url=animate['image'], headers=headers, timeout=5) as res:
                 animate['image'] = await res.read()
-                await Myself.save_finish_animate_data(animate)
+                await Myself._save_finish_animate_data(animate)
 
     @staticmethod
     async def create_finish_animate_data(data):
@@ -264,7 +263,7 @@ class Myself:
         for animate in data:
             if not await database_sync_to_async(list)(FinishAnimateModel.objects.filter(url=animate['url'])):
                 animate.update({'from_website': myself_model})
-                tasks.append(asyncio.create_task(Myself.create_finish_animate_data_task(animate)))
+                tasks.append(asyncio.create_task(Myself._create_finish_animate_data_task(animate)))
         if tasks:
             await asyncio.wait(tasks)
 
