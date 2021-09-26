@@ -1,8 +1,6 @@
 import asyncio
 import json
 import random
-import time
-import threading
 from Tools.myself import Myself
 from channels.generic.websocket import AsyncWebsocketConsumer
 
@@ -19,24 +17,16 @@ class Manage:
             else:
                 page_data = await Myself.finish_animate_page_data(url=FinishAnimateBaseUrl.format(page))
             await Myself.create_finish_animate_data(data=page_data)
-            if page == 5:
+            if page == 3:
                 break
         await self.send(text_data=json.dumps({'msg': '更新好了'}))
 
 
 class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
 
-    async def test2(self):
-        week_data = await Myself.week_animate()
-        await self.send(text_data=json.dumps({'type': 'while', 'data': week_data}))
-        # while True:
-        #     await asyncio.sleep(2)
-        #     await self.send(text_data=json.dumps({'type': 'while', 'msg': f'一直送: {random.randint(1, 100)}'}))
-
     async def connect(self):
         await self.accept()
         await self.send(text_data=json.dumps({'type': 'connect', 'msg': f'連線成功!!'}))
-        # asyncio.create_task(self.test2())
 
     async def disconnect(self, close_code):
         pass
@@ -47,17 +37,13 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
         try:
             if data.get('action'):
                 if data['action'] == 'myself_finish_animate_update':
-                    asyncio.create_task(self.test2())
-                    await self.myself_finish_animate_update()
-
+                    asyncio.create_task(self.myself_finish_animate_update())
+                    await self.send(text_data=json.dumps({'msg': f'正在更新中'}))
+            if data.get('msg') and data['msg'] == 'some message to websocket server':
+                await self.send(text_data=json.dumps({'msg': f'前端在按 Login'}))
         except Exception as error:
             print(error)
             await self.send(text_data=json.dumps({'msg': f'後端出錯了: {error}'}))
-
-    async def test(self):
-        _ = random.randint(1, 10)
-        await asyncio.sleep(_)
-        await self.send(text_data=json.dumps({'msg': f'{_}秒'}))
 
 
 """
