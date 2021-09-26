@@ -14,7 +14,7 @@ from django.core.files.base import ContentFile
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')
 django.setup()
-from Database.models import FinishAnimateModel, AnimateWebsiteModel
+from Database.models import FinishAnimateModel
 from Tools.tools import badname
 
 headers = {
@@ -181,7 +181,7 @@ class Myself:
             return {}
 
     @staticmethod
-    def finish_animate_total_page(url, get_html=False):
+    async def finish_animate_total_page(url, get_res_text=False):
         """
         爬完結動漫總頁數多少。
         :param url: str -> 要爬的網址。
@@ -192,23 +192,23 @@ class Myself:
             html: 該頁面的資料。
         }
         """
-        try:
-            res = requests.get(url=url, headers=headers)
-            html = BeautifulSoup(res.text, 'lxml')
-            page_data = html.find('div', class_='pg').find('a', class_='last').text
-            if page_data and get_html:
-                return {'total_page': int(page_data.replace('... ', '')), 'html': res}
-            else:
-                return {'total_page': int(page_data.replace('... ', ''))}
-        except requests.exceptions.RequestException as error:
-            return {}
+        timeout = aiohttp.client.ClientTimeout(sock_read=5, sock_connect=5)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url=url, headers=headers, timeout=timeout) as res:
+                res_text = await res.text(encoding='utf-8', errors='ignore')
+                html = BeautifulSoup(res_text, 'lxml')
+                page_data = html.find('div', class_='pg').find('a', class_='last').text
+                if page_data and get_res_text:
+                    return {'total_page': int(page_data.replace('... ', '')), 'res_text': res_text}
+                else:
+                    return {'total_page': int(page_data.replace('... ', ''))}
 
     @staticmethod
-    def finish_animate_page_data(url, res=None):
+    async def finish_animate_page_data(url, res_text=None):
         """
         完結動漫頁面的動漫資料。
         :param url: str -> 要爬的網址。
-        :param res: str -> 給完結動漫某頁的HTML，就不用在 requests 了。
+        :param res_text: str -> 給完結動漫某頁的HTML，就不用在 requests 了。
         :return: dict -> 該頁的資料。
         {
             動漫名字:{
@@ -217,15 +217,12 @@ class Myself:
             }
         }
         """
-
-        if not res:
-            try:
-                res = requests.get(url=url, headers=headers)
-                if not res.ok:
-                    return []
-            except requests.exceptions.RequestException as error:
-                return []
-        html = BeautifulSoup(res.text, 'lxml')
+        if not res_text:
+            timeout = aiohttp.client.ClientTimeout(sock_read=5, sock_connect=5)
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url=url, headers=headers, timeout=timeout) as res:
+                    res_text = await res.text(encoding='utf-8', errors='ignore')
+        html = BeautifulSoup(res_text, 'lxml')
         data = []
         for elements in html.find_all('div', class_='c cl'):
             data.append({
@@ -237,7 +234,7 @@ class Myself:
 
     @staticmethod
     @database_sync_to_async
-    def _save_finish_animate_data(animate):
+    def save_finish_animate_data(animate):
         image_io = io.BytesIO(animate['image'])
         open_image = Image.open(image_io)
         image_type = open_image.format.lower()
@@ -246,24 +243,26 @@ class Myself:
         model = FinishAnimateModel()
         model.name = animate['name']
         model.url = animate['url']
-        model.from_website = animate['from_website']
         model.image.save(f'{animate["name"]}.{image_type}', ContentFile(animate['image']))
 
     @staticmethod
-    async def _create_finish_animate_data_task(animate):
+    async def get_image(img_url):
+        timeout = aiohttp.client.ClientTimeout(sock_read=5, sock_connect=5)
         async with aiohttp.ClientSession() as session:
-            async with session.get(url=animate['image'], headers=headers, timeout=5) as res:
-                animate['image'] = await res.read()
-                await Myself._save_finish_animate_data(animate)
+            async with session.get(url=img_url, headers=headers, timeout=timeout) as res:
+                return await res.read()
+
+    @staticmethod
+    async def create_finish_animate_data_task(animate):
+        animate['image'] = await Myself.get_image(img_url=animate['image'])
+        await Myself.save_finish_animate_data(animate)
 
     @staticmethod
     async def create_finish_animate_data(data):
-        myself_model = await sync_to_async(AnimateWebsiteModel.objects.get)(name='Myself')
         tasks = []
         for animate in data:
             if not await database_sync_to_async(list)(FinishAnimateModel.objects.filter(url=animate['url'])):
-                animate.update({'from_website': myself_model})
-                tasks.append(asyncio.create_task(Myself._create_finish_animate_data_task(animate)))
+                tasks.append(asyncio.create_task(Myself.create_finish_animate_data_task(animate)))
         if tasks:
             await asyncio.wait(tasks)
 
@@ -273,5 +272,5 @@ async def main(_):
 
 
 if __name__ == '__main__':
-    # asyncio.run(main())
+    # asyncio.run(main(Myself.finish_animate_page_data(url='https://myself-bbs.com/forum-113-1.html')))
     pass

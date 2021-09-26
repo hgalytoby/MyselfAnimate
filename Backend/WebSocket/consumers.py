@@ -6,8 +6,26 @@ import threading
 from Tools.myself import Myself
 from channels.generic.websocket import AsyncWebsocketConsumer
 
+from Tools.urls import FinishAnimateUrl, FinishAnimateBaseUrl
 
-class AsyncChatConsumer(AsyncWebsocketConsumer):
+
+class Manage:
+    async def myself_finish_animate_update(self):
+        total_page_data = await Myself.finish_animate_total_page(url=FinishAnimateUrl, get_res_text=True)
+        for page in range(1, total_page_data['total_page'] + 1):
+            if page == 1:
+                page_data = await Myself.finish_animate_page_data(url=FinishAnimateBaseUrl.format(page),
+                                                                  res_text=total_page_data['res_text'])
+            else:
+                page_data = await Myself.finish_animate_page_data(url=FinishAnimateBaseUrl.format(page))
+            await Myself.create_finish_animate_data(data=page_data)
+            if page == 5:
+                break
+        await self.send(text_data=json.dumps({'msg': '更新好了'}))
+
+
+class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
+
     async def test2(self):
         week_data = await Myself.week_animate()
         await self.send(text_data=json.dumps({'type': 'while', 'data': week_data}))
@@ -26,21 +44,22 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         data = json.loads(text_data)
         print(data)
-        # if data.get('msg'):
         try:
             if data.get('action'):
                 if data['action'] == 'myself_finish_animate_update':
-                    print('in myself_finish_animate_update')
-                    await self.send(text_data=json.dumps({'msg': f'{data["msg"]}'}))
-        except Exception  as error:
+                    asyncio.create_task(self.test2())
+                    await self.myself_finish_animate_update()
+
+        except Exception as error:
             print(error)
             await self.send(text_data=json.dumps({'msg': f'後端出錯了: {error}'}))
-        # await self.send(text_data=json.dumps({'type': 'click', 'msg': f'我按下去了?: {random.randint(1, 100)}'}))
 
     async def test(self):
         _ = random.randint(1, 10)
         await asyncio.sleep(_)
         await self.send(text_data=json.dumps({'msg': f'{_}秒'}))
+
+
 """
 let ws1 = new WebSocket('ws://127.0.0.1:8000/')
 ws1.onmessage = function (e) {
