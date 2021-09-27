@@ -19,7 +19,9 @@ class HistoryModel(models.Model):
 
 
 class LogModel(models.Model):
-    myself_finish_animate_last_update_date = models.DateTimeField()
+    msg = models.TextField()
+    action = models.CharField(max_length=32)
+    datetime = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'Log'

@@ -1,10 +1,10 @@
 import { createStore } from 'vuex'
 import ws from './ws'
-import api from './storeMyselfi'
+import myself from './storeMyself'
 
 export default createStore({
   modules: {
     ws,
-    api
+    myself
   }
 })

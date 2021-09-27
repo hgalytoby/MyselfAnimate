@@ -1,2 +1,2 @@
 from .myself import AnimateEpisodeInfoModel, AnimateEpisodeTsModel, AnimateInfoModel, FinishAnimateModel
-from .basse import HistoryModel, LogModel
+from .my import HistoryModel, LogModel

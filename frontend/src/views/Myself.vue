@@ -68,14 +68,14 @@ export default {
       isActive: 1
     })
     const store = useStore()
-    const activeWeek = computed(() => store.state.api[activeWeekState])
-    const weekAnimate = computed(() => store.state.api[weekAnimateState])
+    const activeWeek = computed(() => store.state.myself[activeWeekState])
+    const weekAnimate = computed(() => store.state.myself[weekAnimateState])
     onMounted(() => {
-      store.dispatch(`api/${weekAnimateAction}`)
+      store.dispatch(`myself/${weekAnimateAction}`)
     })
 
     function changeWeek (status) {
-      store.commit(`api/${changeActiveWeekMutation}`, status)
+      store.commit(`myself/${changeActiveWeekMutation}`, status)
       weekDict.isActive = weekDict[status]
     }
 

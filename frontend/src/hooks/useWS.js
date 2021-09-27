@@ -1,7 +1,8 @@
 import { useStore } from 'vuex'
-
+import { finishAnimateUpdateButtonMutation } from '../variables/variablesMyself'
 const wsUrl = 'ws://127.0.0.1:8000/ws/'
 const socket = new WebSocket(wsUrl)
+
 export const sendSocketMessage = msg => {
   if (socket.readyState === 1) socket.send(JSON.stringify(msg))
 }
@@ -14,7 +15,12 @@ export const connectSocket = () => {
   }
   socket.onmessage = function (msg) {
     console.log('onmessage', JSON.parse(msg.data))
-    store.commit('ws/setWsRes', JSON.parse(msg.data))
+    const receive = JSON.parse(msg.data)
+    if (receive.action === 'myself_finish_animate_update') {
+      store.commit(`myself/${finishAnimateUpdateButtonMutation}`, receive)
+    } else {
+      store.commit('ws/setWsRes', JSON.parse(msg.data))
+    }
   }
   socket.onerror = function (err) {
     console.log('error', err)

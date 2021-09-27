@@ -1,21 +1,16 @@
-import asyncio
 import io
-from PIL import Image
+import asyncio
 import m3u8
 import requests
 import aiohttp
-from asgiref.sync import sync_to_async
+from PIL import Image
+from Tools.setup import *
 from bs4 import BeautifulSoup
-import django
-import os
-
+from asgiref.sync import sync_to_async
 from channels.db import database_sync_to_async
-from django.core.files.base import ContentFile
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')
-django.setup()
 from Database.models import FinishAnimateModel
-from Tools.tools import badname
+from django.core.files.base import ContentFile
+from Tools.tools import badname, get_text, get_bytes
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Mobile Safari/537.36 Edg/93.0.961.52',
@@ -185,7 +180,7 @@ class Myself:
         """
         爬完結動漫總頁數多少。
         :param url: str -> 要爬的網址。
-        :param get_html: boor -> True = 將 requests.text 返回。
+        :param get_res_text: boor -> True = 將 requests.text 返回。
         :return: dict -> 該頁的資料。
         {
             total_page: 總頁數,
@@ -218,10 +213,7 @@ class Myself:
         }
         """
         if not res_text:
-            timeout = aiohttp.client.ClientTimeout(sock_read=5, sock_connect=5)
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url=url, headers=headers, timeout=timeout) as res:
-                    res_text = await res.text(encoding='utf-8', errors='ignore')
+            res_text = await get_text(url=url)
         html = BeautifulSoup(res_text, 'lxml')
         data = []
         for elements in html.find_all('div', class_='c cl'):
@@ -246,15 +238,8 @@ class Myself:
         model.image.save(f'{animate["name"]}.{image_type}', ContentFile(animate['image']))
 
     @staticmethod
-    async def get_image(img_url):
-        timeout = aiohttp.client.ClientTimeout(sock_read=5, sock_connect=5)
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url=img_url, headers=headers, timeout=timeout) as res:
-                return await res.read()
-
-    @staticmethod
     async def create_finish_animate_data_task(animate):
-        animate['image'] = await Myself.get_image(img_url=animate['image'])
+        animate['image'] = await get_bytes(url=animate['image'])
         await Myself.save_finish_animate_data(animate)
 
     @staticmethod
@@ -267,10 +252,11 @@ class Myself:
             await asyncio.wait(tasks)
 
 
-async def main(_):
+async def main():
+    _ = await Myself.finish_animate_page_data(url='https://myself-bbs.com/forum-113-1.html')
     await Myself.create_finish_animate_data(_)
 
 
 if __name__ == '__main__':
-    # asyncio.run(main(Myself.finish_animate_page_data(url='https://myself-bbs.com/forum-113-1.html')))
+    asyncio.run(main())
     pass

@@ -19,9 +19,9 @@ export default {
   name: 'Finish',
   setup () {
     const store = useStore()
-    const finishList = computed(() => store.state.api[finishListState])
+    const finishList = computed(() => store.state.myself[finishListState])
     onMounted(() => {
-      store.dispatch(`api/${finishListAction}`)
+      store.dispatch(`myself/${finishListAction}`)
     })
     return {
       finishList

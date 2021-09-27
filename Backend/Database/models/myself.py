@@ -1,6 +1,6 @@
 from django.db import models
 
-from Database.models.basse import upload_path
+from Database.models.my import upload_path
 
 
 class AnimateInfoModel(models.Model):
@@ -20,14 +20,14 @@ class AnimateInfoModel(models.Model):
     size = 'big'
     from_website = 'Myself'
     name = models.CharField(max_length=128)
-    animate_type = models.CharField(max_length=32, blank=True, null=True)
-    premiere_date = models.CharField(max_length=16, blank=True, null=True)
-    episode = models.CharField(max_length=16, blank=True, null=True)
-    author = models.CharField(max_length=32, blank=True, null=True)
-    official_website = models.URLField(blank=True, null=True)
-    remarks = models.CharField(max_length=64, blank=True, null=True)
-    image = models.ImageField(upload_to=upload_path, blank=True, null=True)
-    synopsis = models.TextField(blank=True, null=True)
+    animate_type = models.CharField(max_length=32)
+    premiere_date = models.CharField(max_length=16)
+    episode = models.CharField(max_length=16)
+    author = models.CharField(max_length=32)
+    official_website = models.URLField()
+    remarks = models.CharField(max_length=64)
+    image = models.ImageField(upload_to=upload_path)
+    synopsis = models.TextField()
 
     class Meta:
         db_table = 'AnimateInfo'

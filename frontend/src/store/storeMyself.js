@@ -1,8 +1,20 @@
 import axios from 'axios'
 import {
-  activeWeekState, weekAnimateState, animateInfoState, loadingState, finishListState,
-  addAnimateInfoMutation, addFinishListMutation, changeActiveWeekMutation, addWeekAnimateMutation,
-  animateInfoAction, loadingMutation, weekAnimateAction, finishListAction
+  activeWeekState,
+  weekAnimateState,
+  animateInfoState,
+  loadingState,
+  finishListState,
+  addAnimateInfoMutation,
+  addFinishListMutation,
+  changeActiveWeekMutation,
+  addWeekAnimateMutation,
+  animateInfoAction,
+  loadingMutation,
+  weekAnimateAction,
+  finishListAction,
+  finishAnimateUpdateState,
+  finishAnimateUpdateButtonState, finishAnimateUpdateButtonMutation
 } from '../variables/variablesMyself'
 import { myselfApi } from '../../api'
 
@@ -11,7 +23,9 @@ export const state = {
   [activeWeekState]: {},
   [animateInfoState]: {},
   [loadingState]: true,
-  [finishListState]: {}
+  [finishListState]: {},
+  [finishAnimateUpdateState]: false,
+  [finishAnimateUpdateButtonState]: '更新資料'
 }
 
 export const actions = {
@@ -80,6 +94,10 @@ export const mutations = {
     } else {
       alert('失敗')
     }
+  },
+  [finishAnimateUpdateButtonMutation] (state, value) {
+    state[finishAnimateUpdateButtonState] = value.msg
+    state[finishAnimateUpdateState] = value.updating
   }
 }
 export const getters = {

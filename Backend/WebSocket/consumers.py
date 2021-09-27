@@ -4,22 +4,26 @@ import random
 from Tools.myself import Myself
 from channels.generic.websocket import AsyncWebsocketConsumer
 
+from Tools.tools import create_log
 from Tools.urls import FinishAnimateUrl, FinishAnimateBaseUrl
 
 
 class Manage:
     async def myself_finish_animate_update(self):
-        total_page_data = await Myself.finish_animate_total_page(url=FinishAnimateUrl, get_res_text=True)
-        for page in range(1, total_page_data['total_page'] + 1):
+        # total_page_data = await Myself.finish_animate_total_page(url=FinishAnimateUrl, get_res_text=True)
+        # for page in range(1, total_page_data['total_page'] + 1):
+        for page in range(1, 2):
+            # if page == 1:
+            #     page_data = await Myself.finish_animate_page_data(url=FinishAnimateBaseUrl.format(page),
+            #                                                       res_text=total_page_data['res_text'])
+            # else:
+            #     page_data = await Myself.finish_animate_page_data(url=FinishAnimateBaseUrl.format(page))
+            # await Myself.create_finish_animate_data(data=page_data)
+            await asyncio.sleep(2)
             if page == 1:
-                page_data = await Myself.finish_animate_page_data(url=FinishAnimateBaseUrl.format(page),
-                                                                  res_text=total_page_data['res_text'])
-            else:
-                page_data = await Myself.finish_animate_page_data(url=FinishAnimateBaseUrl.format(page))
-            await Myself.create_finish_animate_data(data=page_data)
-            if page == 3:
                 break
-        await self.send(text_data=json.dumps({'msg': '更新好了'}))
+        await create_log(msg='updated', action='myself_finish_animate_update')
+        await self.send(text_data=json.dumps({'msg': '更新完成', 'action': 'myself_finish_animate_update', 'updating': False}))
 
 
 class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
@@ -38,7 +42,7 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
             if data.get('action'):
                 if data['action'] == 'myself_finish_animate_update':
                     asyncio.create_task(self.myself_finish_animate_update())
-                    await self.send(text_data=json.dumps({'msg': f'正在更新中'}))
+                    await self.send(text_data=json.dumps({'msg': f'正在更新中', 'action': data['action'], 'updating': True}))
             if data.get('msg') and data['msg'] == 'some message to websocket server':
                 await self.send(text_data=json.dumps({'msg': f'前端在按 Login'}))
         except Exception as error:
