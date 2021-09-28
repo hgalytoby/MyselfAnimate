@@ -10,16 +10,16 @@ from Tools.urls import FinishAnimateUrl, FinishAnimateBaseUrl
 
 class Manage:
     async def myself_finish_animate_update(self):
-        # total_page_data = await Myself.finish_animate_total_page(url=FinishAnimateUrl, get_res_text=True)
-        # for page in range(1, total_page_data['total_page'] + 1):
-        for page in range(1, 2):
-            # if page == 1:
-            #     page_data = await Myself.finish_animate_page_data(url=FinishAnimateBaseUrl.format(page),
-            #                                                       res_text=total_page_data['res_text'])
-            # else:
-            #     page_data = await Myself.finish_animate_page_data(url=FinishAnimateBaseUrl.format(page))
-            # await Myself.create_finish_animate_data(data=page_data)
-            await asyncio.sleep(2)
+        total_page_data = await Myself.finish_animate_total_page(url=FinishAnimateUrl, get_res_text=True)
+        for page in range(1, total_page_data['total_page'] + 1):
+        # for page in range(1, 2):
+            if page == 1:
+                page_data = await Myself.finish_animate_page_data(url=FinishAnimateBaseUrl.format(page),
+                                                                  res_text=total_page_data['res_text'])
+            else:
+                page_data = await Myself.finish_animate_page_data(url=FinishAnimateBaseUrl.format(page))
+            await Myself.create_finish_animate_data(data=page_data)
+            # await asyncio.sleep(2)
             if page == 1:
                 break
         await create_log(msg='updated', action='myself_finish_animate_update')

@@ -10,30 +10,35 @@ headers = {
 }
 
 
-def badname(name):
+def badname(name: str) -> str:
     """
     避免不正當名字出現導致資料夾或檔案無法創建。
     :param name: str -> 名字。
-    :return: str -> 名字。
+    :return: str
     """
     ban = r'\/:*?"<>|'
     return reduce(lambda x, y: x + y if y not in ban else x + ' ', name).strip()
 
 
-async def get_bytes(url):
+async def base_req_res(url, method, **kwargs):
     timeout = aiohttp.client.ClientTimeout(sock_read=5, sock_connect=5)
     async with aiohttp.ClientSession() as session:
         async with session.get(url=url, headers=headers, timeout=timeout) as res:
-            return await res.read()
+            return await getattr(res, method)(**kwargs)
 
 
-async def get_text(url):
-    timeout = aiohttp.client.ClientTimeout(sock_read=5, sock_connect=5)
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url=url, headers=headers, timeout=timeout) as res:
-            return await res.text(encoding='utf-8', errors='ignore')
+async def req_res_text(url):
+    return await base_req_res(url, method='text', encoding='utf-8', errors='ignore')
+
+
+async def req_res_bytes(url):
+    return await base_req_res(url, method='read')
+
+
+async def req_res_json(url):
+    return await base_req_res(url, method='json')
 
 
 @database_sync_to_async
-def create_log(msg, action):
+def create_log(msg: str, action: str):
     LogModel.objects.create(msg=msg, action=action)

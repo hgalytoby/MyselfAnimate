@@ -25,3 +25,7 @@ class LogModel(models.Model):
 
     class Meta:
         db_table = 'Log'
+
+
+class LoveGroupModel(models.Model):
+    name = models.CharField(max_length=32)

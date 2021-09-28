@@ -10,7 +10,7 @@ from asgiref.sync import sync_to_async
 from channels.db import database_sync_to_async
 from Database.models import FinishAnimateModel
 from django.core.files.base import ContentFile
-from Tools.tools import badname, get_text, get_bytes
+from Tools.tools import badname, req_res_text, req_res_bytes, req_res_json
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Mobile Safari/537.36 Edg/93.0.961.52',
@@ -153,6 +153,7 @@ class Myself:
 
     @staticmethod
     def get_vpx_json(url):
+
         res = requests.get(url=url, headers=headers)
         try:
             if res.ok:
@@ -162,7 +163,7 @@ class Myself:
             return {}
 
     @staticmethod
-    def get_m3u8_data(url):
+    async def get_m3u8_data(url):
         try:
             res = requests.get(url=url, headers=headers)
             if res.ok:
@@ -187,16 +188,13 @@ class Myself:
             html: 該頁面的資料。
         }
         """
-        timeout = aiohttp.client.ClientTimeout(sock_read=5, sock_connect=5)
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url=url, headers=headers, timeout=timeout) as res:
-                res_text = await res.text(encoding='utf-8', errors='ignore')
-                html = BeautifulSoup(res_text, 'lxml')
-                page_data = html.find('div', class_='pg').find('a', class_='last').text
-                if page_data and get_res_text:
-                    return {'total_page': int(page_data.replace('... ', '')), 'res_text': res_text}
-                else:
-                    return {'total_page': int(page_data.replace('... ', ''))}
+        res_text = await req_res_text(url=url)
+        html = BeautifulSoup(res_text, 'lxml')
+        page_data = html.find('div', class_='pg').find('a', class_='last').text
+        if page_data and get_res_text:
+            return {'total_page': int(page_data.replace('... ', '')), 'res_text': res_text}
+        else:
+            return {'total_page': int(page_data.replace('... ', ''))}
 
     @staticmethod
     async def finish_animate_page_data(url, res_text=None):
@@ -213,7 +211,8 @@ class Myself:
         }
         """
         if not res_text:
-            res_text = await get_text(url=url)
+            res_text = await req_res_text(url=url)
+            print(res_text)
         html = BeautifulSoup(res_text, 'lxml')
         data = []
         for elements in html.find_all('div', class_='c cl'):
@@ -239,7 +238,7 @@ class Myself:
 
     @staticmethod
     async def create_finish_animate_data_task(animate):
-        animate['image'] = await get_bytes(url=animate['image'])
+        animate['image'] = await req_res_bytes(url=animate['image'])
         await Myself.save_finish_animate_data(animate)
 
     @staticmethod
