@@ -6,7 +6,7 @@ from functools import reduce
 from Database.models import LogModel
 
 headers = {
-    'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Mobile Safari/537.36 Edg/93.0.961.52',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36',
 }
 
 
@@ -21,10 +21,17 @@ def badname(name: str) -> str:
 
 
 async def base_req_res(url, method, **kwargs):
-    timeout = aiohttp.client.ClientTimeout(sock_read=5, sock_connect=5)
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url=url, headers=headers, timeout=timeout) as res:
-            return await getattr(res, method)(**kwargs)
+    # timeout = aiohttp.client.ClientTimeout(sock_read=10, sock_connect=10)
+    try:
+        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
+            async with session.get(url=url, allow_redirects=False, headers=headers) as res:
+                return await getattr(res, method)(**kwargs)
+    except aiohttp.ServerConnectionError as e:
+        print('ServerConnectionError')
+        return None
+    except aiohttp.ClientConnectorCertificateError as e:
+        print('ClientConnectorCertificateError')
+        return None
 
 
 async def req_res_text(url):

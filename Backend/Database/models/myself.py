@@ -59,7 +59,7 @@ class AnimateEpisodeInfoModel(models.Model):
     owner: 關聯
     """
     name = models.CharField(max_length=64)
-    episode = models.URLField()
+    url = models.URLField()
     done = models.BooleanField(default=False)
     owner = models.ForeignKey(AnimateInfoModel, on_delete=models.CASCADE)
 

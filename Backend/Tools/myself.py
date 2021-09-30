@@ -11,7 +11,7 @@ from channels.db import database_sync_to_async
 from Database.models import FinishAnimateModel
 from django.core.files.base import ContentFile
 from Tools.tools import badname, req_res_text, req_res_bytes, req_res_json
-
+from typing import List
 headers = {
     'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Mobile Safari/537.36 Edg/93.0.961.52',
 }
@@ -40,7 +40,7 @@ class Myself:
     def week_animate() -> dict:
         """
         爬首頁的每周更新表。
-        :return: Dict。
+        :return: dict。
         """
         try:
             # res = requests.get(url='https://myself-bbs.com/portal.php', headers=headers, timeout=(5, 5))
@@ -70,57 +70,57 @@ class Myself:
         """
         取得動漫資料。
         :param url: str -> 要爬的網址。
-        :return: dict -> 所有需要的資料。
+        :return: dict -> 動漫資料。
         {
             url: 網址,
-            video: [{name: 第幾集, url: 網址}]
+            video: [{name: 第幾集名稱, url: 網址}]
             name: 名字,
-            anime_type: 作品類型,
+            animate_type: 作品類型,
             premiere_date: 首播日期,
-            number_of_episodes_broadcast: 播出集數,
+            episode: 播出集數,
             author: 原著作者,
             official_website: 官方網站,
             remarks: 備注,
+            synopsis: 簡介
         }
         """
-        try:
-            res = requests.get(url=url, headers=headers, timeout=(5, 5))
-            html = BeautifulSoup(res.text, features='lxml')
-            data = {'url': url, 'name': badname(html.find('title').text.split('【')[0])}
-            permission = html.find('div', id='messagetext')
-            if permission:
-                data.update({'permission': permission.text.strip()})
-            total = list()
-            for i in html.select('ul.main_list'):
-                for j in i.find_all('a', href='javascript:;'):
-                    title = j.text
-                    for k in j.parent.select("ul.display_none li"):
-                        a = k.select_one("a[data-href*='v.myself-bbs.com']")
-                        if k.select_one("a").text == '站內':
-                            url = a["data-href"].replace('player/play', 'vpx').replace("\r", "").replace("\n", "")
-                            total.append({'name': badname(name=title), 'url': url})
-            data.update({'video': total})
-            for i in html.find_all('div', class_='info_info'):
-                for j, m in enumerate(i.find_all('li')):
-                    text = m.text
-                    key, value = text.split(': ')[0], text.split(': ')[1]
-                    data.update({animate_table[key]: value})
-            for i in html.find_all('div', class_='info_introduction'):
-                for j in i.find_all('p'):
-                    data.update({'synopsis': j.text})
-            for i in html.find_all('div', class_='info_img_box fl'):
-                for j in i.find_all('img'):
-                    data.update({'image': j['src']})
-            res.close()
-            return data
-        except requests.exceptions.RequestException as error:
-            return {}
+        # try:
+        # res = requests.get(url=url, headers=headers, timeout=(5, 5))
+        # if res.ok:
+        with open('info.html', 'r', encoding='utf-8') as f:
+            res_text = f.read()
+        html = BeautifulSoup(res_text, features='lxml')
+        data = {}
+        for elements in html.find_all('div', class_='info_info'):
+            for element in elements.find_all('li'):
+                text = element.text
+                key, value = text.split(': ')
+                data.update({animate_table[key]: value})
+            for element in elements.find_all('p'):
+                data.update({'synopsis': element.text})
+        for elements in html.find_all('div', class_='info_img_box fl'):
+            for element in elements.find_all('img'):
+                data.update({'image': element['src']})
+        videos = []
+        for main_list in html.select('ul.main_list'):
+            for a in main_list.find_all('a', href='javascript:;'):
+                name = a.text
+                for display in a.parent.select("ul.display_none li"):
+                    if display.select_one("a").text == '站內':
+                        a = display.select_one("a[data-href*='v.myself-bbs.com']")
+                        url = a["data-href"].replace('player/play', 'vpx').replace("\r", "").replace("\n", "")
+                        videos.append({'name': badname(name=name), 'url': url})
+        data.update({'url': url, 'name': badname(html.find('title').text.split('【')[0]), 'video': videos})
+        # res.close()
+        return data
+        # except requests.exceptions.RequestException as error:
+        #     return {}
 
     @staticmethod
-    def finish_list():
+    def finish_list() -> dict:
         """
         爬完結列表頁面的動漫資訊
-        :return: Dict。
+        :return: dict。
         """
         # url = 'https://myself-bbs.com/portal.php?mod=topic&topicid=8'
         # res = requests.get(url=url, headers=headers)
@@ -142,46 +142,37 @@ class Myself:
         return {'data': data}
 
     @staticmethod
-    def get_request_json(url):
-        res = requests.get(url=url, headers=headers)
-        try:
-            if res.ok:
-                return res.json()
-            return {}
-        except requests.exceptions.RequestException as error:
-            return {}
+    async def get_vpx_json(url) -> dict:
+        """
+
+        :param url:
+        :return:
+        """
+        return await req_res_json(url=url)
 
     @staticmethod
-    def get_vpx_json(url):
+    async def get_m3u8_data(url) -> object:
+        """
 
-        res = requests.get(url=url, headers=headers)
+        :param url:
+        :return:
+        """
+        res_text = await req_res_text(url=url)
         try:
-            if res.ok:
-                return res.json()
-            return {}
-        except requests.exceptions.RequestException as error:
-            return {}
+            example = m3u8.loads(res_text)
+            for x in example.segments:
+                print(x.uri)
+            return m3u8.loads(res_text)
+        except BaseException as error:
+            print(f'get_m3u8 error: {error}')
+            return None
 
     @staticmethod
-    async def get_m3u8_data(url):
-        try:
-            res = requests.get(url=url, headers=headers)
-            if res.ok:
-                try:
-                    return m3u8.loads(res.text)
-                except BaseException as error:
-                    print(f'get_m3u8 error: {error}')
-                    return {}
-            return {}
-        except requests.exceptions.RequestException as error:
-            return {}
-
-    @staticmethod
-    async def finish_animate_total_page(url, get_res_text=False):
+    async def finish_animate_total_page(url, get_res_text=False) -> dict:
         """
         爬完結動漫總頁數多少。
         :param url: str -> 要爬的網址。
-        :param get_res_text: boor -> True = 將 requests.text 返回。
+        :param get_res_text: bool -> True = 將 requests.text 返回。
         :return: dict -> 該頁的資料。
         {
             total_page: 總頁數,
@@ -197,22 +188,15 @@ class Myself:
             return {'total_page': int(page_data.replace('... ', ''))}
 
     @staticmethod
-    async def finish_animate_page_data(url, res_text=None):
+    async def finish_animate_page_data(url, res_text=None) -> list:
         """
         完結動漫頁面的動漫資料。
         :param url: str -> 要爬的網址。
         :param res_text: str -> 給完結動漫某頁的HTML，就不用在 requests 了。
-        :return: dict -> 該頁的資料。
-        {
-            動漫名字:{
-                url: 動漫網址,
-                img: 圖片網址,
-            }
-        }
+        :return: list -> 該頁的資料。
         """
         if not res_text:
             res_text = await req_res_text(url=url)
-            print(res_text)
         html = BeautifulSoup(res_text, 'lxml')
         data = []
         for elements in html.find_all('div', class_='c cl'):
@@ -252,10 +236,15 @@ class Myself:
 
 
 async def main():
-    _ = await Myself.finish_animate_page_data(url='https://myself-bbs.com/forum-113-1.html')
-    await Myself.create_finish_animate_data(_)
+    # async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
+    #     async with session.get(url='https://vpx06.myself-bbs.com/47690/003/720p.m3u8', headers=headers) as res:
+    #         print(await res.text(encoding='utf-8', errors='ignore'))
+    # _ = await Myself.finish_animate_page_data(url='https://myself-bbs.com/forum-113-1.html')
+    # await Myself.create_finish_animate_data(_)
+    a = await Myself.get_m3u8_data(url='https://vpx.myself-bbs.com/47731/012/720p.m3u8')
 
 
 if __name__ == '__main__':
     asyncio.run(main())
+    # Myself.animate_info(url='https://myself-bbs.com/thread-47690-1-1.html')
     pass
