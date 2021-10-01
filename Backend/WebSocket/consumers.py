@@ -43,6 +43,8 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
                 if data['action'] == 'myself_finish_animate_update':
                     asyncio.create_task(self.myself_finish_animate_update())
                     await self.send(text_data=json.dumps({'msg': f'正在更新中', 'action': data['action'], 'updating': True}))
+                elif data['action'] == 'downloadMyselfAnimate':
+                    await self.send(text_data=json.dumps({'msg': f'我收到要下載的清單了', 'action': data['action']}))
             if data.get('msg') and data['msg'] == 'some message to websocket server':
                 await self.send(text_data=json.dumps({'msg': f'前端在按 Login'}))
         except Exception as error:

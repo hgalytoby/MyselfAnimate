@@ -14,7 +14,10 @@ import {
   weekAnimateAction,
   finishListAction,
   finishAnimateUpdateState,
-  finishAnimateUpdateButtonState, finishAnimateUpdateButtonMutation
+  finishAnimateUpdateButtonState,
+  finishAnimateUpdateButtonMutation,
+  checkboxAnimateEpisodeState,
+  checkboxAnimateEpisodeMutation
 } from '../variables/variablesMyself'
 import { myselfApi } from '../../api'
 
@@ -25,7 +28,8 @@ export const state = {
   [loadingState]: true,
   [finishListState]: {},
   [finishAnimateUpdateState]: false,
-  [finishAnimateUpdateButtonState]: '更新資料'
+  [finishAnimateUpdateButtonState]: '更新資料',
+  [checkboxAnimateEpisodeState]: []
 }
 
 export const actions = {
@@ -44,7 +48,6 @@ export const actions = {
     axios.get(`${myselfApi.animateInfo}?url=${value}`).then(
       response => {
         context.commit(addAnimateInfoMutation, response.data)
-        // context.commit('changeActiveWeek', response.data)
       },
       error => {
         context.commit(addAnimateInfoMutation, error.msg)
@@ -98,6 +101,9 @@ export const mutations = {
   [finishAnimateUpdateButtonMutation] (state, value) {
     state[finishAnimateUpdateButtonState] = value.msg
     state[finishAnimateUpdateState] = value.updating
+  },
+  [checkboxAnimateEpisodeMutation] (state, value) {
+    state[checkboxAnimateEpisodeState] = value
   }
 }
 export const getters = {

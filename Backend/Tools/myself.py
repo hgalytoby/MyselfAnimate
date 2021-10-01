@@ -84,37 +84,37 @@ class Myself:
             synopsis: 簡介
         }
         """
-        # try:
-        # res = requests.get(url=url, headers=headers, timeout=(5, 5))
-        # if res.ok:
-        with open('info.html', 'r', encoding='utf-8') as f:
-            res_text = f.read()
-        html = BeautifulSoup(res_text, features='lxml')
-        data = {}
-        for elements in html.find_all('div', class_='info_info'):
-            for element in elements.find_all('li'):
-                text = element.text
-                key, value = text.split(': ')
-                data.update({animate_table[key]: value})
-            for element in elements.find_all('p'):
-                data.update({'synopsis': element.text})
-        for elements in html.find_all('div', class_='info_img_box fl'):
-            for element in elements.find_all('img'):
-                data.update({'image': element['src']})
-        videos = []
-        for main_list in html.select('ul.main_list'):
-            for a in main_list.find_all('a', href='javascript:;'):
-                name = a.text
-                for display in a.parent.select("ul.display_none li"):
-                    if display.select_one("a").text == '站內':
-                        a = display.select_one("a[data-href*='v.myself-bbs.com']")
-                        url = a["data-href"].replace('player/play', 'vpx').replace("\r", "").replace("\n", "")
-                        videos.append({'name': badname(name=name), 'url': url})
-        data.update({'url': url, 'name': badname(html.find('title').text.split('【')[0]), 'video': videos})
-        # res.close()
-        return data
-        # except requests.exceptions.RequestException as error:
-        #     return {}
+        try:
+            res = requests.get(url=url, headers=headers, timeout=(5, 5))
+            if res.ok:
+            # with open('info.html', 'r', encoding='utf-8') as f:
+            #     res_text = f.read()
+                html = BeautifulSoup(res.text, features='lxml')
+                data = {}
+                for elements in html.find_all('div', class_='info_info'):
+                    for element in elements.find_all('li'):
+                        text = element.text
+                        key, value = text.split(': ')
+                        data.update({animate_table[key]: value})
+                    for element in elements.find_all('p'):
+                        data.update({'synopsis': element.text})
+                for elements in html.find_all('div', class_='info_img_box fl'):
+                    for element in elements.find_all('img'):
+                        data.update({'image': element['src']})
+                videos = []
+                for main_list in html.select('ul.main_list'):
+                    for a in main_list.find_all('a', href='javascript:;'):
+                        name = a.text
+                        for display in a.parent.select("ul.display_none li"):
+                            if display.select_one("a").text == '站內':
+                                a = display.select_one("a[data-href*='v.myself-bbs.com']")
+                                url = a["data-href"].replace('player/play', 'vpx').replace("\r", "").replace("\n", "")
+                                videos.append({'name': badname(name=name), 'url': url})
+                data.update({'url': url, 'name': badname(html.find('title').text.split('【')[0]), 'video': videos})
+                res.close()
+                return data
+        except requests.exceptions.RequestException as error:
+            return {}
 
     @staticmethod
     def finish_list() -> dict:

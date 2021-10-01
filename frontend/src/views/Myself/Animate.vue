@@ -3,17 +3,21 @@
   <div v-if="loading">加載中...</div>
   <div v-else>
     <img :src="animateInfo.image" :alt="animateInfo.name">
-    <li>名字{{ animateInfo.name }}</li>
-    <li>作品類型{{ animateInfo.animate_type }}</li>
-    <li>首播日期{{ animateInfo.premiere_date }}</li>
-    <li>播放集數{{ animateInfo.episodes }}</li>
-    <li>作者{{ animateInfo.author }}</li>
-    <li>官方網站{{ animateInfo.official_website }}</li>
-    <li>備註{{ animateInfo.remarks }}</li>
-    <li>synopsis{{ animateInfo.synopsis }}</li>
-    <li v-for="data in animateInfo.video" :key="data.name">
-      <a :href="data.url">{{ data.name }}</a>
+    <li>名字: {{ animateInfo.name }}</li>
+    <li>作品類型: {{ animateInfo.animate_type }}</li>
+    <li>首播日期: {{ animateInfo.premiere_date }}</li>
+    <li>播放集數: {{ animateInfo.episodes }}</li>
+    <li>作者: {{ animateInfo.author }}</li>
+    <li>官方網站:
+      <a :href="animateInfo.official_website">{{ animateInfo.official_website }}</a>
     </li>
+    <li>備註: {{ animateInfo.remarks }}</li>
+    <li>synopsis{{ animateInfo.synopsis }}</li>
+    <div v-for="data in animateInfo.video" :key="data.url">
+      <input type="checkbox" :id="data.name" :value="data" v-model="checkboxAnimateEpisode">
+      <label :for="data.name">{{ data.name }}</label>
+    </div>
+    <button type="button" class="btn btn-primary" @click="downloadAnimate">下載所選的集數</button>
   </div>
 
 </template>
@@ -21,22 +25,50 @@
 <script>
 import { onMounted, computed } from 'vue'
 import { useStore } from 'vuex'
-import { animateInfoAction, animateInfoState, loadingMutation, loadingState } from '../../variables/variablesMyself'
+import {
+  animateInfoAction,
+  animateInfoState, checkboxAnimateEpisodeMutation,
+  checkboxAnimateEpisodeState,
+  loadingMutation,
+  loadingState
+} from '../../variables/variablesMyself'
+import { sendSocketMessage } from '../../hooks/useWS'
 
 export default {
   name: 'Animate',
-  props: ['url'],
+  props: {
+    url: String
+  },
   setup (props) {
     const store = useStore()
-    const loading = computed(() => store.state.api[loadingState])
-    const animateInfo = computed(() => store.state.api[animateInfoState])
-    store.commit(`api/${loadingMutation}`)
-    onMounted(() => {
-      store.dispatch(`api/${animateInfoAction}`, props.url)
+    const loading = computed(() => store.state.myself[loadingState])
+    const animateInfo = computed(() => store.state.myself[animateInfoState])
+    const checkboxAnimateEpisode = computed({
+      get () {
+        return store.state.myself[checkboxAnimateEpisodeState]
+      },
+      set (value) {
+        store.commit(`myself/${checkboxAnimateEpisodeMutation}`, value)
+      }
     })
+    store.commit(`myself/${loadingMutation}`)
+    onMounted(() => {
+      store.dispatch(`myself/${animateInfoAction}`, props.url)
+    })
+    const downloadAnimate = () => {
+      sendSocketMessage({
+        action: 'downloadMyselfAnimate',
+        episodes: checkboxAnimateEpisode.value,
+        animateName: animateInfo.value.name,
+        fromWebsite: 'Myself'
+      })
+    }
+
     return {
       loading,
-      animateInfo
+      animateInfo,
+      checkboxAnimateEpisode,
+      downloadAnimate
     }
   }
 }
