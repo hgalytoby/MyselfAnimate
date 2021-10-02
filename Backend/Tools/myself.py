@@ -1,17 +1,10 @@
-import io
 import asyncio
 import m3u8
 import requests
-import aiohttp
-from PIL import Image
-from Tools.setup import *
+from Tools.db import DB
 from bs4 import BeautifulSoup
-from asgiref.sync import sync_to_async
-from channels.db import database_sync_to_async
-from Database.models import FinishAnimateModel
-from django.core.files.base import ContentFile
-from Tools.tools import badname, req_res_text, req_res_bytes, req_res_json
-from typing import List
+from Tools.tools import badname, aiohttp_text, aiohttp_json
+
 headers = {
     'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Mobile Safari/537.36 Edg/93.0.961.52',
 }
@@ -28,7 +21,7 @@ week = {
 animate_table = {
     '作品類型': 'animate_type',
     '首播日期': 'premiere_date',
-    '播出集數': 'episodes',
+    '播出集數': 'episode',
     '原著作者': 'author',
     '官方網站': 'official_website',
     '備注': 'remarks',
@@ -108,8 +101,8 @@ class Myself:
                         for display in a.parent.select("ul.display_none li"):
                             if display.select_one("a").text == '站內':
                                 a = display.select_one("a[data-href*='v.myself-bbs.com']")
-                                url = a["data-href"].replace('player/play', 'vpx').replace("\r", "").replace("\n", "")
-                                videos.append({'name': badname(name=name), 'url': url})
+                                video_url = a["data-href"].replace('player/play', 'vpx').replace("\r", "").replace("\n", "")
+                                videos.append({'name': badname(name=name), 'url': video_url})
                 data.update({'url': url, 'name': badname(html.find('title').text.split('【')[0]), 'video': videos})
                 res.close()
                 return data
@@ -148,7 +141,7 @@ class Myself:
         :param url:
         :return:
         """
-        return await req_res_json(url=url)
+        return await aiohttp_json(url=url)
 
     @staticmethod
     async def get_m3u8_data(url) -> object:
@@ -157,7 +150,7 @@ class Myself:
         :param url:
         :return:
         """
-        res_text = await req_res_text(url=url)
+        res_text = await aiohttp_text(url=url)
         try:
             example = m3u8.loads(res_text)
             for x in example.segments:
@@ -179,7 +172,7 @@ class Myself:
             html: 該頁面的資料。
         }
         """
-        res_text = await req_res_text(url=url)
+        res_text = await aiohttp_text(url=url)
         html = BeautifulSoup(res_text, 'lxml')
         page_data = html.find('div', class_='pg').find('a', class_='last').text
         if page_data and get_res_text:
@@ -196,7 +189,7 @@ class Myself:
         :return: list -> 該頁的資料。
         """
         if not res_text:
-            res_text = await req_res_text(url=url)
+            res_text = await aiohttp_text(url=url)
         html = BeautifulSoup(res_text, 'lxml')
         data = []
         for elements in html.find_all('div', class_='c cl'):
@@ -207,41 +200,14 @@ class Myself:
             })
         return data
 
-    @staticmethod
-    @database_sync_to_async
-    def save_finish_animate_data(animate):
-        image_io = io.BytesIO(animate['image'])
-        open_image = Image.open(image_io)
-        image_type = open_image.format.lower()
-        open_image.close()
-        image_io.close()
-        model = FinishAnimateModel()
-        model.name = animate['name']
-        model.url = animate['url']
-        model.image.save(f'{animate["name"]}.{image_type}', ContentFile(animate['image']))
-
-    @staticmethod
-    async def create_finish_animate_data_task(animate):
-        animate['image'] = await req_res_bytes(url=animate['image'])
-        await Myself.save_finish_animate_data(animate)
-
-    @staticmethod
-    async def create_finish_animate_data(data):
-        tasks = []
-        for animate in data:
-            if not await database_sync_to_async(list)(FinishAnimateModel.objects.filter(url=animate['url'])):
-                tasks.append(asyncio.create_task(Myself.create_finish_animate_data_task(animate)))
-        if tasks:
-            await asyncio.wait(tasks)
-
 
 async def main():
     # async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
     #     async with session.get(url='https://vpx06.myself-bbs.com/47690/003/720p.m3u8', headers=headers) as res:
     #         print(await res.text(encoding='utf-8', errors='ignore'))
-    # _ = await Myself.finish_animate_page_data(url='https://myself-bbs.com/forum-113-1.html')
-    # await Myself.create_finish_animate_data(_)
-    a = await Myself.get_m3u8_data(url='https://vpx.myself-bbs.com/47731/012/720p.m3u8')
+    _ = await Myself.finish_animate_page_data(url='https://myself-bbs.com/forum-113-1.html')
+    await DB.Myself.create_many_finish_animate(_)
+    # a = await Myself.get_m3u8_data(url='https://vpx.myself-bbs.com/47731/012/720p.m3u8')
 
 
 if __name__ == '__main__':

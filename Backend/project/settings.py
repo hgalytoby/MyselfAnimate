@@ -144,14 +144,4 @@ CHANNEL_LAYERS = {
 }
 
 MEDIA_ROOT = Path(BASE_DIR, 'static/uploads')
-
-# CORS_ALLOW_CREDENTIALS = True
-#
-# CORS_ORIGIN_ALLOW_ALL = True
-#
-# CORS_ORIGIN_WHITELIST = ('*', )
-#
-# CORS_ALLOW_METHODS = (
-#     'GET',
-#     ''
-# )
+MEDIA_PATH = '/static/uploads'

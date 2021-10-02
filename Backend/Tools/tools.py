@@ -1,4 +1,8 @@
+import io
+
 import aiohttp
+import requests
+from PIL import Image
 from channels.db import database_sync_to_async
 
 from Tools.setup import *
@@ -20,11 +24,11 @@ def badname(name: str) -> str:
     return reduce(lambda x, y: x + y if y not in ban else x + ' ', name).strip()
 
 
-async def base_req_res(url, method, **kwargs):
+async def base_aiohttp_req(url, method, **kwargs):
     # timeout = aiohttp.client.ClientTimeout(sock_read=10, sock_connect=10)
     try:
         async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
-            async with session.get(url=url, allow_redirects=False, headers=headers) as res:
+            async with session.get(url=url, headers=headers) as res:
                 return await getattr(res, method)(**kwargs)
     except aiohttp.ServerConnectionError as e:
         print('ServerConnectionError')
@@ -34,16 +38,29 @@ async def base_req_res(url, method, **kwargs):
         return None
 
 
-async def req_res_text(url):
-    return await base_req_res(url, method='text', encoding='utf-8', errors='ignore')
+async def aiohttp_text(url):
+    return await base_aiohttp_req(url, method='text', encoding='utf-8', errors='ignore')
 
 
-async def req_res_bytes(url):
-    return await base_req_res(url, method='read')
+async def aiohttp_bytes(url):
+    return await base_aiohttp_req(url, method='read')
 
 
-async def req_res_json(url):
-    return await base_req_res(url, method='json')
+async def aiohttp_json(url):
+    return await base_aiohttp_req(url, method='json')
+
+
+def req_bytes(url):
+    return requests.get(url=url, headers=headers).content
+
+
+def use_io_get_image_format(image_bytes):
+    image_io = io.BytesIO(image_bytes)
+    open_image = Image.open(image_io)
+    image_type = open_image.format.lower()
+    open_image.close()
+    image_io.close()
+    return image_type
 
 
 @database_sync_to_async

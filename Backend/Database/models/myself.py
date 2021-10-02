@@ -28,6 +28,7 @@ class AnimateInfoModel(models.Model):
     remarks = models.CharField(max_length=64)
     image = models.ImageField(upload_to=upload_path)
     synopsis = models.TextField()
+    url = models.URLField(unique=True)
 
     class Meta:
         db_table = 'AnimateInfo'
@@ -54,12 +55,14 @@ class FinishAnimateModel(models.Model):
 class AnimateEpisodeInfoModel(models.Model):
     """
     name: 動漫名字
-    episode: 影片連結
-    done: 是否完成
+    url: 影片連結
+    download: 是否開始下載
+    done: 是否下載完成
     owner: 關聯
     """
-    name = models.CharField(max_length=64)
+    name = models.CharField(max_length=64, unique=True)
     url = models.URLField()
+    download = models.BooleanField(default=False)
     done = models.BooleanField(default=False)
     owner = models.ForeignKey(AnimateInfoModel, on_delete=models.CASCADE)
 
