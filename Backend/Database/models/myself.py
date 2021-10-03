@@ -69,6 +69,10 @@ class AnimateEpisodeInfoModel(models.Model):
     class Meta:
         db_table = 'AnimateEpisodeInfo'
 
+    def to_dict(self):
+        return {'id': self.id, 'name': self.name, 'url': self.url, 'download': self.download, 'done': self.done,
+                'owner_id': self.owner_id}
+
 
 class AnimateEpisodeTsModel(models.Model):
     """
@@ -76,8 +80,7 @@ class AnimateEpisodeTsModel(models.Model):
     done: 是否完成
     owner: 關聯
     """
-    ts_url = models.URLField()
-    done = models.BooleanField(default=False)
+    uri = models.CharField(max_length=32)
     owner = models.ForeignKey(AnimateEpisodeInfoModel, on_delete=models.CASCADE)
 
     class Meta:

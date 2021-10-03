@@ -1,4 +1,6 @@
 import asyncio
+import time
+
 import m3u8
 import requests
 from Tools.db import DB
@@ -29,8 +31,8 @@ animate_table = {
 
 
 class Myself:
-    @staticmethod
-    def week_animate() -> dict:
+    @classmethod
+    def week_animate(cls) -> dict:
         """
         爬首頁的每周更新表。
         :return: dict。
@@ -58,8 +60,8 @@ class Myself:
         except requests.exceptions.RequestException as error:
             return {}
 
-    @staticmethod
-    def animate_info(url: str) -> dict:
+    @classmethod
+    def animate_info(cls, url: str) -> dict:
         """
         取得動漫資料。
         :param url: str -> 要爬的網址。
@@ -109,8 +111,8 @@ class Myself:
         except requests.exceptions.RequestException as error:
             return {}
 
-    @staticmethod
-    def finish_list() -> dict:
+    @classmethod
+    def finish_list(cls) -> dict:
         """
         爬完結列表頁面的動漫資訊
         :return: dict。
@@ -134,8 +136,8 @@ class Myself:
         # res.close()
         return {'data': data}
 
-    @staticmethod
-    async def get_vpx_json(url) -> dict:
+    @classmethod
+    async def get_vpx_json(cls, url) -> dict:
         """
 
         :param url:
@@ -143,25 +145,27 @@ class Myself:
         """
         return await aiohttp_json(url=url)
 
-    @staticmethod
-    async def get_m3u8_data(url) -> object:
+    @classmethod
+    async def get_m3u8_data(cls, url) -> object:
         """
 
         :param url:
         :return:
         """
+        s1 = time.time()
         res_text = await aiohttp_text(url=url)
+        print(time.time() - s1)
         try:
-            example = m3u8.loads(res_text)
-            for x in example.segments:
-                print(x.uri)
+            m3u8_obj = m3u8.loads(res_text)
+            # for x in example.segments:
+            #     print(x.uri)
             return m3u8.loads(res_text)
         except BaseException as error:
             print(f'get_m3u8 error: {error}')
             return None
 
-    @staticmethod
-    async def finish_animate_total_page(url, get_res_text=False) -> dict:
+    @classmethod
+    async def finish_animate_total_page(cls, url, get_res_text=False) -> dict:
         """
         爬完結動漫總頁數多少。
         :param url: str -> 要爬的網址。
@@ -180,8 +184,8 @@ class Myself:
         else:
             return {'total_page': int(page_data.replace('... ', ''))}
 
-    @staticmethod
-    async def finish_animate_page_data(url, res_text=None) -> list:
+    @classmethod
+    async def finish_animate_page_data(cls, url, res_text=None) -> list:
         """
         完結動漫頁面的動漫資料。
         :param url: str -> 要爬的網址。
@@ -200,17 +204,33 @@ class Myself:
             })
         return data
 
+    @classmethod
+    async def many_start_download_animate(cls, models):
+        for model in models:
+            animate_video_json = await cls.get_vpx_json(model.url)
+            video_host_list = sorted(animate_video_json['host'], key=lambda x: x.get('weight'), reverse=True)
+            print(video_host_list)
+            m3u8_url = f"{video_host_list[0]['host']}{animate_video_json['video']['720p']}"
+            print(m3u8_url)
+            # print(m3u8_url)
+            m3u8_obj = await cls.get_m3u8_data(url=m3u8_url)
+            for x in m3u8_obj.segments:
+                print(x.uri)
+            # aiohttp_text()
 
 async def main():
     # async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
     #     async with session.get(url='https://vpx06.myself-bbs.com/47690/003/720p.m3u8', headers=headers) as res:
     #         print(await res.text(encoding='utf-8', errors='ignore'))
-    _ = await Myself.finish_animate_page_data(url='https://myself-bbs.com/forum-113-1.html')
-    await DB.Myself.create_many_finish_animate(_)
-    # a = await Myself.get_m3u8_data(url='https://vpx.myself-bbs.com/47731/012/720p.m3u8')
+    # _ = await Myself.finish_animate_page_data(url='https://myself-bbs.com/forum-113-1.html')
+    # await DB.Myself.create_many_finish_animate(_)
+    a = await Myself.get_m3u8_data(url='https://vpx.myself-bbs.com/47731/012/720p.m3u8')
 
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    # asyncio.run(main())
     # Myself.animate_info(url='https://myself-bbs.com/thread-47690-1-1.html')
+    s1 = time.time()
+    print(requests.get(url='https://vpx.myself-bbs.com/47767/001/720p.m3u8', headers=headers).text)
+    print(time.time() - s1)
     pass

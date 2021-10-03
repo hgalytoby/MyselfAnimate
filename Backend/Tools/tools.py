@@ -25,10 +25,10 @@ def badname(name: str) -> str:
 
 
 async def base_aiohttp_req(url, method, **kwargs):
-    # timeout = aiohttp.client.ClientTimeout(sock_read=10, sock_connect=10)
+    timeout = aiohttp.client.ClientTimeout(sock_read=10, sock_connect=10)
     try:
         async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
-            async with session.get(url=url, headers=headers) as res:
+            async with session.get(url=url, headers=headers, timeout=timeout) as res:
                 return await getattr(res, method)(**kwargs)
     except aiohttp.ServerConnectionError as e:
         print('ServerConnectionError')

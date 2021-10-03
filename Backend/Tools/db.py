@@ -1,9 +1,11 @@
 import io
 import asyncio
 from PIL import Image
+from asgiref.sync import sync_to_async
+
 from Tools.setup import *
 from channels.db import database_sync_to_async
-from Database.models import FinishAnimateModel, AnimateInfoModel, AnimateEpisodeInfoModel
+from Database.models import FinishAnimateModel, AnimateInfoModel, AnimateEpisodeInfoModel, AnimateEpisodeTsModel
 from django.core.files.base import ContentFile
 from Tools.tools import aiohttp_bytes, use_io_get_image_format
 
@@ -47,14 +49,32 @@ class MyselfBase:
         return model
 
     @classmethod
-    @database_sync_to_async
     def many_create_animate_episode(cls, data, parent_model):
+        models = []
         for episode in data['video']:
-            AnimateEpisodeInfoModel.objects.get_or_create(url=episode['name'], defaults={
+            models.append(AnimateEpisodeInfoModel.objects.get_or_create(name=episode['name'], defaults={
                 'name': episode['name'],
                 'url': episode['url'],
                 'owner': parent_model,
-            })
+            })[0])
+        return models
+
+    @classmethod
+    @database_sync_to_async
+    def many_animate_episode_update_download(cls, pk_list):
+        models = []
+        for pk in pk_list:
+            model = AnimateEpisodeInfoModel.objects.get(pk=pk)
+            model.download = True
+            model.save()
+            models.append(model)
+        return models
+
+    @classmethod
+    @database_sync_to_async
+    def many_animate_episode_ts(cls, data):
+        for uri in data:
+            AnimateEpisodeTsModel.objects.get_or_create(uri=uri, )
 
 
 class DB:

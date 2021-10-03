@@ -28,13 +28,14 @@ class Manage:
         await self.send(
             text_data=json.dumps({'msg': '更新完成', 'action': 'myself_finish_animate_update', 'updating': False}))
 
-    async def myself_animate_info_update(self, data):
-
-        # db_model = await DB.Myself.update_or_create_animate_info(data=data['animateInfo'])
-        # await DB.Myself.many_create_animate_episode(data=data, parent_model=db_model)
-
-        await self.send(
-            text_data=json.dumps({'msg': '更新完成', 'action': data['action'], 'updating': False}))
+    async def myself_animate_download(self, data):
+        try:
+            animate_episode_models = await DB.Myself.many_animate_episode_update_download(pk_list=data['episodes'])
+            await Myself.many_start_download_animate(models=animate_episode_models)
+            await self.send(
+                text_data=json.dumps({'msg': '更新完成', 'action': data['action'], 'updating': False}))
+        except Exception as e:
+            print(e)
 
 
 class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
@@ -55,8 +56,7 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
                     asyncio.create_task(self.myself_finish_animate_update())
                     await self.send(text_data=json.dumps({'msg': f'正在更新中', 'action': data['action'], 'updating': True}))
                 elif data['action'] == 'downloadMyselfAnimate':
-                    print('in')
-                    asyncio.create_task(self.myself_animate_info_update(data=data))
+                    asyncio.create_task(self.myself_animate_download(data=data))
                     await self.send(
                         text_data=json.dumps({'msg': f'我收到要下載的清單了', 'action': data['action'], 'updating': True}))
             if data.get('msg') and data['msg'] == 'some message to websocket server':

@@ -13,9 +13,9 @@
     </li>
     <li>備註: {{ animateInfo.remarks }}</li>
     <li>synopsis{{ animateInfo.synopsis }}</li>
-    <div v-for="data in animateInfo.video" :key="data.url">
-      <input type="checkbox" :id="data.name" :value="data" v-model="checkboxAnimateEpisode">
-      <label :for="data.name">{{ data.name }}</label>
+    <div v-for="data in animateInfo.video" :key="data.id">
+      <input type="checkbox" :id="data.id" :value="data.id" v-model="checkboxAnimateEpisode">
+      <label :for="data.id">{{ data.name }}</label>
     </div>
     <button type="button" class="btn btn-primary" @click="downloadAnimate">下載所選的集數</button>
     <button type="button" class="btn btn-primary" @click="saveMyLove">儲存到我的最愛</button>
@@ -57,13 +57,10 @@ export default {
       store.dispatch(`myself/${animateInfoAction}`, props.url)
     })
     const downloadAnimate = () => {
-      const copy = {}
-      Object.assign(copy, animateInfo.value)
-      delete copy.video
       sendSocketMessage({
         action: 'downloadMyselfAnimate',
         episodes: checkboxAnimateEpisode.value,
-        animateInfo: copy
+        owner_id: animateInfo.value.id
       })
     }
     function saveMyLove () {
