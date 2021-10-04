@@ -81,7 +81,7 @@ class AnimateEpisodeTsModel(models.Model):
     owner: 關聯
     """
     uri = models.CharField(max_length=32)
-    owner = models.ForeignKey(AnimateEpisodeInfoModel, on_delete=models.CASCADE)
+    owner = models.ForeignKey(AnimateEpisodeInfoModel, on_delete=models.CASCADE, related_name='ts_model')
 
     class Meta:
         db_table = 'AnimateEpisodeTs'

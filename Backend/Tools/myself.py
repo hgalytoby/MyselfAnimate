@@ -82,8 +82,8 @@ class Myself:
         try:
             res = requests.get(url=url, headers=headers, timeout=(5, 5))
             if res.ok:
-            # with open('info.html', 'r', encoding='utf-8') as f:
-            #     res_text = f.read()
+                # with open('info.html', 'r', encoding='utf-8') as f:
+                #     res_text = f.read()
                 html = BeautifulSoup(res.text, features='lxml')
                 data = {}
                 for elements in html.find_all('div', class_='info_info'):
@@ -103,7 +103,8 @@ class Myself:
                         for display in a.parent.select("ul.display_none li"):
                             if display.select_one("a").text == '站內':
                                 a = display.select_one("a[data-href*='v.myself-bbs.com']")
-                                video_url = a["data-href"].replace('player/play', 'vpx').replace("\r", "").replace("\n", "")
+                                video_url = a["data-href"].replace('player/play', 'vpx').replace("\r", "").replace("\n",
+                                                                                                                   "")
                                 videos.append({'name': badname(name=name), 'url': video_url})
                 data.update({'url': url, 'name': badname(html.find('title').text.split('【')[0]), 'video': videos})
                 res.close()
@@ -137,23 +138,25 @@ class Myself:
         return {'data': data}
 
     @classmethod
-    async def get_vpx_json(cls, url) -> dict:
+    async def get_vpx_json(cls, url: str, timeout: tuple = (10, 10)) -> dict:
         """
 
         :param url:
+        :param timeout:
         :return:
         """
-        return await aiohttp_json(url=url)
+        return await aiohttp_json(url=url, timeout=timeout)
 
     @classmethod
-    async def get_m3u8_data(cls, url) -> object:
+    async def get_m3u8_data(cls, url: str, timeout: tuple = (10, 10)) -> object:
         """
 
         :param url:
+        :param timeout:
         :return:
         """
         s1 = time.time()
-        res_text = await aiohttp_text(url=url)
+        res_text = await aiohttp_text(url=url, timeout=timeout)
         print(time.time() - s1)
         try:
             m3u8_obj = m3u8.loads(res_text)
@@ -207,16 +210,20 @@ class Myself:
     @classmethod
     async def many_start_download_animate(cls, models):
         for model in models:
-            animate_video_json = await cls.get_vpx_json(model.url)
+            animate_video_json = await cls.get_vpx_json(model.url, timeout=(60, 10))
             video_host_list = sorted(animate_video_json['host'], key=lambda x: x.get('weight'), reverse=True)
             print(video_host_list)
             m3u8_url = f"{video_host_list[0]['host']}{animate_video_json['video']['720p']}"
             print(m3u8_url)
             # print(m3u8_url)
-            m3u8_obj = await cls.get_m3u8_data(url=m3u8_url)
-            for x in m3u8_obj.segments:
-                print(x.uri)
+            m3u8_obj = await cls.get_m3u8_data(url=m3u8_url, timeout=(60, 10))
+
+            # for x in m3u8_obj.segments:
+            #     print(x.uri)
+            print(len(m3u8_obj.segments))
+            # model
             # aiohttp_text()
+
 
 async def main():
     # async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as session:

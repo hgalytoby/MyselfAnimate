@@ -24,11 +24,11 @@ def badname(name: str) -> str:
     return reduce(lambda x, y: x + y if y not in ban else x + ' ', name).strip()
 
 
-async def base_aiohttp_req(url, method, **kwargs):
-    timeout = aiohttp.client.ClientTimeout(sock_read=10, sock_connect=10)
+async def base_aiohttp_req(url: str, method: str, timeout: tuple, **kwargs):
+    _timeout = aiohttp.client.ClientTimeout(sock_read=timeout[0], sock_connect=timeout[1])
     try:
         async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
-            async with session.get(url=url, headers=headers, timeout=timeout) as res:
+            async with session.get(url=url, headers=headers, timeout=_timeout) as res:
                 return await getattr(res, method)(**kwargs)
     except aiohttp.ServerConnectionError as e:
         print('ServerConnectionError')
@@ -38,23 +38,23 @@ async def base_aiohttp_req(url, method, **kwargs):
         return None
 
 
-async def aiohttp_text(url):
-    return await base_aiohttp_req(url, method='text', encoding='utf-8', errors='ignore')
+async def aiohttp_text(url, timeout=(10, 10)) -> str:
+    return await base_aiohttp_req(url, method='text', timeout=timeout, encoding='utf-8', errors='ignore')
 
 
-async def aiohttp_bytes(url):
-    return await base_aiohttp_req(url, method='read')
+async def aiohttp_bytes(url, timeout=(10, 10)) -> bytes:
+    return await base_aiohttp_req(url, method='read', timeout=timeout)
 
 
-async def aiohttp_json(url):
-    return await base_aiohttp_req(url, method='json')
+async def aiohttp_json(url, timeout=(10, 10)) -> dict:
+    return await base_aiohttp_req(url, method='json', timeout=timeout)
 
 
-def req_bytes(url):
+def req_bytes(url: str) -> bytes:
     return requests.get(url=url, headers=headers).content
 
 
-def use_io_get_image_format(image_bytes):
+def use_io_get_image_format(image_bytes: bytes) -> str:
     image_io = io.BytesIO(image_bytes)
     open_image = Image.open(image_io)
     image_type = open_image.format.lower()

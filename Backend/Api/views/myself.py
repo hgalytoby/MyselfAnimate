@@ -54,7 +54,7 @@ class AnimateInfoView(APIView):
                     {'id': 8, 'name': '第 08 話', 'url': 'https://v.myself-bbs.com/vpx/47767/008', 'download': False,
                      'done': False, 'owner_id': 6},
                     {'id': 9, 'name': '第 09 話', 'url': 'https://v.myself-bbs.com/vpx/47767/009', 'download': False,
-                     'done': False, 'owner_id': 6}], 'id': 6}
+                     'done': False, 'owner_id': 6}], 'id': 1}
 
         if data:
             return Response(data, status=status.HTTP_200_OK)

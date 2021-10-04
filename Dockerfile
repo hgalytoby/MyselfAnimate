@@ -15,5 +15,4 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 WORKDIR /usr/src/app/backend
 RUN pip install -r requirements.txt
 # 還沒寫完與測試
-CMD ["service", "nginx", "start"]
 CMD ["nginx", "-g", "daemon off;"]

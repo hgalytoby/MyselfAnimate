@@ -31,7 +31,9 @@ class Manage:
     async def myself_animate_download(self, data):
         try:
             animate_episode_models = await DB.Myself.many_animate_episode_update_download(pk_list=data['episodes'])
-            await Myself.many_start_download_animate(models=animate_episode_models)
+            print(animate_episode_models)
+            # await Myself.many_start_download_animate(models=animate_episode_models)
+            f = await DB.Myself.filter_animate_episode_ts_count(model=animate_episode_models[0])
             await self.send(
                 text_data=json.dumps({'msg': '更新完成', 'action': data['action'], 'updating': False}))
         except Exception as e:

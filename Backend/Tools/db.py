@@ -76,6 +76,16 @@ class MyselfBase:
         for uri in data:
             AnimateEpisodeTsModel.objects.get_or_create(uri=uri, )
 
+    @classmethod
+    @database_sync_to_async
+    def filter_animate_episode_ts_count(cls, model):
+        return AnimateEpisodeTsModel.objects.filter(owner=model).count()
+
+    @classmethod
+    @database_sync_to_async
+    def delete_one_all_animate_episode_ts(cls, model):
+        AnimateEpisodeTsModel.objects.filter(owner=model).delete()
+
 
 class DB:
     Myself = MyselfBase
