@@ -5,7 +5,7 @@ import m3u8
 import requests
 from Tools.db import DB
 from bs4 import BeautifulSoup
-from Tools.tools import badname, aiohttp_text, aiohttp_json
+from Tools.tools import badname, aiohttp_text, aiohttp_json, aiohttp_bytes
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Mobile Safari/537.36 Edg/93.0.961.52',
@@ -31,8 +31,8 @@ animate_table = {
 
 
 class Myself:
-    @classmethod
-    def week_animate(cls) -> dict:
+    @staticmethod
+    def week_animate() -> dict:
         """
         爬首頁的每周更新表。
         :return: dict。
@@ -60,8 +60,8 @@ class Myself:
         except requests.exceptions.RequestException as error:
             return {}
 
-    @classmethod
-    def animate_info(cls, url: str) -> dict:
+    @staticmethod
+    def animate_info(url: str) -> dict:
         """
         取得動漫資料。
         :param url: str -> 要爬的網址。
@@ -112,8 +112,8 @@ class Myself:
         except requests.exceptions.RequestException as error:
             return {}
 
-    @classmethod
-    def finish_list(cls) -> dict:
+    @staticmethod
+    def finish_list() -> dict:
         """
         爬完結列表頁面的動漫資訊
         :return: dict。
@@ -137,8 +137,8 @@ class Myself:
         # res.close()
         return {'data': data}
 
-    @classmethod
-    async def get_vpx_json(cls, url: str, timeout: tuple = (10, 10)) -> dict:
+    @staticmethod
+    async def get_vpx_json(url: str, timeout: tuple = (10, 10)) -> dict:
         """
 
         :param url:
@@ -147,8 +147,8 @@ class Myself:
         """
         return await aiohttp_json(url=url, timeout=timeout)
 
-    @classmethod
-    async def get_m3u8_data(cls, url: str, timeout: tuple = (10, 10)) -> object:
+    @staticmethod
+    async def get_m3u8_data(url: str, timeout: tuple = (10, 10)) -> object:
         """
 
         :param url:
@@ -167,8 +167,8 @@ class Myself:
             print(f'get_m3u8 error: {error}')
             return None
 
-    @classmethod
-    async def finish_animate_total_page(cls, url, get_res_text=False) -> dict:
+    @staticmethod
+    async def finish_animate_total_page(url, get_res_text=False) -> dict:
         """
         爬完結動漫總頁數多少。
         :param url: str -> 要爬的網址。
@@ -187,8 +187,8 @@ class Myself:
         else:
             return {'total_page': int(page_data.replace('... ', ''))}
 
-    @classmethod
-    async def finish_animate_page_data(cls, url, res_text=None) -> list:
+    @staticmethod
+    async def finish_animate_page_data(url, res_text=None) -> list:
         """
         完結動漫頁面的動漫資料。
         :param url: str -> 要爬的網址。
@@ -208,7 +208,7 @@ class Myself:
         return data
 
     @classmethod
-    async def many_start_download_animate(cls, models):
+    async def many_start_download_animate(cls, models, animate_name):
         for model in models:
             animate_video_json = await cls.get_vpx_json(model.url, timeout=(60, 10))
             video_host_list = sorted(animate_video_json['host'], key=lambda x: x.get('weight'), reverse=True)
@@ -220,7 +220,24 @@ class Myself:
 
             # for x in m3u8_obj.segments:
             #     print(x.uri)
-            print(len(m3u8_obj.segments))
+            try:
+                if await DB.Myself.get_animate_episode_ts_count(model=model) != len(m3u8_obj.segments):
+                    await DB.Myself.delete_filter_animate_episode_ts(model=model)
+                    await DB.Myself.many_create_animate_episode_ts(model=model, m3u8_obj=m3u8_obj)
+                else:
+                    print('else')
+                for obj in m3u8_obj.segments:
+                    ts_url = f"{video_host_list[0]['host']}{animate_video_json['video']['720p'].replace('720p.m3u8', obj.uri)}"
+                    ts = await aiohttp_bytes(url=ts_url, timeout=(30, 10))
+                    # print(1)
+                    # print(model.name, model.download, model.done)
+                    # animawait model.get_animate_name())
+                    # print(await model.owner.name)
+                    # print(2)
+                    with open(f'./static/temp/{animate_name}/{obj.uri}', 'wb') as f:
+                        f.write(ts)
+            except Exception as e:
+                print(e)
             # model
             # aiohttp_text()
 
@@ -237,7 +254,7 @@ async def main():
 if __name__ == '__main__':
     # asyncio.run(main())
     # Myself.animate_info(url='https://myself-bbs.com/thread-47690-1-1.html')
-    s1 = time.time()
-    print(requests.get(url='https://vpx.myself-bbs.com/47767/001/720p.m3u8', headers=headers).text)
-    print(time.time() - s1)
+    # s1 = time.time()
+    # print(requests.get(url='https://vpx.myself-bbs.com/47767/001/720p.m3u8', headers=headers).text)
+    # print(time.time() - s1)
     pass

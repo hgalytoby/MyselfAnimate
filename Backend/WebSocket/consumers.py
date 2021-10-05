@@ -1,12 +1,15 @@
 import asyncio
 import json
+import os
 import random
+
+from asgiref.sync import sync_to_async
 
 from Tools.db import DB
 from Tools.myself import Myself
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-from Tools.tools import create_log, aiohttp_bytes
+from Tools.tools import create_log
 from Tools.urls import FinishAnimateUrl, FinishAnimateBaseUrl
 
 
@@ -30,14 +33,21 @@ class Manage:
 
     async def myself_animate_download(self, data):
         try:
-            animate_episode_models = await DB.Myself.many_animate_episode_update_download(pk_list=data['episodes'])
-            print(animate_episode_models)
-            # await Myself.many_start_download_animate(models=animate_episode_models)
-            f = await DB.Myself.filter_animate_episode_ts_count(model=animate_episode_models[0])
-            await self.send(
-                text_data=json.dumps({'msg': '更新完成', 'action': data['action'], 'updating': False}))
+            if data['episodes']:
+                if not os.path.isdir(f'./static/temp/{data["animateName"]}'):
+                    os.mkdir(f'./static/temp/{data["animateName"]}')
+                animate_episode_models = await DB.Myself.many_animate_episode_update_download(pk_list=data['episodes'])
+
+                # print(animate_episode_models[0])
+
+                await Myself.many_start_download_animate(models=animate_episode_models, animate_name=data["animateName"])
+                # f = await DB.Myself.filter_animate_episode_ts_count(model=animate_episode_models[0])
+                await self.send(
+                    text_data=json.dumps({'msg': '更新完成', 'action': data['action'], 'updating': False}))
         except Exception as e:
             print(e)
+
+    pass
 
 
 class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
@@ -67,12 +77,11 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
             print(error)
             await self.send(text_data=json.dumps({'msg': f'後端出錯了: {error}'}))
 
-
-"""
-let ws1 = new WebSocket('ws://127.0.0.1:8000/')
-ws1.onmessage = function (e) {
-        const data = JSON.parse(e.data);
-        console.log('ws1', data)
-    };
-ws1.send(JSON.stringify({message: 'hello'}))
-"""
+# """
+# let ws1 = new WebSocket('ws://127.0.0.1:8000/')
+# ws1.onmessage = function (e) {
+#         const data = JSON.parse(e.data);
+#         console.log('ws1', data)
+#     };
+# ws1.send(JSON.stringify({message: 'hello'}))
+# """

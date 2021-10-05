@@ -1,3 +1,4 @@
+from channels.db import database_sync_to_async
 from django.db import models
 
 from Database.models.my import upload_path
@@ -69,6 +70,10 @@ class AnimateEpisodeInfoModel(models.Model):
     class Meta:
         db_table = 'AnimateEpisodeInfo'
 
+    @database_sync_to_async
+    def get_animate_name(self):
+        return self.owner.name
+
     def to_dict(self):
         return {'id': self.id, 'name': self.name, 'url': self.url, 'download': self.download, 'done': self.done,
                 'owner_id': self.owner_id}
@@ -81,6 +86,7 @@ class AnimateEpisodeTsModel(models.Model):
     owner: 關聯
     """
     uri = models.CharField(max_length=32)
+    done = models.BooleanField(default=False)
     owner = models.ForeignKey(AnimateEpisodeInfoModel, on_delete=models.CASCADE, related_name='ts_model')
 
     class Meta:

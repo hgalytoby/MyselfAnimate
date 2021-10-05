@@ -60,7 +60,8 @@ export default {
       sendSocketMessage({
         action: 'downloadMyselfAnimate',
         episodes: checkboxAnimateEpisode.value,
-        owner_id: animateInfo.value.id
+        owner_id: animateInfo.value.id,
+        animateName: animateInfo.value.name
       })
     }
     function saveMyLove () {

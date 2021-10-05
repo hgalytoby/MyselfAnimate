@@ -34,8 +34,8 @@ class MyselfBase:
         if tasks:
             await asyncio.wait(tasks)
 
-    @classmethod
-    def update_or_create_animate_info(cls, data, image):
+    @staticmethod
+    def update_or_create_animate_info(data, image):
         try:
             model = AnimateInfoModel.objects.get(url=data['url'])
         except AnimateInfoModel.DoesNotExist:
@@ -48,8 +48,8 @@ class MyselfBase:
         model.image.save(f'{data["name"]}.{image_type}', ContentFile(image))
         return model
 
-    @classmethod
-    def many_create_animate_episode(cls, data, parent_model):
+    @staticmethod
+    def many_create_animate_episode(data, parent_model):
         models = []
         for episode in data['video']:
             models.append(AnimateEpisodeInfoModel.objects.get_or_create(name=episode['name'], defaults={
@@ -59,9 +59,9 @@ class MyselfBase:
             })[0])
         return models
 
-    @classmethod
+    @staticmethod
     @database_sync_to_async
-    def many_animate_episode_update_download(cls, pk_list):
+    def many_animate_episode_update_download(pk_list):
         models = []
         for pk in pk_list:
             model = AnimateEpisodeInfoModel.objects.get(pk=pk)
@@ -70,21 +70,29 @@ class MyselfBase:
             models.append(model)
         return models
 
-    @classmethod
+    @staticmethod
     @database_sync_to_async
-    def many_animate_episode_ts(cls, data):
+    def many_get_or_create_animate_episode_ts(data):
         for uri in data:
             AnimateEpisodeTsModel.objects.get_or_create(uri=uri, )
 
-    @classmethod
+    @staticmethod
     @database_sync_to_async
-    def filter_animate_episode_ts_count(cls, model):
+    def get_animate_episode_ts_count(model):
         return AnimateEpisodeTsModel.objects.filter(owner=model).count()
 
-    @classmethod
+    @staticmethod
     @database_sync_to_async
-    def delete_one_all_animate_episode_ts(cls, model):
+    def delete_filter_animate_episode_ts(model):
         AnimateEpisodeTsModel.objects.filter(owner=model).delete()
+
+    @staticmethod
+    @database_sync_to_async
+    def many_create_animate_episode_ts(model, m3u8_obj):
+        models = []
+        for obj in m3u8_obj.segments:
+            models.append(AnimateEpisodeTsModel(uri=obj.uri, owner=model))
+        AnimateEpisodeTsModel.objects.bulk_create(models)
 
 
 class DB:

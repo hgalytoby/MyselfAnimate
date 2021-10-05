@@ -25,7 +25,7 @@ def badname(name: str) -> str:
 
 
 async def base_aiohttp_req(url: str, method: str, timeout: tuple, **kwargs):
-    _timeout = aiohttp.client.ClientTimeout(sock_read=timeout[0], sock_connect=timeout[1])
+    _timeout = aiohttp.client.ClientTimeout(sock_connect=timeout[0], sock_read=timeout[1])
     try:
         async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
             async with session.get(url=url, headers=headers, timeout=_timeout) as res:
@@ -38,15 +38,15 @@ async def base_aiohttp_req(url: str, method: str, timeout: tuple, **kwargs):
         return None
 
 
-async def aiohttp_text(url, timeout=(10, 10)) -> str:
+async def aiohttp_text(url: str, timeout: tuple = (10, 10)) -> str:
     return await base_aiohttp_req(url, method='text', timeout=timeout, encoding='utf-8', errors='ignore')
 
 
-async def aiohttp_bytes(url, timeout=(10, 10)) -> bytes:
+async def aiohttp_bytes(url: str, timeout=(10, 10)) -> bytes:
     return await base_aiohttp_req(url, method='read', timeout=timeout)
 
 
-async def aiohttp_json(url, timeout=(10, 10)) -> dict:
+async def aiohttp_json(url: str, timeout=(10, 10)) -> dict:
     return await base_aiohttp_req(url, method='json', timeout=timeout)
 
 
