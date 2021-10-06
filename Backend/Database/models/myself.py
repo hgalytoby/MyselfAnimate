@@ -1,7 +1,7 @@
 from channels.db import database_sync_to_async
 from django.db import models
 
-from Database.models.my import upload_path
+from Database.models.my import upload_image_path, upload_ts_path
 
 
 class AnimateInfoModel(models.Model):
@@ -27,7 +27,7 @@ class AnimateInfoModel(models.Model):
     author = models.CharField(max_length=32)
     official_website = models.URLField()
     remarks = models.CharField(max_length=64)
-    image = models.ImageField(upload_to=upload_path)
+    image = models.ImageField(upload_to=upload_image_path)
     synopsis = models.TextField()
     url = models.URLField(unique=True)
 
@@ -47,7 +47,7 @@ class FinishAnimateModel(models.Model):
     from_website = 'Myself'
     name = models.CharField(max_length=128)
     url = models.URLField(unique=True)
-    image = models.ImageField(upload_to=upload_path)
+    image = models.ImageField(upload_to=upload_image_path)
 
     class Meta:
         db_table = 'MyselfFinishAnimate'
@@ -87,6 +87,7 @@ class AnimateEpisodeTsModel(models.Model):
     """
     uri = models.CharField(max_length=32)
     done = models.BooleanField(default=False)
+    ts = models.FileField(upload_to=upload_ts_path)
     owner = models.ForeignKey(AnimateEpisodeInfoModel, on_delete=models.CASCADE, related_name='ts_model')
 
     class Meta:

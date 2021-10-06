@@ -1,8 +1,12 @@
 import asyncio
+import io
 import time
-
+from Tools.setup import *
 import m3u8
 import requests
+from django.core.files.base import ContentFile
+
+from Database.models import AnimateEpisodeTsModel
 from Tools.db import DB
 from bs4 import BeautifulSoup
 from Tools.tools import badname, aiohttp_text, aiohttp_json, aiohttp_bytes
@@ -228,14 +232,15 @@ class Myself:
                     print('else')
                 for obj in m3u8_obj.segments:
                     ts_url = f"{video_host_list[0]['host']}{animate_video_json['video']['720p'].replace('720p.m3u8', obj.uri)}"
+                    print(ts_url)
                     ts = await aiohttp_bytes(url=ts_url, timeout=(30, 10))
-                    # print(1)
+                    # print(ts)
                     # print(model.name, model.download, model.done)
                     # animawait model.get_animate_name())
                     # print(await model.owner.name)
                     # print(2)
-                    with open(f'./static/temp/{animate_name}/{obj.uri}', 'wb') as f:
-                        f.write(ts)
+                    # with open(f'./static/temp/{animate_name}/{obj.uri}', 'wb') as f:
+                    #     f.write(ts)
             except Exception as e:
                 print(e)
             # model
@@ -257,4 +262,10 @@ if __name__ == '__main__':
     # s1 = time.time()
     # print(requests.get(url='https://vpx.myself-bbs.com/47767/001/720p.m3u8', headers=headers).text)
     # print(time.time() - s1)
+    with open('720p_000.ts', 'rb') as f:
+        # _content = io.BytesIO(f.read())
+        ani = AnimateEpisodeTsModel()
+        ani.uri = '720p_000.ts'
+        ani.owner_id = 1
+        ani.ts.save('720p_000.ts', ContentFile(f.read()))
     pass

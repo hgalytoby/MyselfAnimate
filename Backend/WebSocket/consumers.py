@@ -34,8 +34,8 @@ class Manage:
     async def myself_animate_download(self, data):
         try:
             if data['episodes']:
-                if not os.path.isdir(f'./static/temp/{data["animateName"]}'):
-                    os.mkdir(f'./static/temp/{data["animateName"]}')
+                # if not os.path.isdir(f'./static/temp/{data["animateName"]}'):
+                #     os.mkdir(f'./static/temp/{data["animateName"]}')
                 animate_episode_models = await DB.Myself.many_animate_episode_update_download(pk_list=data['episodes'])
 
                 # print(animate_episode_models[0])
