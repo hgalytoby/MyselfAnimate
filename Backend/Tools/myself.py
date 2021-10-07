@@ -1,5 +1,7 @@
 import asyncio
 import io
+from contextlib import suppress
+import random
 import time
 from Tools.setup import *
 import m3u8
@@ -225,15 +227,16 @@ class Myself:
             # for x in m3u8_obj.segments:
             #     print(x.uri)
             try:
-                if await DB.Myself.get_animate_episode_ts_count(model=model) != len(m3u8_obj.segments):
-                    await DB.Myself.delete_filter_animate_episode_ts(model=model)
-                    await DB.Myself.many_create_animate_episode_ts(model=model, m3u8_obj=m3u8_obj)
+                if await DB.Myself.get_animate_episode_ts_count(parent_model=model) != len(m3u8_obj.segments):
+                    await DB.Myself.delete_filter_animate_episode_ts(parent_model=model)
+                    await DB.Myself.many_create_animate_episode_ts(parent_model=model, m3u8_obj=m3u8_obj)
                 else:
                     print('else')
                 for obj in m3u8_obj.segments:
                     ts_url = f"{video_host_list[0]['host']}{animate_video_json['video']['720p'].replace('720p.m3u8', obj.uri)}"
                     print(ts_url)
-                    ts = await aiohttp_bytes(url=ts_url, timeout=(30, 10))
+                    ts_content = await aiohttp_bytes(url=ts_url, timeout=(30, 10))
+                    await DB.Myself.save_animate_episode_ts_file(uri=obj.uri, parent_model=model, ts_content=ts_content)
                     # print(ts)
                     # print(model.name, model.download, model.done)
                     # animawait model.get_animate_name())
@@ -256,16 +259,44 @@ async def main():
     a = await Myself.get_m3u8_data(url='https://vpx.myself-bbs.com/47731/012/720p.m3u8')
 
 
+class Test:
+    def __init__(self):
+        self.count = 0
+        self.now = 0
+        self.max = 2
+        self.mission = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+    async def ts_test(self, ts_semaphore, i, c):
+        async with ts_semaphore:
+            r = random.randint(1, 5)
+            await asyncio.sleep(r)
+            return i, r
+
+    async def read(self):
+        ts_semaphore = asyncio.Semaphore(value=5)
+        c = self.count
+        tasks = []
+        for i in range(10):
+            tasks.append(asyncio.create_task(self.ts_test(ts_semaphore, i, c)))
+        await asyncio.gather(*tasks)
+        self.now -= 1
+
+    async def main_task(self):
+        while True:
+            if self.mission and self.max > self.now:
+                self.now += 1
+                self.count += 1
+                self.mission.pop(0)
+                asyncio.ensure_future(self.read())
+                print(self.count)
+            await asyncio.sleep(1)
+
+    def main_test(self):
+        asyncio.run(self.main_task())
+
+
 if __name__ == '__main__':
     # asyncio.run(main())
-    # Myself.animate_info(url='https://myself-bbs.com/thread-47690-1-1.html')
-    # s1 = time.time()
-    # print(requests.get(url='https://vpx.myself-bbs.com/47767/001/720p.m3u8', headers=headers).text)
-    # print(time.time() - s1)
-    with open('720p_000.ts', 'rb') as f:
-        # _content = io.BytesIO(f.read())
-        ani = AnimateEpisodeTsModel()
-        ani.uri = '720p_000.ts'
-        ani.owner_id = 1
-        ani.ts.save('720p_000.ts', ContentFile(f.read()))
+    t = Test()
+    t.main_test()
     pass

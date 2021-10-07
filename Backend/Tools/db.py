@@ -78,21 +78,28 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def get_animate_episode_ts_count(model):
-        return AnimateEpisodeTsModel.objects.filter(owner=model).count()
+    def get_animate_episode_ts_count(parent_model):
+        return AnimateEpisodeTsModel.objects.filter(owner=parent_model).count()
 
     @staticmethod
     @database_sync_to_async
-    def delete_filter_animate_episode_ts(model):
-        AnimateEpisodeTsModel.objects.filter(owner=model).delete()
+    def delete_filter_animate_episode_ts(parent_model):
+        AnimateEpisodeTsModel.objects.filter(owner=parent_model).delete()
 
     @staticmethod
     @database_sync_to_async
-    def many_create_animate_episode_ts(model, m3u8_obj):
+    def many_create_animate_episode_ts(parent_model, m3u8_obj):
         models = []
         for obj in m3u8_obj.segments:
-            models.append(AnimateEpisodeTsModel(uri=obj.uri, owner=model))
+            models.append(AnimateEpisodeTsModel(uri=obj.uri, owner=parent_model))
         AnimateEpisodeTsModel.objects.bulk_create(models)
+
+    @staticmethod
+    @database_sync_to_async
+    def save_animate_episode_ts_file(uri, parent_model, ts_content):
+        model = AnimateEpisodeTsModel.objects.get(uri=uri, owner=parent_model)
+        model.done = True
+        model.ts.save(uri, ContentFile(ts_content))
 
 
 class DB:
