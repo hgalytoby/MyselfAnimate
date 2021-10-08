@@ -3,6 +3,7 @@ import io
 from contextlib import suppress
 import random
 import time
+
 from Tools.setup import *
 import m3u8
 import requests
@@ -11,7 +12,7 @@ from django.core.files.base import ContentFile
 from Database.models import AnimateEpisodeTsModel
 from Tools.db import DB
 from bs4 import BeautifulSoup
-from Tools.tools import badname, aiohttp_text, aiohttp_json, aiohttp_bytes
+from Tools.tools import badname, aiohttp_text, aiohttp_json, aiohttp_bytes, SERVER_AND_CLIENT_ERROR
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Mobile Safari/537.36 Edg/93.0.961.52',
@@ -146,7 +147,6 @@ class Myself:
     @staticmethod
     async def get_vpx_json(url: str, timeout: tuple = (10, 10)) -> dict:
         """
-
         :param url:
         :param timeout:
         :return:
@@ -154,20 +154,30 @@ class Myself:
         return await aiohttp_json(url=url, timeout=timeout)
 
     @staticmethod
-    async def get_m3u8_data(url: str, timeout: tuple = (10, 10)) -> object:
+    async def get_m3u8_data(host_list: list, video_720p=str, timeout: tuple = (10, 10)) -> object:
         """
 
-        :param url:
+        :param host_list:
         :param timeout:
         :return:
         """
         s1 = time.time()
-        res_text = await aiohttp_text(url=url, timeout=timeout)
+        change = 0
+        host_list_len = len(host_list)
+        while True:
+            m3u8_url = f"{host_list[change]['host']}{video_720p}"
+            try:
+                res_text = await aiohttp_text(url=m3u8_url, timeout=timeout)
+                break
+            except SERVER_AND_CLIENT_ERROR:
+                if change > host_list_len - 1:
+                    change = 0
+                else:
+                    change += 1
+                print('ServerClientConnectionError')
+            await asyncio.sleep(1)
         print(time.time() - s1)
         try:
-            m3u8_obj = m3u8.loads(res_text)
-            # for x in example.segments:
-            #     print(x.uri)
             return m3u8.loads(res_text)
         except BaseException as error:
             print(f'get_m3u8 error: {error}')
@@ -217,15 +227,10 @@ class Myself:
     async def many_start_download_animate(cls, models, animate_name):
         for model in models:
             animate_video_json = await cls.get_vpx_json(model.url, timeout=(60, 10))
-            video_host_list = sorted(animate_video_json['host'], key=lambda x: x.get('weight'), reverse=True)
-            print(video_host_list)
-            m3u8_url = f"{video_host_list[0]['host']}{animate_video_json['video']['720p']}"
-            print(m3u8_url)
-            # print(m3u8_url)
-            m3u8_obj = await cls.get_m3u8_data(url=m3u8_url, timeout=(60, 10))
-
-            # for x in m3u8_obj.segments:
-            #     print(x.uri)
+            host_list = sorted(animate_video_json['host'], key=lambda x: x.get('weight'), reverse=True)
+            # m3u8_url = f"{host_list[0]['host']}{animate_video_json['video']['720p']}"
+            m3u8_obj = await cls.get_m3u8_data(host_list=host_list, video_720p=animate_video_json['video']['720p'],
+                                               timeout=(60, 10))
             try:
                 if await DB.Myself.get_animate_episode_ts_count(parent_model=model) != len(m3u8_obj.segments):
                     await DB.Myself.delete_filter_animate_episode_ts(parent_model=model)
@@ -233,21 +238,27 @@ class Myself:
                 else:
                     print('else')
                 for obj in m3u8_obj.segments:
-                    ts_url = f"{video_host_list[0]['host']}{animate_video_json['video']['720p'].replace('720p.m3u8', obj.uri)}"
-                    print(ts_url)
-                    ts_content = await aiohttp_bytes(url=ts_url, timeout=(30, 10))
+                    ts_content = await cls.download_ts_content(uri=obj.uri, host_list=host_list,
+                                                               video_720p=animate_video_json['video']['720p'])
                     await DB.Myself.save_animate_episode_ts_file(uri=obj.uri, parent_model=model, ts_content=ts_content)
-                    # print(ts)
-                    # print(model.name, model.download, model.done)
-                    # animawait model.get_animate_name())
-                    # print(await model.owner.name)
-                    # print(2)
-                    # with open(f'./static/temp/{animate_name}/{obj.uri}', 'wb') as f:
-                    #     f.write(ts)
             except Exception as e:
                 print(e)
-            # model
-            # aiohttp_text()
+
+    @classmethod
+    async def download_ts_content(cls, uri: str, host_list: list, video_720p: str):
+        change = 0
+        host_list_len = len(host_list)
+        while True:
+            ts_url = f"{host_list[0]['host']}{video_720p.replace('720p.m3u8', uri)}"
+            try:
+                return await aiohttp_bytes(url=ts_url, timeout=(30, 10))
+            except SERVER_AND_CLIENT_ERROR:
+                if change > host_list_len - 1:
+                    change = 0
+                else:
+                    change += 1
+                print('ServerClientConnectionError')
+            await asyncio.sleep(1)
 
 
 async def main():
@@ -256,7 +267,8 @@ async def main():
     #         print(await res.text(encoding='utf-8', errors='ignore'))
     # _ = await Myself.finish_animate_page_data(url='https://myself-bbs.com/forum-113-1.html')
     # await DB.Myself.create_many_finish_animate(_)
-    a = await Myself.get_m3u8_data(url='https://vpx.myself-bbs.com/47731/012/720p.m3u8')
+    # a = await Myself.get_m3u8_data(url='https://vpx.myself-bbs.com/47731/012/720p.m3u8')
+    pass
 
 
 class Test:

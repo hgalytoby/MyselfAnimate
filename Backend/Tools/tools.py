@@ -1,3 +1,4 @@
+import asyncio
 import io
 
 import aiohttp
@@ -13,6 +14,8 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36',
 }
 
+SERVER_AND_CLIENT_ERROR = (aiohttp.ClientConnectorCertificateError, aiohttp.ServerConnectionError,)
+
 
 def badname(name: str) -> str:
     """
@@ -26,16 +29,9 @@ def badname(name: str) -> str:
 
 async def base_aiohttp_req(url: str, method: str, timeout: tuple, **kwargs):
     _timeout = aiohttp.client.ClientTimeout(sock_connect=timeout[0], sock_read=timeout[1])
-    try:
-        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
-            async with session.get(url=url, headers=headers, timeout=_timeout) as res:
-                return await getattr(res, method)(**kwargs)
-    except aiohttp.ServerConnectionError as e:
-        print('ServerConnectionError')
-        return None
-    except aiohttp.ClientConnectorCertificateError as e:
-        print('ClientConnectorCertificateError')
-        return None
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
+        async with session.get(url=url, headers=headers, timeout=_timeout) as res:
+            return await getattr(res, method)(**kwargs)
 
 
 async def aiohttp_text(url: str, timeout: tuple = (10, 10)) -> str:
@@ -47,7 +43,14 @@ async def aiohttp_bytes(url: str, timeout=(10, 10)) -> bytes:
 
 
 async def aiohttp_json(url: str, timeout=(10, 10)) -> dict:
-    return await base_aiohttp_req(url, method='json', timeout=timeout)
+    error_count = 0
+    while True:
+        try:
+            return await base_aiohttp_req(url, method='json', timeout=timeout)
+        except SERVER_AND_CLIENT_ERROR:
+            error_count += 1
+            print('ServerClientConnectionError')
+        await asyncio.sleep(1)
 
 
 def req_bytes(url: str) -> bytes:
