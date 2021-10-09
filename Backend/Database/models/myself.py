@@ -65,7 +65,7 @@ class AnimateEpisodeInfoModel(models.Model):
     url = models.URLField()
     download = models.BooleanField(default=False)
     done = models.BooleanField(default=False)
-    owner = models.ForeignKey(AnimateInfoModel, on_delete=models.CASCADE)
+    owner = models.ForeignKey(AnimateInfoModel, on_delete=models.CASCADE, related_name='episode_info_model')
 
     class Meta:
         db_table = 'AnimateEpisodeInfo'
@@ -92,3 +92,4 @@ class AnimateEpisodeTsModel(models.Model):
 
     class Meta:
         db_table = 'AnimateEpisodeTs'
+

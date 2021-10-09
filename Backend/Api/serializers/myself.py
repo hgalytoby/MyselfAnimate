@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from Database.models import FinishAnimateModel
+from Database.models import FinishAnimateModel, AnimateEpisodeInfoModel
 
 
 class FinishAnimateSerializer(serializers.ModelSerializer):
@@ -12,3 +12,12 @@ class FinishAnimateSerializer(serializers.ModelSerializer):
     class Meta:
         model = FinishAnimateModel
         fields = ('id', 'name', 'url', 'image')
+
+
+class AnimateEpisodeInfoSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(read_only=True)
+    url = serializers.URLField(read_only=True)
+
+    class Meta:
+        model = AnimateEpisodeInfoModel
+        fields = ('id', 'name', 'url', 'download', 'done')

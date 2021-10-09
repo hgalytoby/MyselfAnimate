@@ -1,14 +1,13 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 
-from Api.serializers import FinishAnimateSerializer
-from Database.models import FinishAnimateModel, AnimateEpisodeInfoModel
-from Tools.db import DB
+from Api.serializers import FinishAnimateSerializer, AnimateEpisodeInfoSerializer
+from Database.models import FinishAnimateModel, AnimateEpisodeInfoModel, AnimateEpisodeTsModel
 from Tools.myself import Myself
-from Tools.tools import req_bytes
-from project.settings import MEDIA_ROOT, MEDIA_PATH
+
+
 
 
 class WeekAnimateView(APIView):
@@ -25,8 +24,8 @@ class AnimateInfoView(APIView):
         # animate_url = f'https://myself-bbs.com/{url}'
         # data = Myself.animate_info(url=animate_url)
         # image = req_bytes(url=data['image'])
-        # model = DB.Myself.update_or_create_animate_info(data=data, image=image)
-        # models = DB.Myself.many_create_animate_episode(data, parent_model=model)
+        # model = DB.Myself.update_or_create_animate_info_model(data=data, image=image)
+        # models = DB.Myself.create_many_animate_episode_models(data, parent_model=model)
         # data['image'] = f'{MEDIA_PATH}{model.image.url}'
         # data['id'] = model.id
         # data['video'] = [m.to_dict() for m in models]
@@ -77,3 +76,13 @@ class FinishAnimateView(ListAPIView):
         serializer = self.get_serializer(self.get_queryset(), many=True)
         return Response(serializer.data)
 
+
+class AnimateEpisodeInfoView(RetrieveUpdateAPIView):
+    serializer_class = AnimateEpisodeInfoSerializer
+    queryset = AnimateEpisodeInfoModel.objects.select_related('owner').all()
+
+    def put(self, request, *args, **kwargs):
+        if request.data.get('download'):
+            model = AnimateEpisodeInfoModel.objects.get(pk=kwargs.get('pk'))
+            AnimateEpisodeTsModel.objects.filter(owner=model).delete()
+        return self.update(request, *args, **kwargs)

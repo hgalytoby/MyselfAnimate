@@ -1,9 +1,5 @@
 import asyncio
 import json
-import os
-import random
-
-from asgiref.sync import sync_to_async
 
 from Tools.db import DB
 from Tools.myself import Myself
@@ -33,17 +29,12 @@ class Manage:
 
     async def myself_animate_download(self, data):
         try:
+            # DB.Myself.get_animate_episode_download_undone_data()
             if data['episodes']:
-                # if not os.path.isdir(f'./static/temp/{data["animateName"]}'):
-                #     os.mkdir(f'./static/temp/{data["animateName"]}')
-                animate_episode_models = await DB.Myself.many_animate_episode_update_download(pk_list=data['episodes'])
-
-                # print(animate_episode_models[0])
-
-                await Myself.many_start_download_animate(models=animate_episode_models, animate_name=data["animateName"])
-                # f = await DB.Myself.filter_animate_episode_ts_count(model=animate_episode_models[0])
+                animate_episode_models = await DB.Myself.update_many_animate_episode_download_models(
+                    pk_list=data['episodes'])
                 await self.send(
-                    text_data=json.dumps({'msg': '更新完成', 'action': data['action'], 'updating': False}))
+                    text_data=json.dumps({'msg': '下載完成', 'action': data['action'], 'updating': False}))
         except Exception as e:
             print(e)
 

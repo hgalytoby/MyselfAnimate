@@ -1,16 +1,8 @@
 import asyncio
-import io
-from contextlib import suppress
-import random
 import time
-
-from Tools.setup import *
 import m3u8
 import requests
-from django.core.files.base import ContentFile
 
-from Database.models import AnimateEpisodeTsModel
-from Tools.db import DB
 from bs4 import BeautifulSoup
 from Tools.tools import badname, aiohttp_text, aiohttp_json, aiohttp_bytes, SERVER_AND_CLIENT_ERROR
 
@@ -65,7 +57,28 @@ class Myself:
                 # res.close()
                 return data
         except requests.exceptions.RequestException as error:
+            print(f'week_animate: {error}')
             return {}
+
+    @staticmethod
+    def animate_info_video_data(html, ):
+        data = []
+        for main_list in html.select('ul.main_list'):
+            for a in main_list.find_all('a', href='javascript:;'):
+                name = a.text
+                for display in a.parent.select("ul.display_none li"):
+                    if display.select_one("a").text == '站內':
+                        a = display.select_one("a[data-href*='v.myself-bbs.com']")
+                        video_url = a["data-href"].replace('player/play', 'vpx').replace("\r", "").replace("\n", "")
+                        data.append({'name': badname(name=name), 'url': video_url})
+        return data
+
+    @staticmethod
+    async def re_animate_info_video_data(url):
+        res_text = await aiohttp_text(url=url)
+        html = BeautifulSoup(res_text, 'lxml')
+        video_data = Myself.animate_info_video_data(html=html)
+        return dict(map(lambda kv: (kv['name'], kv['url']), video_data))
 
     @staticmethod
     def animate_info(url: str) -> dict:
@@ -103,20 +116,12 @@ class Myself:
                 for elements in html.find_all('div', class_='info_img_box fl'):
                     for element in elements.find_all('img'):
                         data.update({'image': element['src']})
-                videos = []
-                for main_list in html.select('ul.main_list'):
-                    for a in main_list.find_all('a', href='javascript:;'):
-                        name = a.text
-                        for display in a.parent.select("ul.display_none li"):
-                            if display.select_one("a").text == '站內':
-                                a = display.select_one("a[data-href*='v.myself-bbs.com']")
-                                video_url = a["data-href"].replace('player/play', 'vpx').replace("\r", "").replace("\n",
-                                                                                                                   "")
-                                videos.append({'name': badname(name=name), 'url': video_url})
-                data.update({'url': url, 'name': badname(html.find('title').text.split('【')[0]), 'video': videos})
+                video = Myself.animate_info_video_data(html=html)
+                data.update({'url': url, 'name': badname(html.find('title').text.split('【')[0]), 'video': video})
                 res.close()
                 return data
         except requests.exceptions.RequestException as error:
+            print(f'animate_info_error: {error}')
             return {}
 
     @staticmethod
@@ -154,10 +159,11 @@ class Myself:
         return await aiohttp_json(url=url, timeout=timeout)
 
     @staticmethod
-    async def get_m3u8_data(host_list: list, video_720p=str, timeout: tuple = (10, 10)) -> object:
+    async def get_m3u8_uri_list(host_list: list, video_720p=str, timeout: tuple = (10, 10)) -> m3u8:
         """
 
         :param host_list:
+        :param video_720p:
         :param timeout:
         :return:
         """
@@ -177,8 +183,14 @@ class Myself:
                 print('ServerClientConnectionError')
             await asyncio.sleep(1)
         print(time.time() - s1)
+        with open('m3u8.txt', 'w', encoding='utf-8') as f:
+            f.write(res_text)
         try:
-            return m3u8.loads(res_text)
+            m3u8_obj = m3u8.loads(res_text)
+            ts_list = []
+            for m3u8_obj in m3u8_obj.segments:
+                ts_list.append(m3u8_obj.uri)
+            return ts_list
         except BaseException as error:
             print(f'get_m3u8 error: {error}')
             return None
@@ -224,32 +236,17 @@ class Myself:
         return data
 
     @classmethod
-    async def many_start_download_animate(cls, models, animate_name):
-        for model in models:
-            animate_video_json = await cls.get_vpx_json(model.url, timeout=(60, 10))
-            host_list = sorted(animate_video_json['host'], key=lambda x: x.get('weight'), reverse=True)
-            # m3u8_url = f"{host_list[0]['host']}{animate_video_json['video']['720p']}"
-            m3u8_obj = await cls.get_m3u8_data(host_list=host_list, video_720p=animate_video_json['video']['720p'],
-                                               timeout=(60, 10))
-            try:
-                if await DB.Myself.get_animate_episode_ts_count(parent_model=model) != len(m3u8_obj.segments):
-                    await DB.Myself.delete_filter_animate_episode_ts(parent_model=model)
-                    await DB.Myself.many_create_animate_episode_ts(parent_model=model, m3u8_obj=m3u8_obj)
-                else:
-                    print('else')
-                for obj in m3u8_obj.segments:
-                    ts_content = await cls.download_ts_content(uri=obj.uri, host_list=host_list,
-                                                               video_720p=animate_video_json['video']['720p'])
-                    await DB.Myself.save_animate_episode_ts_file(uri=obj.uri, parent_model=model, ts_content=ts_content)
-            except Exception as e:
-                print(e)
+    async def get_animate_video_json_and_host_list(cls, url):
+        animate_video_json = await cls.get_vpx_json(url=url, timeout=(60, 10))
+        host_list = sorted(animate_video_json['host'], key=lambda x: x.get('weight'), reverse=True)
+        return animate_video_json, host_list
 
     @classmethod
-    async def download_ts_content(cls, uri: str, host_list: list, video_720p: str):
+    async def download_ts_content(cls, ts_uri: str, host_list: list, video_720p: str):
         change = 0
         host_list_len = len(host_list)
         while True:
-            ts_url = f"{host_list[0]['host']}{video_720p.replace('720p.m3u8', uri)}"
+            ts_url = f"{host_list[0]['host']}{video_720p.replace('720p.m3u8', ts_uri)}"
             try:
                 return await aiohttp_bytes(url=ts_url, timeout=(30, 10))
             except SERVER_AND_CLIENT_ERROR:
@@ -270,45 +267,6 @@ async def main():
     # a = await Myself.get_m3u8_data(url='https://vpx.myself-bbs.com/47731/012/720p.m3u8')
     pass
 
-
-class Test:
-    def __init__(self):
-        self.count = 0
-        self.now = 0
-        self.max = 2
-        self.mission = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-
-    async def ts_test(self, ts_semaphore, i, c):
-        async with ts_semaphore:
-            r = random.randint(1, 5)
-            await asyncio.sleep(r)
-            return i, r
-
-    async def read(self):
-        ts_semaphore = asyncio.Semaphore(value=5)
-        c = self.count
-        tasks = []
-        for i in range(10):
-            tasks.append(asyncio.create_task(self.ts_test(ts_semaphore, i, c)))
-        await asyncio.gather(*tasks)
-        self.now -= 1
-
-    async def main_task(self):
-        while True:
-            if self.mission and self.max > self.now:
-                self.now += 1
-                self.count += 1
-                self.mission.pop(0)
-                asyncio.ensure_future(self.read())
-                print(self.count)
-            await asyncio.sleep(1)
-
-    def main_test(self):
-        asyncio.run(self.main_task())
-
-
 if __name__ == '__main__':
-    # asyncio.run(main())
-    t = Test()
-    t.main_test()
+    # asyncio.run(main_task())
     pass

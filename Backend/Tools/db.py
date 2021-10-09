@@ -4,10 +4,11 @@ from PIL import Image
 from asgiref.sync import sync_to_async
 
 from Tools.setup import *
+from Tools.myself import Myself
 from channels.db import database_sync_to_async
 from Database.models import FinishAnimateModel, AnimateInfoModel, AnimateEpisodeInfoModel, AnimateEpisodeTsModel
 from django.core.files.base import ContentFile
-from Tools.tools import aiohttp_bytes, use_io_get_image_format
+from Tools.tools import aiohttp_bytes, use_io_get_image_format, aiohttp_text
 
 
 class MyselfBase:
@@ -27,6 +28,11 @@ class MyselfBase:
 
     @classmethod
     async def create_many_finish_animate(cls, data):
+        """
+
+        :param data:
+        :return:
+        """
         tasks = []
         for animate in data:
             if not await database_sync_to_async(list)(FinishAnimateModel.objects.filter(url=animate['url'])):
@@ -35,7 +41,13 @@ class MyselfBase:
             await asyncio.wait(tasks)
 
     @staticmethod
-    def update_or_create_animate_info(data, image):
+    def update_or_create_animate_info_model(data, image):
+        """
+        更新或新增動漫資料。
+        :param data:
+        :param image:
+        :return:
+        """
         try:
             model = AnimateInfoModel.objects.get(url=data['url'])
         except AnimateInfoModel.DoesNotExist:
@@ -49,7 +61,13 @@ class MyselfBase:
         return model
 
     @staticmethod
-    def many_create_animate_episode(data, parent_model):
+    def create_many_animate_episode_models(data, parent_model):
+        """
+        新增多個動漫集數。
+        :param data:
+        :param parent_model:
+        :return:
+        """
         models = []
         for episode in data['video']:
             models.append(AnimateEpisodeInfoModel.objects.get_or_create(name=episode['name'], defaults={
@@ -61,7 +79,12 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def many_animate_episode_update_download(pk_list):
+    def update_many_animate_episode_download_models(pk_list):
+        """
+        更新多個動漫集數下載。
+        :param pk_list:
+        :return:
+        """
         models = []
         for pk in pk_list:
             model = AnimateEpisodeInfoModel.objects.get(pk=pk)
@@ -72,35 +95,117 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def many_get_or_create_animate_episode_ts(data):
-        for uri in data:
-            AnimateEpisodeTsModel.objects.get_or_create(uri=uri, )
-
-    @staticmethod
-    @database_sync_to_async
     def get_animate_episode_ts_count(parent_model):
+        """
+        取得動漫某一集 ts 總數量。
+        :param parent_model:
+        :return:
+        """
         return AnimateEpisodeTsModel.objects.filter(owner=parent_model).count()
 
-    @staticmethod
+    @classmethod
     @database_sync_to_async
-    def delete_filter_animate_episode_ts(parent_model):
+    def delete_filter_animate_episode_ts(cls, parent_model):
+        """
+        刪除動滿某一集所有 ts 資料。
+        :param parent_model:
+        :return:
+        """
         AnimateEpisodeTsModel.objects.filter(owner=parent_model).delete()
 
     @staticmethod
     @database_sync_to_async
-    def many_create_animate_episode_ts(parent_model, m3u8_obj):
+    def create_many_animate_episode_ts(parent_model, ts_list):
+        """
+        新增多個動漫某一集的所有 ts 資料。
+        :param parent_model:
+        :param ts_list:
+        :return:
+        """
         models = []
-        for obj in m3u8_obj.segments:
-            models.append(AnimateEpisodeTsModel(uri=obj.uri, owner=parent_model))
+        for ts_uri in ts_list:
+            models.append(AnimateEpisodeTsModel(uri=ts_uri, owner=parent_model))
         AnimateEpisodeTsModel.objects.bulk_create(models)
 
     @staticmethod
     @database_sync_to_async
     def save_animate_episode_ts_file(uri, parent_model, ts_content):
+        """
+        儲存動漫某一集的 ts 檔案
+        :param uri:
+        :param parent_model:
+        :param ts_content:
+        :return:
+        """
         model = AnimateEpisodeTsModel.objects.get(uri=uri, owner=parent_model)
         model.done = True
         model.ts.save(uri, ContentFile(ts_content))
 
+    @staticmethod
+    @database_sync_to_async
+    def get_animate_episode_download_undone_list():
+        """
+        取得正在下載的動漫陣列清單。
+        :return:
+        """
+        data = []
+        animate_models = AnimateInfoModel.objects.all()
+        for animate_model in animate_models:
+            episode_ts_models = animate_model.episode_info_model.filter(download=True)
+            if episode_ts_models:
+                data.append({'id': animate_model.id, 'name': animate_model.name, 'url': animate_model.url})
+        return data
+
+    @staticmethod
+    @database_sync_to_async
+    def get_animate_episode_info_model(animate_name, episode_name):
+        """
+        取得動漫資料 model。
+        :param animate_name:
+        :param episode_name:
+        :return:
+        """
+        return AnimateEpisodeInfoModel.objects.get(owner__name=animate_name, name=episode_name)
+
+    @staticmethod
+    @database_sync_to_async
+    def filter_animate_episode_info_downloading_models(owner_id):
+        """
+        取得指定動漫有哪些集數正在下載的 model。
+        :param owner_id:
+        :return:
+        """
+        return list(AnimateEpisodeInfoModel.objects.filter(owner_id=owner_id, download=True))
+
+    @staticmethod
+    @database_sync_to_async
+    def filter_animate_episode_ts_undone_uri_list(parent_model):
+        """
+        取得指定動漫某一集尚未下載的 ts uri 陣列清單。
+        :param parent_model:
+        :return:
+        """
+        data = []
+        for model in AnimateEpisodeTsModel.objects.filter(owner=parent_model, done=False):
+            data.append(model.uri)
+        return data
+
+    @classmethod
+    @database_sync_to_async
+    def update_animate_episode_url(cls, new_url, model):
+        """
+        更新 AnimateEpisodeInfoModel 的 URL。
+        :param new_url:
+        :param model:
+        :return:
+        """
+        model.url = new_url
+        model.save()
+
 
 class DB:
     Myself = MyselfBase
+
+
+if __name__ == '__main__':
+    pass
