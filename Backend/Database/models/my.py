@@ -15,6 +15,13 @@ def upload_ts_path(instance, filename):
     return f'ts/{instance.owner.owner.name}/{instance.owner.name}/{filename}'
 
 
+def upload_video_path(instance, filename):
+    """
+    Profile name 為資料夾名字放入圖片。
+    """
+    return f'video/{instance.owner.name}/{instance.name}/{filename}'
+
+
 class HistoryModel(models.Model):
     animate_website_name = models.CharField(max_length=32)
     animate_name = models.CharField(max_length=128)

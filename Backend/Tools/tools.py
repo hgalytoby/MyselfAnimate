@@ -66,6 +66,10 @@ def use_io_get_image_format(image_bytes: bytes) -> str:
     return image_type
 
 
+def merge_ts_to_mp4():
+    pass
+
+
 @database_sync_to_async
 def create_log(msg: str, action: str):
     LogModel.objects.create(msg=msg, action=action)

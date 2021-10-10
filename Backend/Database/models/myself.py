@@ -1,7 +1,7 @@
 from channels.db import database_sync_to_async
 from django.db import models
 
-from Database.models.my import upload_image_path, upload_ts_path
+from Database.models.my import upload_image_path, upload_ts_path, upload_video_path
 
 
 class AnimateInfoModel(models.Model):
@@ -65,6 +65,7 @@ class AnimateEpisodeInfoModel(models.Model):
     url = models.URLField()
     download = models.BooleanField(default=False)
     done = models.BooleanField(default=False)
+    video = models.FileField(upload_to=upload_video_path, null=True, blank=True)
     owner = models.ForeignKey(AnimateInfoModel, on_delete=models.CASCADE, related_name='episode_info_model')
 
     class Meta:

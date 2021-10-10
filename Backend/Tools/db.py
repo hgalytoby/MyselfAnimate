@@ -79,19 +79,24 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def update_many_animate_episode_download_models(pk_list):
+    def get_many_animate_episode_download_data_and_update_download(pk_list):
         """
-        更新多個動漫集數下載。
+        取得多個動漫集數資料與更新成下載中。
         :param pk_list:
         :return:
         """
-        models = []
+        data = []
         for pk in pk_list:
             model = AnimateEpisodeInfoModel.objects.get(pk=pk)
             model.download = True
             model.save()
-            models.append(model)
-        return models
+            data.append({
+                'id': model.id,
+                'animate_name': model.owner.name,
+                'episode_name': model.name,
+                'vpx_url': model.url,
+            })
+        return data
 
     @staticmethod
     @database_sync_to_async
@@ -140,6 +145,16 @@ class MyselfBase:
         model = AnimateEpisodeTsModel.objects.get(uri=uri, owner=parent_model)
         model.done = True
         model.ts.save(uri, ContentFile(ts_content))
+
+    @staticmethod
+    @database_sync_to_async
+    def save_animate_episode_file(pk):
+        """
+        :return:
+        """
+        model = AnimateEpisodeInfoModel.objects.get(pk=pk)
+        model.done = True
+        model.save()
 
     @staticmethod
     @database_sync_to_async
