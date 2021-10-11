@@ -14,7 +14,7 @@ from Tools.tools import aiohttp_bytes, use_io_get_image_format, aiohttp_text
 class MyselfBase:
     @classmethod
     @database_sync_to_async
-    def create_finish_animate(cls, animate):
+    def create_finish_animate(cls, animate: dict):
         image_type = use_io_get_image_format(animate['image'])
         model = FinishAnimateModel()
         model.name = animate['name']
@@ -22,12 +22,12 @@ class MyselfBase:
         model.image.save(f'{animate["name"]}.{image_type}', ContentFile(animate['image']))
 
     @classmethod
-    async def create_finish_animate_data_task(cls, animate):
+    async def create_finish_animate_data_task(cls, animate: dict):
         animate['image'] = await aiohttp_bytes(url=animate['image'])
         await cls.create_finish_animate(animate)
 
     @classmethod
-    async def create_many_finish_animate(cls, data):
+    async def create_many_finish_animate(cls, data: list):
         """
 
         :param data:
@@ -41,7 +41,7 @@ class MyselfBase:
             await asyncio.wait(tasks)
 
     @staticmethod
-    def update_or_create_animate_info_model(data, image):
+    def update_or_create_animate_info_model(data: dict, image: bytes):
         """
         更新或新增動漫資料。
         :param data:
@@ -61,7 +61,7 @@ class MyselfBase:
         return model
 
     @staticmethod
-    def create_many_animate_episode_models(data, parent_model):
+    def create_many_animate_episode_models(data: dict, parent_model):
         """
         新增多個動漫集數。
         :param data:
@@ -79,7 +79,7 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def get_many_animate_episode_download_data_and_update_download(pk_list):
+    def get_many_animate_episode_download_data_and_update_download(pk_list: list) -> list:
         """
         取得多個動漫集數資料與更新成下載中。
         :param pk_list:
@@ -120,7 +120,7 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def create_many_animate_episode_ts(parent_model, ts_list):
+    def create_many_animate_episode_ts(parent_model, ts_list: list):
         """
         新增多個動漫某一集的所有 ts 資料。
         :param parent_model:
@@ -134,7 +134,7 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def save_animate_episode_ts_file(uri, parent_model, ts_content):
+    def save_animate_episode_ts_file(uri: str, parent_model, ts_content: bytes):
         """
         儲存動漫某一集的 ts 檔案
         :param uri:
@@ -173,7 +173,7 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def get_animate_episode_info_model(animate_name, episode_name):
+    def get_animate_episode_info_model(animate_name: str, episode_name: str):
         """
         取得動漫資料 model。
         :param animate_name:
@@ -207,7 +207,7 @@ class MyselfBase:
 
     @classmethod
     @database_sync_to_async
-    def update_animate_episode_url(cls, new_url, model):
+    def update_animate_episode_url(cls, new_url: str, model):
         """
         更新 AnimateEpisodeInfoModel 的 URL。
         :param new_url:

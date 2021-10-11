@@ -61,7 +61,7 @@ class Myself:
             return {}
 
     @staticmethod
-    def animate_info_video_data(html, ):
+    def animate_info_video_data(html: BeautifulSoup) -> list:
         data = []
         for main_list in html.select('ul.main_list'):
             for a in main_list.find_all('a', href='javascript:;'):
@@ -74,7 +74,7 @@ class Myself:
         return data
 
     @staticmethod
-    async def re_animate_info_video_data(url):
+    async def re_animate_info_video_data(url: str) -> dict:
         res_text = await aiohttp_text(url=url)
         html = BeautifulSoup(res_text, 'lxml')
         video_data = Myself.animate_info_video_data(html=html)
@@ -196,7 +196,7 @@ class Myself:
             return None
 
     @staticmethod
-    async def finish_animate_total_page(url, get_res_text=False) -> dict:
+    async def finish_animate_total_page(url: str, get_res_text: bool = False) -> dict:
         """
         爬完結動漫總頁數多少。
         :param url: str -> 要爬的網址。
@@ -216,7 +216,7 @@ class Myself:
             return {'total_page': int(page_data.replace('... ', ''))}
 
     @staticmethod
-    async def finish_animate_page_data(url, res_text=None) -> list:
+    async def finish_animate_page_data(url: str, res_text: str = None) -> list:
         """
         完結動漫頁面的動漫資料。
         :param url: str -> 要爬的網址。
@@ -236,7 +236,7 @@ class Myself:
         return data
 
     @classmethod
-    async def get_animate_video_json_and_host_list(cls, url):
+    async def get_animate_video_json_and_host_list(cls, url: str) -> tuple:
         animate_video_json = await cls.get_vpx_json(url=url, timeout=(60, 10))
         host_list = sorted(animate_video_json['host'], key=lambda x: x.get('weight'), reverse=True)
         return animate_video_json, host_list
@@ -266,6 +266,7 @@ async def main():
     # await DB.Myself.create_many_finish_animate(_)
     # a = await Myself.get_m3u8_data(url='https://vpx.myself-bbs.com/47731/012/720p.m3u8')
     pass
+
 
 if __name__ == '__main__':
     # asyncio.run(main_task())
