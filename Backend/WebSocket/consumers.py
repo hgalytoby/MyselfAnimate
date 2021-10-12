@@ -6,6 +6,7 @@ from Tools.myself import Myself
 from Tools.tools import create_log
 from Tools.urls import FinishAnimateUrl, FinishAnimateBaseUrl
 from channels.generic.websocket import AsyncWebsocketConsumer
+import threading
 
 
 class DownloadManage:
@@ -14,9 +15,10 @@ class DownloadManage:
         self.wait_download_list = []
         self.now = 0
         self.max = 2
-        asyncio.run(self.main_task())
+        threading.Thread(target=self.main, args=()).start()
 
-    async def download_ts(self, ts_semaphore, ts_uri, task_data):
+    @staticmethod
+    async def download_ts(ts_semaphore, ts_uri, task_data):
         async with ts_semaphore:
             ts_content = await Myself.download_ts_content(ts_uri=ts_uri, host_list=task_data['host_list'],
                                                           video_720p=task_data['video_720p'])
@@ -75,15 +77,22 @@ class DownloadManage:
         pass
 
     async def main_task(self):
-        await self.get_animate_episode_download_undone_data()
-        print(self.wait_download_list)
+        # await self.get_animate_episode_download_undone_data()
+        # print(self.wait_download_list)
         while True:
-            if self.wait_download_list and self.max > self.now:
-                self.now += 1
-                task_data = self.wait_download_list.pop(0)
-                self.download_list.append(task_data)
-                asyncio.ensure_future(self.download_animate_script(task_data))
+            print(self.wait_download_list)
+            # if self.wait_download_list and self.max > self.now:
+            #     self.now += 1
+            #     task_data = self.wait_download_list.pop(0)
+            #     self.download_list.append(task_data)
+            #     asyncio.ensure_future(self.download_animate_script(task_data))
             await asyncio.sleep(1)
+
+    def main(self):
+        asyncio.run(self.main_task())
+
+
+download_manage = DownloadManage()
 
 
 class Manage:
@@ -109,7 +118,9 @@ class Manage:
             if data['episodes']:
                 animate_episode_list = await DB.Myself.get_many_animate_episode_download_data_and_update_download(
                     pk_list=data['episodes'])
-                print(animate_episode_list, '123')
+                download_manage.wait_download_list.append(animate_episode_list)
+
+                # print(animate_episode_list, '123')
                 await self.send(
                     text_data=json.dumps({'msg': '下載完成', 'action': data['action'], 'updating': False}))
         except Exception as e:

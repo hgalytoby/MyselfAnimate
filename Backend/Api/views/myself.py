@@ -72,10 +72,6 @@ class FinishAnimateView(ListAPIView):
     serializer_class = FinishAnimateSerializer
     queryset = FinishAnimateModel.objects.all()
 
-    def list(self, request, *args, **kwargs):
-        serializer = self.get_serializer(self.get_queryset(), many=True)
-        return Response(serializer.data)
-
 
 class AnimateEpisodeInfoView(RetrieveUpdateAPIView):
     serializer_class = AnimateEpisodeInfoSerializer
