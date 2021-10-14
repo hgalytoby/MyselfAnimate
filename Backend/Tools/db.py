@@ -166,7 +166,7 @@ class MyselfBase:
         data = []
         animate_models = AnimateInfoModel.objects.all()
         for animate_model in animate_models:
-            episode_ts_models = animate_model.episode_info_model.filter(download=True)
+            episode_ts_models = animate_model.episode_info_model.filter(download=True, done=False)
             if episode_ts_models:
                 data.append({'id': animate_model.id, 'name': animate_model.name, 'url': animate_model.url})
         return data

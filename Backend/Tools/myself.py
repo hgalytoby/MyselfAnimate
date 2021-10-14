@@ -62,6 +62,11 @@ class Myself:
 
     @staticmethod
     def animate_info_video_data(html: BeautifulSoup) -> list:
+        """
+        取得影片 Api Host Url。
+        :param html:
+        :return:
+        """
         data = []
         for main_list in html.select('ul.main_list'):
             for a in main_list.find_all('a', href='javascript:;'):
@@ -161,7 +166,6 @@ class Myself:
     @staticmethod
     async def get_m3u8_uri_list(host_list: list, video_720p=str, timeout: tuple = (10, 10)) -> m3u8:
         """
-
         :param host_list:
         :param video_720p:
         :param timeout:
