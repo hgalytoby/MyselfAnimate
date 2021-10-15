@@ -54,8 +54,10 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
     async def connect(self):
         await self.accept()
         await self.send(text_data=json.dumps({'type': 'connect', 'msg': f'連線成功!!'}))
+        download_manage.ws = self
 
     async def disconnect(self, close_code):
+        download_manage.ws = None
         pass
 
     async def receive(self, text_data=None, bytes_data=None):
