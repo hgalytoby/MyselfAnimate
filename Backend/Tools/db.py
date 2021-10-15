@@ -95,6 +95,7 @@ class MyselfBase:
                 'animate_name': model.owner.name,
                 'episode_name': model.name,
                 'vpx_url': model.url,
+                'count': 0
             })
         return data
 
