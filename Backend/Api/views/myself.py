@@ -24,12 +24,15 @@ class AnimateInfoView(APIView):
         url = request.query_params.get('url')
         animate_url = f'https://myself-bbs.com/{url}'
         data = Myself.animate_info(url=animate_url)
+        print(data)
         image = req_bytes(url=data['image'])
         model = DB.Myself.update_or_create_animate_info_model(data=data, image=image)
+        print(model.id)
         models = DB.Myself.create_many_animate_episode_models(data, parent_model=model)
         data['image'] = f'{MEDIA_PATH}{model.image.url}'
         data['id'] = model.id
         data['video'] = [m.to_dict() for m in models]
+        
         # data = {'animate_type': '校園 / 勵志', 'premiere_date': '2021年07月11日', 'episode': '未定', 'author': '矢立肇',
         #         'official_website': 'https://www.lovelive-anime.jp/yuigaoka/', 'remarks': '',
         #         'synopsis': '結丘女子高等學校，首位入學生來到了這所位於表參道、原宿和青山這三條街區之間的新學校。沒有歷史、沒有前輩、名字也完全不為人所知，在這間盡是「沒有」的學校，以澀谷香音為中心的五名少女和“學園偶像”遇上了。\n\r\n我果然很喜歡歌唱！ 想透過歌唱……實現點什麼！！渺小的星星們，她們宏大的想法重合著——。白紙一張，擁有著無限可能性的她們的「大家一起實現的故事（School idol project）」。飛翔吧！我們的LoveLive！',

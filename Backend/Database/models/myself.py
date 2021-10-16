@@ -61,7 +61,7 @@ class AnimateEpisodeInfoModel(models.Model):
     done: 是否下載完成
     owner: 關聯
     """
-    name = models.CharField(max_length=64, unique=True)
+    name = models.CharField(max_length=64)
     url = models.URLField()
     download = models.BooleanField(default=False)
     done = models.BooleanField(default=False)
@@ -93,4 +93,5 @@ class AnimateEpisodeTsModel(models.Model):
 
     class Meta:
         db_table = 'AnimateEpisodeTs'
+        
 

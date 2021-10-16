@@ -1,5 +1,7 @@
 import io
 import asyncio
+import subprocess
+
 from PIL import Image
 from asgiref.sync import sync_to_async
 
@@ -9,6 +11,7 @@ from channels.db import database_sync_to_async
 from Database.models import FinishAnimateModel, AnimateInfoModel, AnimateEpisodeInfoModel, AnimateEpisodeTsModel
 from django.core.files.base import ContentFile
 from Tools.tools import aiohttp_bytes, use_io_get_image_format, aiohttp_text
+from project.settings import MEDIA_PATH
 
 
 class MyselfBase:
@@ -70,11 +73,12 @@ class MyselfBase:
         """
         models = []
         for episode in data['video']:
-            models.append(AnimateEpisodeInfoModel.objects.get_or_create(name=episode['name'], defaults={
-                'name': episode['name'],
-                'url': episode['url'],
-                'owner': parent_model,
-            })[0])
+            models.append(
+                AnimateEpisodeInfoModel.objects.get_or_create(name=episode['name'], owner=parent_model, defaults={
+                    'name': episode['name'],
+                    'url': episode['url'],
+                    'owner': parent_model,
+                })[0])
         return models
 
     @staticmethod
@@ -149,6 +153,19 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
+    def save_animate_episode_video_file(name: str, parent_model, video_content: bytes):
+        """
+        儲存動漫某一集的 ts 檔案
+        :param name:
+        :param parent_model:
+        :param video_content:
+        :return:
+        """
+        model = AnimateEpisodeInfoModel.objects.get(name=name, owner=parent_model)
+        model.video.save(f'{model.name}.mp4', ContentFile(video_content))
+
+    @staticmethod
+    @database_sync_to_async
     def save_animate_episode_file(pk):
         """
         :return:
@@ -206,6 +223,14 @@ class MyselfBase:
             data.append(model.uri)
         return data
 
+    @staticmethod
+    @database_sync_to_async
+    def filter_animate_episode_ts_undone_ts_list(parent_model):
+        data = []
+        for model in AnimateEpisodeTsModel.objects.filter(owner=parent_model):
+            data.append(f"file '.{MEDIA_PATH}/{model.ts}'")
+        return data
+
     @classmethod
     @database_sync_to_async
     def update_animate_episode_url(cls, new_url: str, model):
@@ -224,4 +249,24 @@ class DB:
 
 
 if __name__ == '__main__':
-    pass
+    animate = AnimateInfoModel.objects.last()
+    episode_info = AnimateEpisodeInfoModel.objects.filter(owner=animate).first()
+    # print(episode_info.id)
+    episode_ts = AnimateEpisodeTsModel.objects.filter(owner=episode_info)
+    # print(episode_ts)
+    data = []
+    for index, ts in enumerate(episode_ts):
+        data.append(f"file './{MEDIA_PATH}/{ts.ts}'")
+        # print(f'.{MEDIA_PATH}/{ts.ts}')
+
+    with open('file.txt', 'w', encoding='utf-8') as f:
+        f.write('\n'.join(data))
+    # videos = '|'.join(data)
+    # print(videos)
+    # print(videos)
+    # # cmd = f'ffmpeg -i "concat:{videos}" -y -c copy C:/Python/MyselfAnimate/backend/out.mp4'
+    # cmd = f'ffmpeg -f concat -safe 0 -y -i file.txt -c copy C:/Python/MyselfAnimate/backend/out.mp4'
+    # print(1)
+    # run_ffmpeg = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+    # run_ffmpeg.wait()
+    # print(2)

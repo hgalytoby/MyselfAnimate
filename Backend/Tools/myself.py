@@ -259,6 +259,8 @@ class Myself:
                 else:
                     change += 1
                 print('ServerClientConnectionError')
+            except Exception as error:
+                print(error)
             await asyncio.sleep(1)
 
 
