@@ -2,6 +2,7 @@
   <div>我是animate</div>
   <div v-if="loading">加載中...</div>
   <div v-else>
+    <p>{{animateInfo.id}}</p>
     <img :src="animateInfo.image" :alt="animateInfo.name">
     <li>名字: {{ animateInfo.name }}</li>
     <li>作品類型: {{ animateInfo.animate_type }}</li>
@@ -60,7 +61,7 @@ export default {
       sendSocketMessage({
         action: 'downloadMyselfAnimate',
         episodes: checkboxAnimateEpisode.value,
-        owner_id: animateInfo.value.id,
+        id: animateInfo.value.id,
         animateName: animateInfo.value.name
       })
     }

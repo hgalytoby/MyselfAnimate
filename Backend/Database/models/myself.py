@@ -75,6 +75,10 @@ class AnimateEpisodeInfoModel(models.Model):
     def get_animate_name(self):
         return self.owner.name
 
+    @database_sync_to_async
+    def get_from_website(self):
+        return self.owner.from_website
+
     def to_dict(self):
         return {'id': self.id, 'name': self.name, 'url': self.url, 'download': self.download, 'done': self.done,
                 'owner_id': self.owner_id}

@@ -14,7 +14,6 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -145,4 +144,7 @@ CHANNEL_LAYERS = {
 }
 
 MEDIA_ROOT = Path(BASE_DIR, 'static/uploads')
+
 MEDIA_PATH = '/static/uploads'
+
+ROOT_MEDIA_PATH = f"{BASE_DIR}{MEDIA_PATH}/"

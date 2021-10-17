@@ -3,23 +3,20 @@ from django.db import models
 
 def upload_image_path(instance, filename):
     """
-    Profile name 為資料夾名字放入圖片。
     """
-    return f'{instance.from_website}/{instance.name}/{instance.size}_{filename}'
+    return f'{instance.from_website}/{instance.name}/image/{instance.size}_{filename}'
 
 
 def upload_ts_path(instance, filename):
     """
-    Profile name 為資料夾名字放入圖片。
     """
-    return f'ts/{instance.owner.owner.name}/{instance.owner.name}/{filename}'
+    return f'{instance.owner.owner.from_website}/{instance.owner.owner.name}/video/{instance.owner.name}/{filename}'
 
 
 def upload_video_path(instance, filename):
     """
-    Profile name 為資料夾名字放入圖片。
     """
-    return f'video/{instance.owner.name}/{instance.name}/{filename}'
+    return f'{instance.owner.from_website}/{instance.owner.name}/video/{filename}'
 
 
 class HistoryModel(models.Model):

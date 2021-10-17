@@ -30,16 +30,13 @@ class Manage:
             text_data=json.dumps({'msg': '更新完成', 'action': 'myself_finish_animate_update', 'updating': False}))
 
     async def myself_animate_download(self, data):
-        print('in')
         try:
             if data['episodes']:
                 try:
                     animate_episode_list = await DB.Myself.get_many_animate_episode_download_data_and_update_download(
                         pk_list=data['episodes'])
                     # print(animate_episode_list)
-                    print(download_manage.wait_download_list, 1)
                     download_manage.wait_download_list.extend(animate_episode_list)
-                    print(download_manage.wait_download_list, 2)
                 except Exception as error:
                     print(error)
                 # print(animate_episode_list, '123')
