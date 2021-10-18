@@ -2,7 +2,7 @@
   <div>我是animate</div>
   <div v-if="loading">加載中...</div>
   <div v-else>
-    <p>{{animateInfo.id}}</p>
+    <div>{{animateInfo}}</div>
     <img :src="animateInfo.image" :alt="animateInfo.name">
     <li>名字: {{ animateInfo.name }}</li>
     <li>作品類型: {{ animateInfo.animate_type }}</li>
@@ -15,8 +15,8 @@
     <li>備註: {{ animateInfo.remarks }}</li>
     <li>synopsis{{ animateInfo.synopsis }}</li>
     <div v-for="data in animateInfo.video" :key="data.id">
-      <input type="checkbox" :id="data.id" :value="data.id" v-model="checkboxAnimateEpisode">
-      <label :for="data.id">{{ data.name }}</label>
+      <input type="checkbox" :checked="data.download" :id="data.id" :value="data.id" v-model="checkboxAnimateEpisode">
+      <label :for="data.id">{{ data.download }}</label>
     </div>
     <button type="button" class="btn btn-primary" @click="downloadAnimate">下載所選的集數</button>
     <button type="button" class="btn btn-primary" @click="saveMyLove">儲存到我的最愛</button>

@@ -10,7 +10,7 @@ def upload_image_path(instance, filename):
 def upload_ts_path(instance, filename):
     """
     """
-    return f'{instance.owner.owner.from_website}/{instance.owner.owner.name}/video/{instance.owner.name}/{filename}'
+    return f'{instance.owner.owner.from_website}/{instance.owner.owner.name}/video/ts/{instance.owner.name}/{filename}'
 
 
 def upload_video_path(instance, filename):

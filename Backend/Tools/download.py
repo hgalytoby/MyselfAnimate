@@ -12,6 +12,7 @@ class DownloadManage:
     def __init__(self):
         self.download_list = []
         self.wait_download_list = []
+        self.connections = 10
         self.now = 0
         self.max = 2
         self.ws = None
@@ -90,8 +91,8 @@ class DownloadManage:
             model = await DB.Myself.get_animate_episode_info_model(animate_name=task_data['animate_name'],
                                                                    episode_name=task_data['episode_name'])
             from_website = await model.get_from_website()
-            ts_list_path = f"{from_website}/{task_data['animate_name']}/video/{task_data['episode_name']}/ts_list.txt"
-            video_path = f"{from_website}/{task_data['animate_name']}/video/{task_data['episode_name']}/{task_data['episode_name']}.mp4"
+            ts_list_path = f"{from_website}/{task_data['animate_name']}/video/ts/{task_data['episode_name']}/ts_list.txt"
+            video_path = f"{from_website}/{task_data['animate_name']}/video/{task_data['episode_name']}.mp4"
             print(video_path)
             ts_path_list = await DB.Myself.filter_animate_episode_ts_list(parent_model=model)
             with open(f"{ROOT_MEDIA_PATH}{ts_list_path}", 'w', encoding='utf-8') as f:
@@ -103,20 +104,13 @@ class DownloadManage:
             await DB.Myself.save_animate_episode_video_file(name=task_data['episode_name'], video_path=video_path,
                                                             parent_id=task_data['owner_id'])
             await DB.Myself.delete_filter_animate_episode_ts(parent_id=task_data['id'])
-            await self.ws_send_msg(msg={
-                'type': 'download',
-                'status': '下載完成',
-                'name': f"{task_data['animate_name']} {task_data['episode_name']}",
-                'progress_rate': 100
-            })
         except Exception as error:
             print(error)
 
     async def download_animate(self, task_data: dict):
-        ts_semaphore = asyncio.Semaphore(value=10)
+        ts_semaphore = asyncio.Semaphore(value=self.connections)
         animate_video_json, host_list = await self._process_host(task_data=task_data)
         if not task_data.get('ts_list'):
-            print(task_data['id'])
             print(f'{task_data["animate_name"]} {task_data["episode_name"]} 拿 m3u8')
             await self._process_m3u8(animate_video_json=animate_video_json, host_list=host_list, task_data=task_data)
         tasks = []
@@ -128,7 +122,6 @@ class DownloadManage:
         send_download_msg.cancel()
         await self._process_merge_video(task_data=task_data)
         print(f'{task_data["animate_name"]} {task_data["episode_name"]} 下載完了')
-        self.now -= 1
 
     async def ws_send_msg(self, msg: dict):
         if self.ws:
@@ -150,6 +143,12 @@ class DownloadManage:
 
     async def download_animate_script(self, task_data: dict):
         await self.download_animate(task_data=task_data)
+        await self.ws_send_msg(msg={
+            'type': 'download',
+            'status': '下載完成',
+            'name': f"{task_data['animate_name']} {task_data['episode_name']}",
+            'progress_rate': 100
+        })
         self.now -= 1
 
     async def get_animate_episode_download_undone_data(self):
