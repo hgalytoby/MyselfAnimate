@@ -14,12 +14,16 @@
     </li>
     <li>備註: {{ animateInfo.remarks }}</li>
     <li>synopsis{{ animateInfo.synopsis }}</li>
-    <div v-for="data in animateInfo.video" :key="data.id">
-      <input type="checkbox" :checked="data.download" :id="data.id" :value="data.id" v-model="checkboxAnimateEpisode">
-      <label :for="data.id">{{ data.download }}</label>
+    <div v-for="data in animateInfo.video" :key="data.id" @click="clickCheckbox(data.id)">
+<!--      <i class="bi bi-check-square">123</i>-->
+      <BootstrapIcon icon="check2-square" v-show="checkCheckboxArray(data.id, data.download)"/>
+      <BootstrapIcon icon="square" v-show="!checkCheckboxArray(data.id, data.download)"/>
+<!--      <input type="checkbox" :id="data.id" :value="data" v-model="checkboxAnimateEpisode">-->
+      <span>{{ data.download }}</span>
     </div>
     <button type="button" class="btn btn-primary" @click="downloadAnimate">下載所選的集數</button>
     <button type="button" class="btn btn-primary" @click="saveMyLove">儲存到我的最愛</button>
+    {{checkboxAnimateEpisode}}
   </div>
 
 </template>
@@ -29,10 +33,10 @@ import { onMounted, computed } from 'vue'
 import { useStore } from 'vuex'
 import {
   animateInfoAction,
-  animateInfoState, checkboxAnimateEpisodeMutation,
+  animateInfoState, addCheckboxAnimateEpisodeMutation,
   checkboxAnimateEpisodeState,
   loadingMutation,
-  loadingState
+  loadingState, removeCheckboxAnimateEpisodeMutation
 } from '../../variables/variablesMyself'
 import { sendSocketMessage } from '../../hooks/useWS'
 
@@ -50,7 +54,7 @@ export default {
         return store.state.myself[checkboxAnimateEpisodeState]
       },
       set (value) {
-        store.commit(`myself/${checkboxAnimateEpisodeMutation}`, value)
+        store.commit(`myself/${addCheckboxAnimateEpisodeMutation}`, value)
       }
     })
     store.commit(`myself/${loadingMutation}`)
@@ -68,12 +72,27 @@ export default {
     function saveMyLove () {
       console.log(animateInfo.value)
     }
+    function clickCheckbox (id) {
+      const index = checkboxAnimateEpisode.value.indexOf(id)
+      if (index === -1) {
+        store.commit(`myself/${addCheckboxAnimateEpisodeMutation}`, id)
+      } else {
+        store.commit(`myself/${removeCheckboxAnimateEpisodeMutation}`, index)
+      }
+    }
+    function checkCheckboxArray (id, download) {
+      // console.log(checkboxAnimateEpisode.value[0])
+      console.log(id)
+      return checkboxAnimateEpisode.value.indexOf(id) !== -1 || download
+    }
     return {
       loading,
       animateInfo,
       checkboxAnimateEpisode,
       downloadAnimate,
-      saveMyLove
+      saveMyLove,
+      clickCheckbox,
+      checkCheckboxArray
     }
   }
 }

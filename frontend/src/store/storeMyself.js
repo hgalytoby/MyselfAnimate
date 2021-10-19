@@ -17,7 +17,7 @@ import {
   finishAnimateUpdateButtonState,
   finishAnimateUpdateButtonMutation,
   checkboxAnimateEpisodeState,
-  checkboxAnimateEpisodeMutation
+  addCheckboxAnimateEpisodeMutation, removeCheckboxAnimateEpisodeMutation
 } from '../variables/variablesMyself'
 import { myselfApi } from '../../api'
 
@@ -102,8 +102,11 @@ export const mutations = {
     state[finishAnimateUpdateButtonState] = value.msg
     state[finishAnimateUpdateState] = value.updating
   },
-  [checkboxAnimateEpisodeMutation] (state, value) {
-    state[checkboxAnimateEpisodeState] = value
+  [addCheckboxAnimateEpisodeMutation] (state, value) {
+    state[checkboxAnimateEpisodeState].push(value)
+  },
+  [removeCheckboxAnimateEpisodeMutation] (state, value) {
+    state[checkboxAnimateEpisodeState].splice(value, 1)
   }
 }
 export const getters = {
