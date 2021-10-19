@@ -37,11 +37,9 @@ class Myself:
         :return: dict。
         """
         try:
-            # res = requests.get(url='https://myself-bbs.com/portal.php', headers=headers, timeout=(5, 5))
-            # if res.ok:
-            with open('week.html', 'r', encoding='utf-8') as f:
-                res = f.read()
-                html = BeautifulSoup(res, features='lxml')
+            res = requests.get(url='https://myself-bbs.com/portal.php', headers=headers, timeout=(5, 5))
+            if res.ok:
+                html = BeautifulSoup(res.text, features='lxml')
                 data = {}
                 elements = html.find('div', id='tabSuCvYn')
                 for index, elements in enumerate(elements.find_all('div', class_='module cl xl xl1')):
@@ -54,7 +52,7 @@ class Myself:
                             'update': element.find('span').find('font').text,
                         })
                     data.update({week[index]: animates})
-                # res.close()
+                res.close()
                 return data
         except requests.exceptions.RequestException as error:
             print(f'week_animate: {error}')
@@ -107,8 +105,6 @@ class Myself:
         try:
             res = requests.get(url=url, headers=headers, timeout=(5, 5))
             if res.ok:
-                # with open('info.html', 'r', encoding='utf-8') as f:
-                #     res_text = f.read()
                 html = BeautifulSoup(res.text, features='lxml')
                 data = {}
                 for elements in html.find_all('div', class_='info_info'):
@@ -135,24 +131,25 @@ class Myself:
         爬完結列表頁面的動漫資訊
         :return: dict。
         """
-        # url = 'https://myself-bbs.com/portal.php?mod=topic&topicid=8'
-        # res = requests.get(url=url, headers=headers)
-        with open('finish_list.html', 'r', encoding='utf-8') as f:
-            res = f.read()
-        # html = BeautifulSoup(res.text, features='lxml')
-        html = BeautifulSoup(res, features='lxml')
-        data = []
-        for elements in html.find_all('div', {'class': 'tab-title title column cl'}):
-            year_list = []
-            for element in elements.find_all('div', {'class': 'block move-span'}):
-                year_month_title = element.find('span', {'class': 'titletext'}).text
-                season_list = []
-                for k in element.find_all('a'):
-                    season_list.append({'name': k['title'], 'url': f"https://myself-bbs.com/{k['href']}"})
-                year_list.append({'title': year_month_title, 'data': season_list})
-            data.append({'data': year_list})
-        # res.close()
-        return {'data': data}
+        try:
+            url = 'https://myself-bbs.com/portal.php?mod=topic&topicid=8'
+            res = requests.get(url=url, headers=headers)
+            html = BeautifulSoup(res.text, features='lxml')
+            data = []
+            for elements in html.find_all('div', {'class': 'tab-title title column cl'}):
+                year_list = []
+                for element in elements.find_all('div', {'class': 'block move-span'}):
+                    year_month_title = element.find('span', {'class': 'titletext'}).text
+                    season_list = []
+                    for k in element.find_all('a'):
+                        season_list.append({'name': k['title'], 'url': f"https://myself-bbs.com/{k['href']}"})
+                    year_list.append({'title': year_month_title, 'data': season_list})
+                data.append({'data': year_list})
+            res.close()
+            return {'data': data}
+        except requests.exceptions.RequestException as error:
+            print(f'finish_list: {error}')
+            return {}
 
     @staticmethod
     async def get_vpx_json(url: str, timeout: tuple = (10, 10)) -> dict:

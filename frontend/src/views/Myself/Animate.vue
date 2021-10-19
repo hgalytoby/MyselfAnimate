@@ -82,7 +82,6 @@ export default {
     }
     function checkCheckboxArray (id, download) {
       // console.log(checkboxAnimateEpisode.value[0])
-      console.log(id)
       return checkboxAnimateEpisode.value.indexOf(id) !== -1 || download
     }
     return {

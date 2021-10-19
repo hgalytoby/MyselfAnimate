@@ -32,10 +32,11 @@ class Manage:
         try:
             if data['episodes']:
                 try:
-                    animate_episode_list = await DB.Myself.get_many_animate_episode_download_data_and_update_download(
-                        pk_list=data['episodes'])
-                    # print(animate_episode_list)
-                    download_manage.wait_download_list.extend(animate_episode_list)
+                    pass
+                    # animate_episode_list = await DB.Myself.get_many_animate_episode_download_data_and_update_download(
+                    #     pk_list=data['episodes'])
+                    # # print(animate_episode_list)
+                    # download_manage.wait_download_list.extend(animate_episode_list)
                 except Exception as error:
                     print(error)
                 # print(animate_episode_list, '123')
@@ -44,6 +45,14 @@ class Manage:
         except Exception as e:
             print(e)
 
+    async def download_tasks(self):
+        while True:
+            await self.send(
+                text_data=json.dumps(
+                    {'download_list': download_manage.download_list + download_manage.wait_download_list,
+                     'action': 'download'}))
+            await asyncio.sleep(1)
+
 
 class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
 
@@ -51,6 +60,7 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
         await self.accept()
         await self.send(text_data=json.dumps({'type': 'connect', 'msg': f'連線成功!!'}))
         download_manage.ws = self
+        # asyncio.create_task(self.download_tasks())
 
     async def disconnect(self, close_code):
         download_manage.ws = None
