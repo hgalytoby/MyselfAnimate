@@ -6,7 +6,15 @@
 
 後端使用 Django
 
-因為是只給自己使用的，所以資料庫用基本的 sqlite
+因為是只給自己使用的，所以資料庫用 sqlite
+
+使用 redis 
+
+windows: https://github.com/tporadowski/redis/releases
+
+mac linux: http://download.redis.io
+
+使用 ffmpeg
 
 用 websocket 傳送下載進度給前端做顯示
 
