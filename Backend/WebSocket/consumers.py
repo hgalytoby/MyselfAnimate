@@ -32,11 +32,9 @@ class Manage:
         try:
             if data['episodes']:
                 try:
-                    pass
-                    # animate_episode_list = await DB.Myself.get_many_animate_episode_download_data_and_update_download(
-                    #     pk_list=data['episodes'])
-                    # # print(animate_episode_list)
-                    # download_manage.wait_download_list.extend(animate_episode_list)
+                    animate_episode_list = await DB.Myself.get_many_animate_episode_download_data_and_update_download(
+                        pk_list=data['episodes'])
+                    download_manage.wait_download_list.extend(animate_episode_list)
                 except Exception as error:
                     print(error)
                 # print(animate_episode_list, '123')
@@ -48,10 +46,11 @@ class Manage:
     async def download_tasks(self):
         while True:
             await self.send(
-                text_data=json.dumps(
-                    {'download_list': download_manage.download_list + download_manage.wait_download_list,
-                     'action': 'download'}))
-            await asyncio.sleep(1)
+                text_data=json.dumps({
+                    'msg': '目前下載列表',
+                    'data': download_manage.download_list + download_manage.wait_download_list,
+                    'action': 'download_myself_animate_array'}))
+            await asyncio.sleep(0.5)
 
 
 class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
@@ -60,7 +59,7 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
         await self.accept()
         await self.send(text_data=json.dumps({'type': 'connect', 'msg': f'連線成功!!'}))
         download_manage.ws = self
-        # asyncio.create_task(self.download_tasks())
+        asyncio.create_task(self.download_tasks())
 
     async def disconnect(self, close_code):
         download_manage.ws = None
@@ -74,7 +73,7 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
                 if data['action'] == 'myself_finish_animate_update':
                     asyncio.create_task(self.myself_finish_animate_update())
                     await self.send(text_data=json.dumps({'msg': f'正在更新中', 'action': data['action'], 'updating': True}))
-                elif data['action'] == 'downloadMyselfAnimate':
+                elif data['action'] == 'download_myself_animate':
                     asyncio.create_task(self.myself_animate_download(data=data))
                     await self.send(
                         text_data=json.dumps({'msg': f'我收到要下載的清單了', 'action': data['action'], 'updating': True}))

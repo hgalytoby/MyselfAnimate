@@ -17,7 +17,10 @@ import {
   finishAnimateUpdateButtonState,
   finishAnimateUpdateButtonMutation,
   checkboxAnimateEpisodeState,
-  addCheckboxAnimateEpisodeMutation, removeCheckboxAnimateEpisodeMutation
+  addCheckboxAnimateEpisodeMutation,
+  removeCheckboxAnimateEpisodeMutation,
+  downloadMyselfAnimateMutation,
+  downloadMyselfAnimateState, downloadMyselfAnimateGetters
 } from '../variables/variablesMyself'
 import { myselfApi } from '../../api'
 
@@ -107,11 +110,18 @@ export const mutations = {
   },
   [removeCheckboxAnimateEpisodeMutation] (state, value) {
     state[checkboxAnimateEpisodeState].splice(value, 1)
+  },
+  [downloadMyselfAnimateMutation] (state, value) {
+    // console.log(value)
+    state[downloadMyselfAnimateState] = value
   }
 }
 export const getters = {
   getterWeekAnimate (state) {
     return state[weekAnimateState]
+  },
+  [downloadMyselfAnimateGetters] (state) {
+    return state[downloadMyselfAnimateState]
   }
 }
 

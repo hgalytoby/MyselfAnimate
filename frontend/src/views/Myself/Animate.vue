@@ -63,7 +63,7 @@ export default {
     })
     const downloadAnimate = () => {
       sendSocketMessage({
-        action: 'downloadMyselfAnimate',
+        action: 'download_myself_animate',
         episodes: checkboxAnimateEpisode.value,
         id: animateInfo.value.id,
         animateName: animateInfo.value.name

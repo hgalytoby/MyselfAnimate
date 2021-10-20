@@ -100,7 +100,8 @@ class MyselfBase:
                 'animate_name': model.owner.name,
                 'episode_name': model.name,
                 'vpx_url': model.url,
-                'count': 0
+                'count': 0,
+                'status': '準備下載'
             })
         return data
 

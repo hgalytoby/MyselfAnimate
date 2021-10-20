@@ -52,12 +52,13 @@ class DownloadManage:
         # _, _ = await proc.communicate()
 
     async def _process_host(self, task_data):
-        await self.ws_send_msg(msg={
-            'type': 'download',
-            'status': '取得 Host 資料中',
-            'name': f'{task_data["animate_name"]} {task_data["episode_name"]}',
-            'progress_rate': 0
-        })
+        # await self.ws_send_msg(msg={
+        #     'type': 'download',
+        #     'status': '取得 Host 資料中',
+        #     'name': f'{task_data["animate_name"]} {task_data["episode_name"]}',
+        #     'progress_rate': 0
+        # })
+        task_data.update({'status': '取得 Host 資料中'})
         print(f"{task_data['animate_name']} {task_data['episode_name']} 拿 host")
         animate_video_json, host_list = await Myself.get_animate_video_json_and_host_list(url=task_data['vpx_url'])
         task_data.update({
@@ -67,12 +68,13 @@ class DownloadManage:
         return animate_video_json, host_list
 
     async def _process_m3u8(self, animate_video_json, host_list, task_data):
-        await self.ws_send_msg(msg={
-            'type': 'download',
-            'status': '取得 M3U8 資料中',
-            'name': f"{task_data['animate_name']} {task_data['episode_name']}",
-            'progress_rate': 0
-        })
+        # await self.ws_send_msg(msg={
+        #     'type': 'download',
+        #     'status': '取得 M3U8 資料中',
+        #     'name': f"{task_data['animate_name']} {task_data['episode_name']}",
+        #     'progress_rate': 0
+        # })
+        task_data.update({'status': '取得 M3U8 資料中'})
         episode_info_model = await DB.Myself.get_animate_episode_info_model(animate_name=task_data['animate_name'],
                                                                             episode_name=task_data['episode_name'])
         task_data['ts_list'] = await Myself.get_m3u8_uri_list(host_list=host_list, timeout=(60, 10),
@@ -81,12 +83,13 @@ class DownloadManage:
         await DB.Myself.create_many_animate_episode_ts(parent_model=episode_info_model, ts_list=task_data['ts_list'])
 
     async def _process_merge_video(self, task_data):
-        await self.ws_send_msg(msg={
-            'type': 'download',
-            'status': '合併影片中',
-            'name': f"{task_data['animate_name']} {task_data['episode_name']}",
-            'progress_rate': 100
-        })
+        # await self.ws_send_msg(msg={
+        #     'type': 'download',
+        #     'status': '合併影片中',
+        #     'name': f"{task_data['animate_name']} {task_data['episode_name']}",
+        #     'progress_rate': 100
+        # })
+        task_data.update({'status': '合併影片中'})
         try:
             model = await DB.Myself.get_animate_episode_info_model(animate_name=task_data['animate_name'],
                                                                    episode_name=task_data['episode_name'])
@@ -115,11 +118,12 @@ class DownloadManage:
             await self._process_m3u8(animate_video_json=animate_video_json, host_list=host_list, task_data=task_data)
         tasks = []
         print(f'{task_data["animate_name"]} {task_data["episode_name"]} 開始下載')
+        task_data.update({'status': '下載中'})
         for ts_uri in task_data['ts_list']:
             tasks.append(asyncio.create_task(self.download_ts(ts_semaphore, ts_uri, task_data)))
-        send_download_msg = asyncio.create_task(self.send_download_msg(task_data=task_data))
+        # send_download_msg = asyncio.create_task(self.send_download_msg(task_data=task_data))
         await asyncio.gather(*tasks)
-        send_download_msg.cancel()
+        # send_download_msg.cancel()
         await self._process_merge_video(task_data=task_data)
         print(f'{task_data["animate_name"]} {task_data["episode_name"]} 下載完了')
 
@@ -143,12 +147,13 @@ class DownloadManage:
 
     async def download_animate_script(self, task_data: dict):
         await self.download_animate(task_data=task_data)
-        await self.ws_send_msg(msg={
-            'type': 'download',
-            'status': '下載完成',
-            'name': f"{task_data['animate_name']} {task_data['episode_name']}",
-            'progress_rate': 100
-        })
+        task_data.update({'status': '下載完成'})
+        # await self.ws_send_msg(msg={
+        #     'type': 'download',
+        #     'status': '下載完成',
+        #     'name': f"{task_data['animate_name']} {task_data['episode_name']}",
+        #     'progress_rate': 100
+        # })
         self.now -= 1
 
     async def get_animate_episode_download_undone_data(self):
@@ -181,6 +186,7 @@ class DownloadManage:
                     'ts_list': ts_list,
                     'ts_count': ts_count,
                     'count': ts_count - len(ts_list),
+                    'status': '準備下載'
                 })
         pass
 

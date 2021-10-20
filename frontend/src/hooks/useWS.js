@@ -18,8 +18,10 @@ export const connectSocket = () => {
     const receive = JSON.parse(msg.data)
     if (receive.action === 'myself_finish_animate_update') {
       store.commit(`myself/${finishAnimateUpdateButtonMutation}`, receive)
-    } else if (receive.action === 'downloadMyselfAnimate') {
+    } else if (receive.action === 'download_myself_animate') {
       console.log(receive)
+    } else if (receive.action === 'download_myself_animate_array') {
+      store.commit('myself/downloadMyselfAnimateMutation', receive.data)
     } else {
       store.commit('ws/setWsRes', JSON.parse(msg.data))
     }
