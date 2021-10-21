@@ -1,12 +1,5 @@
-import io
 import asyncio
-import subprocess
-
-from PIL import Image
-from asgiref.sync import sync_to_async
-
 from Tools.setup import *
-from Tools.myself import Myself
 from channels.db import database_sync_to_async
 from Database.models import FinishAnimateModel, AnimateInfoModel, AnimateEpisodeInfoModel, AnimateEpisodeTsModel
 from django.core.files.base import ContentFile
@@ -64,20 +57,19 @@ class MyselfBase:
         return model
 
     @staticmethod
-    def create_many_animate_episode_models(data: dict, parent_model):
+    def create_many_animate_episode_models(data: dict, **kwargs):
         """
         新增多個動漫集數。
         :param data:
-        :param parent_model:
         :return:
         """
         models = []
         for episode in data['video']:
             models.append(
-                AnimateEpisodeInfoModel.objects.get_or_create(name=episode['name'], owner=parent_model, defaults={
+                AnimateEpisodeInfoModel.objects.get_or_create(name=episode['name'], **kwargs, defaults={
                     'name': episode['name'],
                     'url': episode['url'],
-                    'owner': parent_model,
+                    'owner': kwargs.get('owner'),
                 })[0])
         return models
 
@@ -107,63 +99,56 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def get_animate_episode_ts_count(parent_model):
+    def get_animate_episode_ts_count(**kwargs):
         """
         取得動漫某一集 ts 總數量。
-        :param parent_model:
         :return:
         """
-        return AnimateEpisodeTsModel.objects.filter(owner=parent_model).count()
+        return AnimateEpisodeTsModel.objects.filter(**kwargs).count()
 
     @classmethod
     @database_sync_to_async
-    def delete_filter_animate_episode_ts(cls, parent_id):
+    def delete_filter_animate_episode_ts(cls, **kwargs):
         """
         刪除動滿某一集所有 ts 資料。
-        :param parent_id:
         :return:
         """
-        AnimateEpisodeTsModel.objects.filter(owner_id=parent_id).delete()
+        AnimateEpisodeTsModel.objects.filter(**kwargs).delete()
 
     @staticmethod
     @database_sync_to_async
-    def create_many_animate_episode_ts(parent_model, ts_list: list):
+    def create_many_animate_episode_ts(ts_list: list, **kwargs):
         """
         新增多個動漫某一集的所有 ts 資料。
-        :param parent_model:
         :param ts_list:
         :return:
         """
         models = []
         for ts_uri in ts_list:
-            models.append(AnimateEpisodeTsModel(uri=ts_uri, owner=parent_model))
+            models.append(AnimateEpisodeTsModel(uri=ts_uri, **kwargs))
         AnimateEpisodeTsModel.objects.bulk_create(models)
 
     @staticmethod
     @database_sync_to_async
-    def save_animate_episode_ts_file(uri: str, parent_model, ts_content: bytes):
+    def save_animate_episode_ts_file(ts_content: bytes, **kwargs):
         """
         儲存動漫某一集的 ts 檔案
-        :param uri:
-        :param parent_model:
         :param ts_content:
         :return:
         """
-        model = AnimateEpisodeTsModel.objects.get(uri=uri, owner=parent_model)
+        model = AnimateEpisodeTsModel.objects.get(**kwargs)
         model.done = True
-        model.ts.save(uri, ContentFile(ts_content))
+        model.ts.save(model.uri, ContentFile(ts_content))
 
     @staticmethod
     @database_sync_to_async
-    def save_animate_episode_video_file(name: str, parent_id, video_path: str):
+    def save_animate_episode_video_file(video_path: str, **kwargs):
         """
         儲存動漫某一集的 ts 檔案
-        :param name:
-        :param parent_id:
         :param video_path:
         :return:
         """
-        model = AnimateEpisodeInfoModel.objects.get(name=name, owner_id=parent_id)
+        model = AnimateEpisodeInfoModel.objects.get(**kwargs)
         model.done = True
         model.video = video_path
         model.save()
@@ -185,43 +170,39 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def get_animate_episode_info_model(animate_name: str, episode_name: str):
+    def get_animate_episode_info_model(**kwargs):
         """
         取得動漫資料 model。
-        :param animate_name:
-        :param episode_name:
         :return:
         """
-        return AnimateEpisodeInfoModel.objects.get(owner__name=animate_name, name=episode_name)
+        return AnimateEpisodeInfoModel.objects.get(**kwargs)
 
     @staticmethod
     @database_sync_to_async
-    def filter_animate_episode_info_downloading_models(owner_id):
+    def filter_animate_episode_info_downloading_models(**kwargs):
         """
         取得指定動漫有哪些集數正在下載的 model。
-        :param owner_id:
         :return:
         """
-        return list(AnimateEpisodeInfoModel.objects.filter(owner_id=owner_id, download=True, done=False))
+        return list(AnimateEpisodeInfoModel.objects.filter(download=True, done=False, **kwargs))
 
     @staticmethod
     @database_sync_to_async
-    def filter_animate_episode_ts_undone_uri_list(parent_model):
+    def filter_animate_episode_ts_undone_uri_list(**kwargs):
         """
         取得指定動漫某一集尚未下載的 ts uri 陣列清單。
-        :param parent_model:
         :return:
         """
         data = []
-        for model in AnimateEpisodeTsModel.objects.filter(owner=parent_model, done=False):
+        for model in AnimateEpisodeTsModel.objects.filter(done=False, **kwargs):
             data.append(model.uri)
         return data
 
     @staticmethod
     @database_sync_to_async
-    def filter_animate_episode_ts_list(parent_model):
+    def filter_animate_episode_ts_list(**kwargs):
         data = []
-        for model in AnimateEpisodeTsModel.objects.filter(owner=parent_model):
+        for model in AnimateEpisodeTsModel.objects.filter(**kwargs):
             data.append(f"file '{BASE_DIR}{MEDIA_PATH}/{model.ts}'")
         return data
 
@@ -240,23 +221,3 @@ class MyselfBase:
 
 class DB:
     Myself = MyselfBase
-
-
-if __name__ == '__main__':
-    animate = AnimateInfoModel.objects.get(pk=11)
-    episode_info = AnimateEpisodeInfoModel.objects.filter(owner=animate).first()
-    episode_ts = AnimateEpisodeTsModel.objects.filter(owner=episode_info)
-    data = []
-    for index, ts in enumerate(episode_ts):
-        data.append(f"file '{os.getcwd()}{MEDIA_PATH}/{ts.ts}'")
-    with open('file.txt', 'w', encoding='utf-8') as f:
-        f.write('\n'.join(data))
-    # videos = '|'.join(data)
-    # print(videos)
-    # print(videos)
-    # # cmd = f'ffmpeg -i "concat:{videos}" -y -c copy C:/Python/MyselfAnimate/backend/out.mp4'
-    # cmd = f'ffmpeg -f concat -safe 0 -y -i ./temp/月光下的異世界之旅 第 02 話.txt -c copy 月光下的異世界之旅 第 02 話.mp4'
-    # print(1)
-    # run_ffmpeg = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
-    # run_ffmpeg.wait()
-    # print(2)

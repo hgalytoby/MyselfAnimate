@@ -23,10 +23,9 @@ class DownloadManage:
         async with ts_semaphore:
             ts_content = await Myself.download_ts_content(ts_uri=ts_uri, host_list=task_data['host_list'],
                                                           video_720p=task_data['video_720p'])
-            model = await DB.Myself.get_animate_episode_info_model(animate_name=task_data['animate_name'],
-                                                                   episode_name=task_data['episode_name'])
-            await DB.Myself.save_animate_episode_ts_file(uri=ts_uri, parent_model=model,
-                                                         ts_content=ts_content)
+            model = await DB.Myself.get_animate_episode_info_model(owner__name=task_data['animate_name'],
+                                                                   name=task_data['episode_name'])
+            await DB.Myself.save_animate_episode_ts_file(uri=ts_uri, owner=model, ts_content=ts_content)
             task_data['ts_list'].remove(ts_uri)
             task_data['count'] += 1
 
@@ -45,19 +44,14 @@ class DownloadManage:
         :param cmd:
         :return:
         """
-        run = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+        run = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        run.communicate()
         run.wait()
         # proc = await asyncio.create_subprocess_shell(cmd, stdout=asyncio.subprocess.PIPE,
         #                                              stderr=asyncio.subprocess.PIPE)
         # _, _ = await proc.communicate()
 
     async def _process_host(self, task_data):
-        # await self.ws_send_msg(msg={
-        #     'type': 'download',
-        #     'status': '取得 Host 資料中',
-        #     'name': f'{task_data["animate_name"]} {task_data["episode_name"]}',
-        #     'progress_rate': 0
-        # })
         task_data.update({'status': '取得 Host 資料中'})
         print(f"{task_data['animate_name']} {task_data['episode_name']} 拿 host")
         animate_video_json, host_list = await Myself.get_animate_video_json_and_host_list(url=task_data['vpx_url'])
@@ -68,36 +62,24 @@ class DownloadManage:
         return animate_video_json, host_list
 
     async def _process_m3u8(self, animate_video_json, host_list, task_data):
-        # await self.ws_send_msg(msg={
-        #     'type': 'download',
-        #     'status': '取得 M3U8 資料中',
-        #     'name': f"{task_data['animate_name']} {task_data['episode_name']}",
-        #     'progress_rate': 0
-        # })
         task_data.update({'status': '取得 M3U8 資料中'})
-        episode_info_model = await DB.Myself.get_animate_episode_info_model(animate_name=task_data['animate_name'],
-                                                                            episode_name=task_data['episode_name'])
+        episode_info_model = await DB.Myself.get_animate_episode_info_model(owner__name=task_data['animate_name'],
+                                                                            name=task_data['episode_name'])
         task_data['ts_list'] = await Myself.get_m3u8_uri_list(host_list=host_list, timeout=(60, 10),
                                                               video_720p=animate_video_json['video']['720p'])
         task_data.update({'ts_count': len(task_data['ts_list'])})
-        await DB.Myself.create_many_animate_episode_ts(parent_model=episode_info_model, ts_list=task_data['ts_list'])
+        await DB.Myself.create_many_animate_episode_ts(owner=episode_info_model, ts_list=task_data['ts_list'])
 
     async def _process_merge_video(self, task_data):
-        # await self.ws_send_msg(msg={
-        #     'type': 'download',
-        #     'status': '合併影片中',
-        #     'name': f"{task_data['animate_name']} {task_data['episode_name']}",
-        #     'progress_rate': 100
-        # })
         task_data.update({'status': '合併影片中'})
         try:
-            model = await DB.Myself.get_animate_episode_info_model(animate_name=task_data['animate_name'],
-                                                                   episode_name=task_data['episode_name'])
+            model = await DB.Myself.get_animate_episode_info_model(owner__name=task_data['animate_name'],
+                                                                   name=task_data['episode_name'])
             from_website = await model.get_from_website()
             ts_list_path = f"{from_website}/{task_data['animate_name']}/video/ts/{task_data['episode_name']}/ts_list.txt"
             video_path = f"{from_website}/{task_data['animate_name']}/video/{task_data['episode_name']}.mp4"
             print(video_path)
-            ts_path_list = await DB.Myself.filter_animate_episode_ts_list(parent_model=model)
+            ts_path_list = await DB.Myself.filter_animate_episode_ts_list(owner=model)
             with open(f"{ROOT_MEDIA_PATH}{ts_list_path}", 'w', encoding='utf-8') as f:
                 f.write('\n'.join(ts_path_list))
             cmd = f'ffmpeg -f concat -safe 0 -y -i "{ROOT_MEDIA_PATH}{ts_list_path}" -c copy "{ROOT_MEDIA_PATH}{video_path}"'
@@ -105,8 +87,8 @@ class DownloadManage:
             _.start()
             _.join()
             await DB.Myself.save_animate_episode_video_file(name=task_data['episode_name'], video_path=video_path,
-                                                            parent_id=task_data['owner_id'])
-            await DB.Myself.delete_filter_animate_episode_ts(parent_id=task_data['id'])
+                                                            owner_id=task_data['owner_id'])
+            await DB.Myself.delete_filter_animate_episode_ts(owner_id=task_data['id'])
         except Exception as error:
             print(error)
 
@@ -148,12 +130,6 @@ class DownloadManage:
     async def download_animate_script(self, task_data: dict):
         await self.download_animate(task_data=task_data)
         task_data.update({'status': '下載完成'})
-        # await self.ws_send_msg(msg={
-        #     'type': 'download',
-        #     'status': '下載完成',
-        #     'name': f"{task_data['animate_name']} {task_data['episode_name']}",
-        #     'progress_rate': 100
-        # })
         self.now -= 1
 
     async def get_animate_episode_download_undone_data(self):
@@ -166,16 +142,16 @@ class DownloadManage:
                 new_url = animate_dict[animate['name']][episode_info_model.name]
                 if new_url != episode_info_model.url:
                     await DB.Myself.update_animate_episode_url(new_url=new_url, model=episode_info_model)
-                    await DB.Myself.delete_filter_animate_episode_ts(parent_id=episode_info_model.id)
+                    await DB.Myself.delete_filter_animate_episode_ts(owner_id=episode_info_model.id)
                     animate_video_json, host_list = await Myself.get_animate_video_json_and_host_list(url=new_url)
                     ts_list = await Myself.get_m3u8_uri_list(host_list=host_list,
                                                              video_720p=animate_video_json['video']['720p'],
                                                              timeout=(60, 10))
                     ts_count = len(ts_list)
-                    await DB.Myself.create_many_animate_episode_ts(parent_model=episode_info_model, ts_list=ts_list)
+                    await DB.Myself.create_many_animate_episode_ts(owner=episode_info_model, ts_list=ts_list)
                 else:
-                    ts_list = await DB.Myself.filter_animate_episode_ts_undone_uri_list(parent_model=episode_info_model)
-                    ts_count = await DB.Myself.get_animate_episode_ts_count(parent_model=episode_info_model)
+                    ts_list = await DB.Myself.filter_animate_episode_ts_undone_uri_list(owner=episode_info_model)
+                    ts_count = await DB.Myself.get_animate_episode_ts_count(owner=episode_info_model)
 
                 self.wait_download_list.append({
                     'id': episode_info_model.id,
