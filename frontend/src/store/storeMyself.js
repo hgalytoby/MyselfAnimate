@@ -20,7 +20,11 @@ import {
   addCheckboxAnimateEpisodeMutation,
   removeCheckboxAnimateEpisodeMutation,
   downloadMyselfAnimateMutation,
-  downloadMyselfAnimateState, downloadMyselfAnimateGetters
+  downloadMyselfAnimateState,
+  downloadMyselfAnimateGetters,
+  finishAnimateState,
+  finishAnimateAction,
+  addFinishAnimateMutation, searchMyselfAnimateMutation, displayFinishAnimateState, displayFinishAnimateMutation
 } from '../variables/variablesMyself'
 import { myselfApi } from '../../api'
 
@@ -32,7 +36,9 @@ export const state = {
   [finishListState]: {},
   [finishAnimateUpdateState]: false,
   [finishAnimateUpdateButtonState]: '更新資料',
-  [checkboxAnimateEpisodeState]: []
+  [checkboxAnimateEpisodeState]: [],
+  [finishAnimateState]: [],
+  [displayFinishAnimateState]: []
 }
 
 export const actions = {
@@ -61,10 +67,20 @@ export const actions = {
     axios.get(myselfApi.finishList).then(
       response => {
         context.commit(addFinishListMutation, response.data)
-        // context.commit('changeActiveWeek', response.data)
       },
       error => {
         context.commit(addFinishListMutation, error.msg)
+      }
+    )
+  },
+  [finishAnimateAction] (context, value) {
+    axios.get(myselfApi.finishAnimate).then(
+      response => {
+        context.commit(addFinishAnimateMutation, response.data)
+        context.commit(displayFinishAnimateMutation)
+      },
+      error => {
+        context.commit(addFinishAnimateMutation, error.msg)
       }
     )
   }
@@ -96,7 +112,13 @@ export const mutations = {
   [addFinishListMutation] (state, value) {
     if (value) {
       state[finishListState] = value.data
-      console.log(state[finishListState])
+    } else {
+      alert('失敗')
+    }
+  },
+  [addFinishAnimateMutation] (state, value) {
+    if (value) {
+      state[finishAnimateState] = value
     } else {
       alert('失敗')
     }
@@ -114,6 +136,12 @@ export const mutations = {
   [downloadMyselfAnimateMutation] (state, value) {
     // console.log(value)
     state[downloadMyselfAnimateState] = value
+  },
+  [searchMyselfAnimateMutation] (state, value) {
+    state[displayFinishAnimateState] = value
+  },
+  [displayFinishAnimateMutation] (state, value) {
+    state[displayFinishAnimateState] = state[finishAnimateState]
   }
 }
 export const getters = {

@@ -37,6 +37,36 @@ class MyselfBase:
             await asyncio.wait(tasks)
 
     @staticmethod
+    def create_many_animate_episode_models(data: dict, **kwargs):
+        """
+        新增多個動漫集數。
+        :param data:
+        :return:
+        """
+        models = []
+        for episode in data['video']:
+            models.append(
+                AnimateEpisodeInfoModel.objects.get_or_create(name=episode['name'], **kwargs, defaults={
+                    'name': episode['name'],
+                    'url': episode['url'],
+                    'owner': kwargs.get('owner'),
+                })[0])
+        return models
+
+    @staticmethod
+    @database_sync_to_async
+    def create_many_animate_episode_ts(ts_list: list, **kwargs):
+        """
+        新增多個動漫某一集的所有 ts 資料。
+        :param ts_list:
+        :return:
+        """
+        models = []
+        for ts_uri in ts_list:
+            models.append(AnimateEpisodeTsModel(uri=ts_uri, **kwargs))
+        AnimateEpisodeTsModel.objects.bulk_create(models)
+
+    @staticmethod
     def update_or_create_animate_info_model(data: dict, image: bytes):
         """
         更新或新增動漫資料。
@@ -56,22 +86,17 @@ class MyselfBase:
         model.image.save(f'{data["name"]}.{image_type}', ContentFile(image))
         return model
 
-    @staticmethod
-    def create_many_animate_episode_models(data: dict, **kwargs):
+    @classmethod
+    @database_sync_to_async
+    def update_animate_episode_url(cls, new_url: str, model):
         """
-        新增多個動漫集數。
-        :param data:
+        更新 AnimateEpisodeInfoModel 的 URL。
+        :param new_url:
+        :param model:
         :return:
         """
-        models = []
-        for episode in data['video']:
-            models.append(
-                AnimateEpisodeInfoModel.objects.get_or_create(name=episode['name'], **kwargs, defaults={
-                    'name': episode['name'],
-                    'url': episode['url'],
-                    'owner': kwargs.get('owner'),
-                })[0])
-        return models
+        model.url = new_url
+        model.save()
 
     @staticmethod
     @database_sync_to_async
@@ -105,53 +130,6 @@ class MyselfBase:
         :return:
         """
         return AnimateEpisodeTsModel.objects.filter(**kwargs).count()
-
-    @classmethod
-    @database_sync_to_async
-    def delete_filter_animate_episode_ts(cls, **kwargs):
-        """
-        刪除動滿某一集所有 ts 資料。
-        :return:
-        """
-        AnimateEpisodeTsModel.objects.filter(**kwargs).delete()
-
-    @staticmethod
-    @database_sync_to_async
-    def create_many_animate_episode_ts(ts_list: list, **kwargs):
-        """
-        新增多個動漫某一集的所有 ts 資料。
-        :param ts_list:
-        :return:
-        """
-        models = []
-        for ts_uri in ts_list:
-            models.append(AnimateEpisodeTsModel(uri=ts_uri, **kwargs))
-        AnimateEpisodeTsModel.objects.bulk_create(models)
-
-    @staticmethod
-    @database_sync_to_async
-    def save_animate_episode_ts_file(ts_content: bytes, **kwargs):
-        """
-        儲存動漫某一集的 ts 檔案
-        :param ts_content:
-        :return:
-        """
-        model = AnimateEpisodeTsModel.objects.get(**kwargs)
-        model.done = True
-        model.ts.save(model.uri, ContentFile(ts_content))
-
-    @staticmethod
-    @database_sync_to_async
-    def save_animate_episode_video_file(video_path: str, **kwargs):
-        """
-        儲存動漫某一集的 ts 檔案
-        :param video_path:
-        :return:
-        """
-        model = AnimateEpisodeInfoModel.objects.get(**kwargs)
-        model.done = True
-        model.video = video_path
-        model.save()
 
     @staticmethod
     @database_sync_to_async
@@ -206,16 +184,46 @@ class MyselfBase:
             data.append(f"file '{BASE_DIR}{MEDIA_PATH}/{model.ts}'")
         return data
 
+    @staticmethod
+    @database_sync_to_async
+    def filter_finish_animate_list(**kwargs):
+        data = []
+        for model in FinishAnimateModel.objects.filter(**kwargs):
+            data.append(model.to_dict())
+        return data
+
     @classmethod
     @database_sync_to_async
-    def update_animate_episode_url(cls, new_url: str, model):
+    def delete_filter_animate_episode_ts(cls, **kwargs):
         """
-        更新 AnimateEpisodeInfoModel 的 URL。
-        :param new_url:
-        :param model:
+        刪除動滿某一集所有 ts 資料。
         :return:
         """
-        model.url = new_url
+        AnimateEpisodeTsModel.objects.filter(**kwargs).delete()
+
+    @staticmethod
+    @database_sync_to_async
+    def save_animate_episode_ts_file(ts_content: bytes, **kwargs):
+        """
+        儲存動漫某一集的 ts 檔案
+        :param ts_content:
+        :return:
+        """
+        model = AnimateEpisodeTsModel.objects.get(**kwargs)
+        model.done = True
+        model.ts.save(model.uri, ContentFile(ts_content))
+
+    @staticmethod
+    @database_sync_to_async
+    def save_animate_episode_video_file(video_path: str, **kwargs):
+        """
+        儲存動漫某一集的 ts 檔案
+        :param video_path:
+        :return:
+        """
+        model = AnimateEpisodeInfoModel.objects.get(**kwargs)
+        model.done = True
+        model.video = video_path
         model.save()
 
 

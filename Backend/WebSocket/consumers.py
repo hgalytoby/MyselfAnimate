@@ -45,6 +45,7 @@ class Manage:
 
     async def download_tasks(self):
         while True:
+            # dict(map(lambda kv:: x[''], download_manage.download_list + download_manage.wait_download_list))
             await self.send(
                 text_data=json.dumps({
                     'msg': '目前下載列表',
@@ -77,6 +78,10 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
                     asyncio.create_task(self.myself_animate_download(data=data))
                     await self.send(
                         text_data=json.dumps({'msg': f'我收到要下載的清單了', 'action': data['action'], 'updating': True}))
+                elif data['action'] == 'search_myself_animate':
+                    result = await DB.Myself.filter_finish_animate_list(name__contains=data['msg'])
+                    print(result)
+                    await self.send(text_data=json.dumps({'data': result, 'action': data['action']}))
             if data.get('msg') and data['msg'] == 'some message to websocket server':
                 await self.send(text_data=json.dumps({'msg': f'前端在按 Login'}))
         except Exception as error:

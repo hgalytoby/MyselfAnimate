@@ -30,10 +30,10 @@ from project.settings import MEDIA_PATH
 #     tt.start()
 #     tt.join()
 # try:
-cmd = f'ffmpeg -f concat -safe 0 -y -i C:/Python/MyselfAnimate/backend/file.txt -c copy output.mp4'
-run = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-run.communicate()
-run.wait()
+# cmd = f'ffmpeg -f concat -safe 0 -y -i C:/Python/MyselfAnimate/backend/file.txt -c copy output.mp4'
+# run = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+# run.communicate()
+# run.wait()
 # cmd = f'ffmpeg -f concat -safe 0 -y -i {os.getcwd()}/temp/file.txt -c copy {os.getcwd()}/temp/out.mp4'
 # # print(cmd)
 # print(1)
@@ -116,14 +116,11 @@ run.wait()
 # data['clones'].extend(get_clone())
 # json.dump(data, open('data.json', 'w', encoding='utf-8'), indent=2)
 
-# if __name__ == '__main__':
-
-
-
-
-
-image_path = '/x00'
-print(len(image_path))
+if __name__ == '__main__':
+    d = [{'id': 1, 'name': 'a'}, {'id': 2, 'name': 'b'}]
+    print(dict(map(lambda x: (x['id'], x['name']), d)))
+# image_path = '/x00'
+# print(len(image_path))
 # _split = os.path.split(image_path)
 # print(_split)
 # _ = list(filter(lambda x: x == _split[1], os.listdir(_split[0])))

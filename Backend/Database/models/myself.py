@@ -2,6 +2,7 @@ from channels.db import database_sync_to_async
 from django.db import models
 
 from Database.models.my import upload_image_path, upload_ts_path, upload_video_path
+from project.settings import MEDIA_PATH
 
 
 class AnimateInfoModel(models.Model):
@@ -48,6 +49,9 @@ class FinishAnimateModel(models.Model):
     name = models.CharField(max_length=128)
     url = models.URLField(unique=True)
     image = models.ImageField(upload_to=upload_image_path)
+
+    def to_dict(self):
+        return {'id': self.id, 'name': self.name, 'url': self.url, 'image': f'{MEDIA_PATH}{self.image.url}'}
 
     class Meta:
         db_table = 'MyselfFinishAnimate'
@@ -97,5 +101,3 @@ class AnimateEpisodeTsModel(models.Model):
 
     class Meta:
         db_table = 'AnimateEpisodeTs'
-        
-
