@@ -14,7 +14,7 @@ download_manage = DownloadManage()
 class Manage:
     async def myself_finish_animate_update(self):
         total_page_data = await Myself.finish_animate_total_page(url=FinishAnimateUrl, get_res_text=True)
-        for page in range(1, total_page_data['total_page'] + 1):
+        for page in range(total_page_data['total_page'], 0, -1):
             if page == 1:
                 page_data = await Myself.finish_animate_page_data(url=FinishAnimateBaseUrl.format(page),
                                                                   res_text=total_page_data['res_text'])

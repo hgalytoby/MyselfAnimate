@@ -1,11 +1,19 @@
 <template>
   <div>我的下載區域</div>
+
   <div v-for="animate in downloadMyselfAnimateArray" :key="animate.id">
     id:{{ animate.id }}
     動漫名字:{{ animate.animate_name }}
     級數:{{ animate.episode_name }}
     狀態:{{ animate.status }}
-    進度: {{ computeProgressRate(animate.count, animate.ts_count) }}
+    <div class="progress">
+      <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+           :aria-valuenow="computeProgressRate(animate.count, animate.ts_count)"
+           aria-valuemin="0" aria-valuemax="100"
+           :style="`width: ${computeProgressRate(animate.count, animate.ts_count)}%`">
+        {{ computeProgressRate(animate.count, animate.ts_count) }}%
+      </div>
+    </div>
   </div>
 </template>
 

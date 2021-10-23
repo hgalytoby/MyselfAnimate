@@ -1,13 +1,11 @@
 import axios from 'axios'
 import {
-  activeWeekState,
   weekAnimateState,
   animateInfoState,
   loadingState,
   finishListState,
   addAnimateInfoMutation,
   addFinishListMutation,
-  changeActiveWeekMutation,
   addWeekAnimateMutation,
   animateInfoAction,
   loadingMutation,
@@ -30,7 +28,6 @@ import { myselfApi } from '../../api'
 
 export const state = {
   [weekAnimateState]: {},
-  [activeWeekState]: {},
   [animateInfoState]: {},
   [loadingState]: true,
   [finishListState]: {},
@@ -46,7 +43,6 @@ export const actions = {
     axios.get(myselfApi.weekAnimate).then(
       response => {
         context.commit(addWeekAnimateMutation, response.data)
-        // context.commit('changeActiveWeek', response.data)
       },
       error => {
         context.commit(addWeekAnimateMutation, error.msg)
@@ -90,13 +86,9 @@ export const mutations = {
   [addWeekAnimateMutation] (state, value) {
     if (value) {
       state[weekAnimateState] = value
-      state[activeWeekState] = state[weekAnimateState].Monday
     } else {
       alert('失敗')
     }
-  },
-  [changeActiveWeekMutation] (state, value) {
-    state.activeWeekState = state[weekAnimateState][value]
   },
   [addAnimateInfoMutation] (state, value) {
     if (value) {
