@@ -18,6 +18,15 @@ week = {
     5: 'Saturday',
     6: 'Sunday',
 }
+# week = {
+#     0: '星期一',
+#     1: '星期二',
+#     2: '星期三',
+#     3: '星期四',
+#     4: '星期五',
+#     5: '星期六',
+#     6: '星期日',
+# }
 
 animate_table = {
     '作品類型': 'animate_type',
@@ -26,6 +35,7 @@ animate_table = {
     '原著作者': 'author',
     '官方網站': 'official_website',
     '備注': 'remarks',
+    '簡介': 'synopsis',
 }
 
 
@@ -232,7 +242,8 @@ class Myself:
             data.append({
                 'url': f"https://myself-bbs.com/{elements.find('a')['href']}",
                 'name': badname(elements.find('a')['title']),
-                'image': f"https://myself-bbs.com/{elements.find('a').find('img')['src']}"
+                'image': f"https://myself-bbs.com/{elements.find('a').find('img')['src']}",
+                'info': elements.find('p').text
             })
         return data
 
@@ -265,12 +276,12 @@ async def main():
     # async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
     #     async with session.get(url='https://vpx06.myself-bbs.com/47690/003/720p.m3u8', headers=headers) as res:
     #         print(await res.text(encoding='utf-8', errors='ignore'))
-    # _ = await Myself.finish_animate_page_data(url='https://myself-bbs.com/forum-113-1.html')
+    _ = await Myself.finish_animate_page_data(url='https://myself-bbs.com/forum-113-1.html')
     # await DB.Myself.create_many_finish_animate(_)
     # a = await Myself.get_m3u8_data(url='https://vpx.myself-bbs.com/47731/012/720p.m3u8')
     pass
 
 
 if __name__ == '__main__':
-    # asyncio.run(main_task())
+    asyncio.run(main())
     pass

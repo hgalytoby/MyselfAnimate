@@ -5,6 +5,7 @@
 <script>
 import Sidebar from './components/Sidebar'
 import { connectSocket } from './hooks/useWS'
+import 'animate.css'
 
 export default {
   name: 'App',

@@ -1,27 +1,32 @@
 <template>
   <div class="row">
     <div class="mb-3">
-    <label for="exampleInputEmail1" class="form-label">搜尋動漫</label>
-    <input type="email" class="form-control" id="exampleInputEmail1" @keyup="searchAnimate" v-model="searchText">
-  </div>
+      <input type="text" class="form-control shadow-sm p-3 mb-5 bg-body rounded" id="search" @keyup="searchAnimate"
+             v-model="searchText" placeholder="搜尋動漫">
+    </div>
   </div>
   <button type="button" class="btn btn-primary" :disabled="finishAnimateUpdate" @click="updateFinishAnimateData">
     {{ finishAnimateUpdateButton }}
   </button>
   <div class="row">
-    <div class="col-2 col-sm-2" v-for="animate in displayFinishAnimate" :key="animate.id">
-      <router-link :to="{
-      name: 'MyselfAnimate',
-      query: {
-        url: animate.url.split('/').at(-1),
-      }
-    }">
-        <figure class="figure">
-          <img :src="animate.image" class="figure-img img-fluid rounded" alt="...">
-          <figcaption class="figure-caption text-center">{{ animate.name}}</figcaption>
-        </figure>
-      </router-link>
-    </div>
+    <transition-group mode="out-in" appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"
+                      leave-active-class="animate__fadeOut">
+      <div class="card col-xxl-2 col-xl-3 col-lg-3 col-md-5 col-sm-5" v-for="animate in displayFinishAnimate"
+           :key="animate.id">
+        <router-link :to="{
+          name: 'MyselfAnimate',
+          query: {
+            url: animate.url.split('/').at(-1),
+          }
+        }">
+          <img :src="animate.image" class="card-img-top rounded mx-auto d-block img-thumbnail p-2" alt="animate.name">
+          <div class="card-body">
+            <p class="card-text overflow-hidden text-nowrap animate-name" data-toggle="tooltip" data-placement="bottom"
+               :title="animate.name">{{ animate.name }}</p>
+          </div>
+        </router-link>
+      </div>
+    </transition-group>
   </div>
 </template>
 
@@ -41,6 +46,7 @@ export default {
   name: 'Search',
   setup () {
     const searchText = ref('')
+    const show = ref(true)
     const store = useStore()
     const displayFinishAnimate = computed(() => store.state.myself[displayFinishAnimateState])
     const updateFinishAnimateData = () => {
@@ -69,12 +75,15 @@ export default {
       finishAnimateUpdateButton,
       displayFinishAnimate,
       searchText,
-      searchAnimate
+      searchAnimate,
+      show
     }
   }
 }
 </script>
 
 <style scoped>
-
+  .animate-name {
+    text-overflow: ellipsis;
+  }
 </style>
