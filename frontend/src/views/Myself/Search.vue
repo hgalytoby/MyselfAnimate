@@ -11,7 +11,7 @@
   <div class="row">
     <transition-group mode="out-in" appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"
                       leave-active-class="animate__fadeOut">
-      <div class="card col-xxl-2 col-xl-3 col-lg-3 col-md-5 col-sm-5" v-for="animate in displayFinishAnimate"
+      <div class="card col-sm-5 col-lg-3 col-xxl-2" v-for="animate in displayFinishAnimate"
            :key="animate.id">
         <router-link :to="{
           name: 'MyselfAnimate',
@@ -20,11 +20,17 @@
           }
         }">
           <img :src="animate.image" class="card-img-top rounded mx-auto d-block img-thumbnail p-2" alt="animate.name">
-          <div class="card-body">
-            <p class="card-text overflow-hidden text-nowrap animate-name" data-toggle="tooltip" data-placement="bottom"
-               :title="animate.name">{{ animate.name }}</p>
+<!--          <span class="bg-dark text-white text-center position-relative bottom-50">{{ animate.info }}</span>-->
+          <div class="card-img-overlay">
+            <p class="bg-dark position-relative top-50 start-50 translate-middle-x text-white text-center">{{animate.info}}</p>
           </div>
         </router-link>
+        <div class="card-body">
+          <p class="card-text overflow-hidden text-nowrap animate-name text-center" data-toggle="tooltip" data-placement="bottom"
+               :title="animate.name">{{ animate.name }}</p>
+          </div>
+        <div class="h-auto d-inline-block">
+        </div>
       </div>
     </transition-group>
   </div>

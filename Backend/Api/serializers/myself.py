@@ -11,7 +11,7 @@ class FinishAnimateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FinishAnimateModel
-        fields = ('id', 'name', 'url', 'image')
+        fields = ('id', 'name', 'url', 'image', 'info')
 
 
 class AnimateEpisodeInfoSerializer(serializers.ModelSerializer):

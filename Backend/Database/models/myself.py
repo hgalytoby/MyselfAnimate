@@ -51,10 +51,10 @@ class FinishAnimateModel(models.Model):
     name = models.CharField(max_length=128)
     url = models.URLField(unique=True)
     image = models.ImageField(upload_to=upload_image_path)
-    # info = models.CharField(max_length=16)
+    info = models.CharField(max_length=16)
 
     def to_dict(self):
-        return {'id': self.id, 'name': self.name, 'url': self.url, 'image': f'{MEDIA_PATH}{self.image.url}'}
+        return {'id': self.id, 'name': self.name, 'url': self.url, 'image': f'{MEDIA_PATH}{self.image.url}', 'info': self.info}
 
     class Meta:
         db_table = 'MyselfFinishAnimate'

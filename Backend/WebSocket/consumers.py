@@ -14,16 +14,13 @@ download_manage = DownloadManage()
 class Manage:
     async def myself_finish_animate_update(self):
         total_page_data = await Myself.finish_animate_total_page(url=FinishAnimateUrl, get_res_text=True)
-        for page in range(total_page_data['total_page'], 0, -1):
+        for page in range(1, total_page_data['total_page'] + 1):
             if page == 1:
                 page_data = await Myself.finish_animate_page_data(url=FinishAnimateBaseUrl.format(page),
                                                                   res_text=total_page_data['res_text'])
             else:
                 page_data = await Myself.finish_animate_page_data(url=FinishAnimateBaseUrl.format(page))
             await DB.Myself.create_many_finish_animate(data=page_data)
-            # await asyncio.sleep(2)
-            if page == 1:
-                break
         await create_log(msg='updated', action='myself_finish_animate_update')
         await self.send(
             text_data=json.dumps({'msg': '更新完成', 'action': 'myself_finish_animate_update', 'updating': False}))
@@ -80,8 +77,8 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
                         text_data=json.dumps({'msg': f'我收到要下載的清單了', 'action': data['action'], 'updating': True}))
                 elif data['action'] == 'search_myself_animate':
                     result = await DB.Myself.filter_finish_animate_list(name__contains=data['msg'])
-                    print('*'*50,result)
-                    await self.send(text_data=json.dumps({'data': result, 'action': data['action']}))
+                    print('*'*50,result[:25])
+                    await self.send(text_data=json.dumps({'data': result[:25], 'action': data['action']}))
             if data.get('msg') and data['msg'] == 'some message to websocket server':
                 await self.send(text_data=json.dumps({'msg': f'前端在按 Login'}))
         except Exception as error:

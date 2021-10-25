@@ -6,7 +6,7 @@
   <div v-else>
     <div class="card">
       <div class="row g-0">
-        <div class="col-md-7 col-lg-7 col-xl-4 col-xxl-3">
+        <div class="col-sm-12 col-lg-7 col-xl-4 col-xxl-3">
           <img :src="animateInfo.image" :alt="animateInfo.name" class="rounded mx-auto d-block img-thumbnail w-100 p-2">
         </div>
         <div class="col-lg">

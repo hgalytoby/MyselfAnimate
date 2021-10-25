@@ -15,6 +15,7 @@ class MyselfBase:
         model = FinishAnimateModel()
         model.name = animate['name']
         model.url = animate['url']
+        model.info = animate['info']
         model.image.save(f'{animate["name"]}.{image_type}', ContentFile(animate['image']))
 
     @classmethod
@@ -200,6 +201,15 @@ class MyselfBase:
         :return:
         """
         AnimateEpisodeTsModel.objects.filter(**kwargs).delete()
+
+    @classmethod
+    @database_sync_to_async
+    def delete_all_finish_animate(cls):
+        """
+        刪除所有完結動漫資料。
+        :return:
+        """
+        FinishAnimateModel.objects.all().delete()
 
     @staticmethod
     @database_sync_to_async
