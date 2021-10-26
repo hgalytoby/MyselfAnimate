@@ -272,6 +272,7 @@ class Myself:
             await asyncio.sleep(1)
 
 
+
 async def main():
     # async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
     #     async with session.get(url='https://vpx06.myself-bbs.com/47690/003/720p.m3u8', headers=headers) as res:

@@ -110,7 +110,7 @@ export const mutations = {
   },
   [addFinishAnimateMutation] (state, value) {
     if (value) {
-      state[finishAnimateState] = value
+      state[finishAnimateState] = value.data
     } else {
       alert('失敗')
     }
@@ -130,7 +130,7 @@ export const mutations = {
     state[downloadMyselfAnimateState] = value
   },
   [searchMyselfAnimateMutation] (state, value) {
-    state[displayFinishAnimateState] = value
+    state[displayFinishAnimateState] = value.data
   },
   [displayFinishAnimateMutation] (state, value) {
     state[displayFinishAnimateState] = state[finishAnimateState]

@@ -1,6 +1,7 @@
 import json
 import asyncio
 
+from Api.serializers import FinishAnimateSerializer
 from Tools.db import DB
 from Tools.download import DownloadManage
 from Tools.myself import Myself
@@ -76,14 +77,15 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
                     await self.send(
                         text_data=json.dumps({'msg': f'我收到要下載的清單了', 'action': data['action'], 'updating': True}))
                 elif data['action'] == 'search_myself_animate':
-                    result = await DB.Myself.filter_finish_animate_list(name__contains=data['msg'])
-                    print('*'*50,result[:25])
-                    await self.send(text_data=json.dumps({'data': result[:25], 'action': data['action']}))
+                    model = await DB.Myself.filter_finish_animate(name__contains=data['msg'])
+                    serializer_data = await DB.Myself.test(model=model)
+                    await self.send(text_data=json.dumps({'data': serializer_data, 'action': data['action']}))
             if data.get('msg') and data['msg'] == 'some message to websocket server':
                 await self.send(text_data=json.dumps({'msg': f'前端在按 Login'}))
         except Exception as error:
             print(error)
             await self.send(text_data=json.dumps({'msg': f'後端出錯了: {error}'}))
+
 
 # """
 # let ws1 = new WebSocket('ws://127.0.0.1:8000/')
@@ -93,3 +95,4 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
 #     };
 # ws1.send(JSON.stringify({message: 'hello'}))
 # """
+

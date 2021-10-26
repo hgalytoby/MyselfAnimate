@@ -1,4 +1,9 @@
 import asyncio
+
+from django.core.paginator import Paginator
+
+from Api.serializers import FinishAnimateSerializer
+from Api.views.tools import MyPageNumberPagination
 from Tools.setup import *
 from channels.db import database_sync_to_async
 from Database.models import FinishAnimateModel, AnimateInfoModel, AnimateEpisodeInfoModel, AnimateEpisodeTsModel
@@ -187,11 +192,8 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def filter_finish_animate_list(**kwargs):
-        data = []
-        for model in FinishAnimateModel.objects.filter(**kwargs):
-            data.append(model.to_dict())
-        return data
+    def filter_finish_animate(**kwargs):
+        return FinishAnimateModel.objects.filter(**kwargs)
 
     @classmethod
     @database_sync_to_async
@@ -235,6 +237,22 @@ class MyselfBase:
         model.done = True
         model.video = video_path
         model.save()
+
+    @staticmethod
+    @database_sync_to_async
+    def test(model):
+        paginator = Paginator(model, 25)
+        pag_obj = paginator.page(1)
+        serializer = FinishAnimateSerializer(pag_obj, many=True)
+        result = {
+            'previous': pag_obj.previous_page_number() if pag_obj.has_previous() else None,
+            'page': pag_obj.number,
+            'next': pag_obj.next_page_number() if pag_obj.has_next() else None,
+            'total_pages': paginator.num_pages,
+            'count': paginator.count,
+            'data': serializer.data
+        }
+        return result
 
 
 class DB:

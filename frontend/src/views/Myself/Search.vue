@@ -20,17 +20,16 @@
           }
         }">
           <img :src="animate.image" class="card-img-top rounded mx-auto d-block img-thumbnail p-2" alt="animate.name">
-<!--          <span class="bg-dark text-white text-center position-relative bottom-50">{{ animate.info }}</span>-->
           <div class="card-img-overlay">
-            <p class="bg-dark position-relative top-50 start-50 translate-middle-x text-white text-center">{{animate.info}}</p>
+            <p class="card-title text">{{ animate.info }}</p>
           </div>
-        </router-link>
-        <div class="card-body">
-          <p class="card-text overflow-hidden text-nowrap animate-name text-center" data-toggle="tooltip" data-placement="bottom"
+          <div class="card-body">
+            <p class="card-text overflow-hidden text-nowrap animate-name text-center" data-toggle="tooltip"
+               data-placement="bottom"
                :title="animate.name">{{ animate.name }}</p>
           </div>
-        <div class="h-auto d-inline-block">
-        </div>
+        </router-link>
+
       </div>
     </transition-group>
   </div>
@@ -91,5 +90,20 @@ export default {
 <style scoped>
   .animate-name {
     text-overflow: ellipsis;
+  }
+  .box {
+    position: relative;
+}
+  .box .text {
+      position: absolute;
+      z-index: 999;
+      text-align: center;
+      bottom: 0;
+      left: 0;
+      background: rgba(178, 0, 0, 0.8);
+      font-family: Arial,sans-serif;
+      color: #fff;
+      width: 100%; /* Set the width of the positioned div */
+      height: 10%;
   }
 </style>
