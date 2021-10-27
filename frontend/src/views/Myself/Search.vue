@@ -9,30 +9,41 @@
     {{ finishAnimateUpdateButton }}
   </button>
   <div class="row">
-    <transition-group mode="out-in" appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"
-                      leave-active-class="animate__fadeOut">
-      <div class="card col-sm-5 col-lg-3 col-xxl-2" v-for="animate in displayFinishAnimate"
-           :key="animate.id">
+    <template v-for="animate in displayFinishAnimate.data" :key="animate.id">
+    <transition appear name="animate__animated animate__bounce" enter-active-class="animate__backInDown"
+                      leave-active-class="animate__heartBeat">
+      <div class="card col-sm-5 col-lg-3 col-xxl-2">
         <router-link :to="{
           name: 'MyselfAnimate',
           query: {
             url: animate.url.split('/').at(-1),
           }
         }">
-          <img :src="animate.image" class="card-img-top rounded mx-auto d-block img-thumbnail p-2" alt="animate.name">
-          <div class="card-img-overlay">
-            <p class="card-title text">{{ animate.info }}</p>
-          </div>
+          <img :src="animate.image" class="card-img-top rounded mx-auto d-block img-thumbnail p-2 w-100"
+               alt="animate.name">
           <div class="card-body">
+            <p class="card-title text-center text-white p-bg">{{ animate.info }}</p>
             <p class="card-text overflow-hidden text-nowrap animate-name text-center" data-toggle="tooltip"
-               data-placement="bottom"
-               :title="animate.name">{{ animate.name }}</p>
+             data-placement="bottom"
+             :title="animate.name">{{ animate.name }}</p>
           </div>
         </router-link>
-
       </div>
-    </transition-group>
+    </transition>
+    </template>
   </div>
+  <nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" :class="displayFinishAnimate.previous ? '' : 'disabled'" @click="changePage(displayFinishAnimate.page - 1)">
+        <a class="page-link">Previous</a>
+      </li>
+      <li class="page-item"><a class="page-link" href="#">{{ displayFinishAnimate.page }}</a></li>
+      <li class="page-item" :class="displayFinishAnimate.next ? '' : 'disabled'" @click="changePage(displayFinishAnimate.page + 1)">
+        <a class="page-link">next</a>
+      </li>
+    </ul>
+    <p class="text-center">全部:{{ displayFinishAnimate.count }} / 總頁數:{{ displayFinishAnimate.total_pages }}</p>
+  </nav>
 </template>
 
 <script>
@@ -50,8 +61,8 @@ import { useStore } from 'vuex'
 export default {
   name: 'Search',
   setup () {
-    const searchText = ref('')
     const show = ref(true)
+    const searchText = ref('')
     const store = useStore()
     const displayFinishAnimate = computed(() => store.state.myself[displayFinishAnimateState])
     const updateFinishAnimateData = () => {
@@ -74,6 +85,14 @@ export default {
         store.commit(`myself/${displayFinishAnimateMutation}`)
       }
     }
+    function changePage (page) {
+      console.log('changePage')
+      sendSocketMessage({
+        action: 'search_myself_animate',
+        msg: searchText.value,
+        page: page
+      })
+    }
     return {
       updateFinishAnimateData,
       finishAnimateUpdate,
@@ -81,6 +100,7 @@ export default {
       displayFinishAnimate,
       searchText,
       searchAnimate,
+      changePage,
       show
     }
   }
@@ -91,19 +111,24 @@ export default {
   .animate-name {
     text-overflow: ellipsis;
   }
-  .box {
+
+  .p-main {
+    display: block;
+    max-width: 265px;
+    width: 100%;
+    height: 225px;
     position: relative;
-}
-  .box .text {
-      position: absolute;
-      z-index: 999;
-      text-align: center;
-      bottom: 0;
-      left: 0;
-      background: rgba(178, 0, 0, 0.8);
-      font-family: Arial,sans-serif;
-      color: #fff;
-      width: 100%; /* Set the width of the positioned div */
-      height: 10%;
+  }
+
+  .p-test {
+    position: absolute;
+    z-index: 1;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+  }
+
+  .p-bg {
+    background: rgba(0, 0, 0, 0.6);
   }
 </style>

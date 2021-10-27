@@ -78,7 +78,7 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
                         text_data=json.dumps({'msg': f'我收到要下載的清單了', 'action': data['action'], 'updating': True}))
                 elif data['action'] == 'search_myself_animate':
                     model = await DB.Myself.filter_finish_animate(name__contains=data['msg'])
-                    serializer_data = await DB.Myself.test(model=model)
+                    serializer_data = await DB.Myself.test(model=model, page=data.get('page'))
                     await self.send(text_data=json.dumps({'data': serializer_data, 'action': data['action']}))
             if data.get('msg') and data['msg'] == 'some message to websocket server':
                 await self.send(text_data=json.dumps({'msg': f'前端在按 Login'}))

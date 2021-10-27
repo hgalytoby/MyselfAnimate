@@ -72,7 +72,7 @@ export const actions = {
   [finishAnimateAction] (context, value) {
     axios.get(myselfApi.finishAnimate).then(
       response => {
-        context.commit(addFinishAnimateMutation, response.data)
+        context.commit(addFinishAnimateMutation, response)
         context.commit(displayFinishAnimateMutation)
       },
       error => {
@@ -126,11 +126,11 @@ export const mutations = {
     state[checkboxAnimateEpisodeState].splice(value, 1)
   },
   [downloadMyselfAnimateMutation] (state, value) {
-    // console.log(value)
     state[downloadMyselfAnimateState] = value
   },
   [searchMyselfAnimateMutation] (state, value) {
-    state[displayFinishAnimateState] = value.data
+    state[displayFinishAnimateState] = []
+    state[displayFinishAnimateState] = value
   },
   [displayFinishAnimateMutation] (state, value) {
     state[displayFinishAnimateState] = state[finishAnimateState]

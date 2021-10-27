@@ -240,9 +240,9 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def test(model):
-        paginator = Paginator(model, 25)
-        pag_obj = paginator.page(1)
+    def test(model, page):
+        paginator = Paginator(model, 12)
+        pag_obj = paginator.page(page if page else 1)
         serializer = FinishAnimateSerializer(pag_obj, many=True)
         result = {
             'previous': pag_obj.previous_page_number() if pag_obj.has_previous() else None,
