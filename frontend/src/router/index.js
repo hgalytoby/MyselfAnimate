@@ -9,6 +9,7 @@ import Week from '../views/Myself/Week'
 import Finish from '../views/Myself/Finish'
 import Animate from '../views/Myself/Animate'
 import Search from '../views/Myself/Search'
+import MyLog from '../views/MyLog'
 
 const routes = [
   {
@@ -54,6 +55,10 @@ const routes = [
     path: '/Myself/AnimateSearch',
     component: Search,
     name: 'MyselfAnimateSearch'
+  },
+  {
+    path: '/MyLog',
+    component: MyLog
   },
   {
     path: '/MySettings',

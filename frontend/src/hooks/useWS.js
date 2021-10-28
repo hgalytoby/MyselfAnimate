@@ -11,7 +11,7 @@ export const connectSocket = () => {
   const store = useStore()
   socket.onopen = function () {
     console.log('websocket connected!!')
-    // sendSocketMessage(JSON.stringify({ msg1: '我要跟後端連線了!' }))
+    sendSocketMessage({ msg1: '我要跟後端連線了!' })
   }
   socket.onmessage = function (msg) {
     console.log('onmessage', JSON.parse(msg.data))

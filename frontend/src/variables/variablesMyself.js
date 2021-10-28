@@ -8,11 +8,13 @@ export const finishAnimateUpdateState = 'finishAnimateUpdateState'
 export const finishAnimateUpdateButtonState = 'finishAnimateUpdateButtonState'
 export const checkboxAnimateEpisodeState = 'checkboxAnimateEpisodeState'
 export const downloadMyselfAnimateState = 'downloadMyselfAnimateState'
+export const myLogState = 'myLogState'
 
 export const weekAnimateAction = 'weekAnimateAction'
 export const animateInfoAction = 'animateInfoAction'
 export const finishListAction = 'finishListAction'
 export const finishAnimateAction = 'finishAnimateAction'
+export const myLogAction = 'myLogAction'
 
 export const addWeekAnimateMutation = 'addWeekAnimateMutation'
 export const addAnimateInfoMutation = 'addAnimateInfoMutation'
@@ -25,5 +27,6 @@ export const removeCheckboxAnimateEpisodeMutation = 'removeCheckboxAnimateEpisod
 export const downloadMyselfAnimateMutation = 'downloadMyselfAnimateMutation'
 export const searchMyselfAnimateMutation = 'searchMyselfAnimateMutation'
 export const displayFinishAnimateMutation = 'displayFinishAnimateMutation'
+export const myLogMutation = 'myLogMutation'
 
 export const downloadMyselfAnimateGetters = 'downloadMyselfAnimateGetters'

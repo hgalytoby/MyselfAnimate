@@ -51,6 +51,18 @@ class Manage:
                     'action': 'download_myself_animate_array'}))
             await asyncio.sleep(0.5)
 
+    async def search_animate(self, data):
+        try:
+            if data['msg']:
+                model = await DB.Myself.filter_finish_animate(name__contains=data['msg'])
+                print(model, 'if')
+            else:
+                model = await DB.Myself.All_finish_animate()
+                print(model, 'model')
+            serializer_data = await DB.Myself.test(model=model, page=data.get('page'))
+            await self.send(text_data=json.dumps({'data': serializer_data, 'action': data['action']}))
+        except Exception as e:
+            print(e)
 
 class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
 
@@ -77,15 +89,18 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
                     await self.send(
                         text_data=json.dumps({'msg': f'我收到要下載的清單了', 'action': data['action'], 'updating': True}))
                 elif data['action'] == 'search_myself_animate':
-                    model = await DB.Myself.filter_finish_animate(name__contains=data['msg'])
+                    if data['msg']:
+                        model = await DB.Myself.filter_finish_animate(name__contains=data['msg'])
+                    else:
+                        model = await DB.Myself.All_finish_animate()
                     serializer_data = await DB.Myself.test(model=model, page=data.get('page'))
                     await self.send(text_data=json.dumps({'data': serializer_data, 'action': data['action']}))
-            if data.get('msg') and data['msg'] == 'some message to websocket server':
-                await self.send(text_data=json.dumps({'msg': f'前端在按 Login'}))
+                    # asyncio.create_task(self.search_animate(data=data))
+            # if data.get('msg') and data['msg'] == 'some message to websocket server':
+            #     await self.send(text_data=json.dumps({'msg': f'前端在按 Login'}))
         except Exception as error:
             print(error)
             await self.send(text_data=json.dumps({'msg': f'後端出錯了: {error}'}))
-
 
 # """
 # let ws1 = new WebSocket('ws://127.0.0.1:8000/')
@@ -95,4 +110,3 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
 #     };
 # ws1.send(JSON.stringify({message: 'hello'}))
 # """
-

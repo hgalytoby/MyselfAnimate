@@ -9,10 +9,9 @@
     {{ finishAnimateUpdateButton }}
   </button>
   <div class="row">
-    <template v-for="animate in displayFinishAnimate.data" :key="animate.id">
-    <transition appear name="animate__animated animate__bounce" enter-active-class="animate__backInDown"
-                      leave-active-class="animate__heartBeat">
-      <div class="card col-sm-5 col-lg-3 col-xxl-2">
+    <transition-group appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"
+                      leave-active-class="animate__fadeOut">
+      <div class="card col-sm-5 col-lg-3 col-xxl-2" v-for="animate in displayFinishAnimate.data" :key="animate.id">
         <router-link :to="{
           name: 'MyselfAnimate',
           query: {
@@ -29,8 +28,7 @@
           </div>
         </router-link>
       </div>
-    </transition>
-    </template>
+    </transition-group>
   </div>
   <nav aria-label="Page navigation example">
     <ul class="pagination justify-content-center">
@@ -50,9 +48,9 @@
 import { sendSocketMessage } from '../../hooks/useWS'
 import { computed, onMounted, ref } from 'vue'
 import {
-  displayFinishAnimateMutation,
+  // displayFinishAnimateMutation,
   displayFinishAnimateState,
-  finishAnimateAction,
+  // finishAnimateAction,
   finishAnimateUpdateButtonState,
   finishAnimateUpdateState
 } from '../../variables/variablesMyself'
@@ -71,19 +69,38 @@ export default {
       })
     }
     onMounted(() => {
-      store.dispatch(`myself/${finishAnimateAction}`)
+      // store.dispatch(`myself/${finishAnimateAction}`)
+      sendSocketMessage({
+        action: 'search_myself_animate',
+        msg: searchText.value
+      })
+      // setTimeout(() => {
+      //   sendSocketMessage({
+      //     action: 'search_myself_animate',
+      //     msg: searchText.value
+      //   })
+      // }, 2000)
+      // sendSocketMessage({
+      //   action: 'search_myself_animate',
+      //   msg: searchText.value
+      // })
     })
     const finishAnimateUpdate = computed(() => store.state.myself[finishAnimateUpdateState])
     const finishAnimateUpdateButton = computed(() => store.state.myself[finishAnimateUpdateButtonState])
     const searchAnimate = () => {
-      if (searchText.value) {
-        sendSocketMessage({
-          action: 'search_myself_animate',
-          msg: searchText.value
-        })
-      } else {
-        store.commit(`myself/${displayFinishAnimateMutation}`)
-      }
+      console.log(1)
+      sendSocketMessage({
+        action: 'search_myself_animate',
+        msg: searchText.value
+      })
+      // if (searchText.value) {
+      //   sendSocketMessage({
+      //     action: 'search_myself_animate',
+      //     msg: searchText.value
+      //   })
+      // } else {
+      //   store.commit(`myself/${displayFinishAnimateMutation}`)
+      // }
     }
     function changePage (page) {
       console.log('changePage')

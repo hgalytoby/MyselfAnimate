@@ -35,21 +35,28 @@
                 </li>
               </ul>
             </div>
-            <li>
+            <li class="nav-item">
               <router-link class="nav-link py-3 px-2" title="" to="/MyDownload" data-bs-toggle="tooltip"
                            data-bs-placement="right"
                            data-bs-original-title="Orders">
                 <BootstrapIcon icon="cloud-download" size="2x"/>
               </router-link>
             </li>
-            <li>
+            <li class="nav-item">
               <router-link class="nav-link py-3 px-2" title="" to="/MyLove" data-bs-toggle="tooltip"
                            data-bs-placement="right"
                            data-bs-original-title="Products">
                 <BootstrapIcon icon="suit-heart-fill" size="2x"/>
               </router-link>
             </li>
-            <li>
+            <li class="nav-item">
+              <router-link class="nav-link py-3 px-2" title="" to="/MyLog" data-bs-toggle="tooltip"
+                           data-bs-placement="right"
+                           data-bs-original-title="Products">
+                <BootstrapIcon icon="journal-text" size="2x"/>
+              </router-link>
+            </li>
+            <li class="nav-item">
               <router-link class="nav-link py-3 px-2" title="" to="/MySettings" data-bs-toggle="tooltip"
                            data-bs-placement="right"
                            data-bs-original-title="Products">

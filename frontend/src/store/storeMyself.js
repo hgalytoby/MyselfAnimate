@@ -22,7 +22,11 @@ import {
   downloadMyselfAnimateGetters,
   finishAnimateState,
   finishAnimateAction,
-  addFinishAnimateMutation, searchMyselfAnimateMutation, displayFinishAnimateState, displayFinishAnimateMutation
+  addFinishAnimateMutation,
+  searchMyselfAnimateMutation,
+  displayFinishAnimateState,
+  displayFinishAnimateMutation,
+  myLogState, myLogAction, myLogMutation
 } from '../variables/variablesMyself'
 import { myselfApi } from '../../api'
 
@@ -35,7 +39,8 @@ export const state = {
   [finishAnimateUpdateButtonState]: '更新資料',
   [checkboxAnimateEpisodeState]: [],
   [finishAnimateState]: [],
-  [displayFinishAnimateState]: []
+  [displayFinishAnimateState]: [],
+  [myLogState]: []
 }
 
 export const actions = {
@@ -72,11 +77,21 @@ export const actions = {
   [finishAnimateAction] (context, value) {
     axios.get(myselfApi.finishAnimate).then(
       response => {
-        context.commit(addFinishAnimateMutation, response)
+        context.commit(addFinishAnimateMutation, response.data)
         context.commit(displayFinishAnimateMutation)
       },
       error => {
         context.commit(addFinishAnimateMutation, error.msg)
+      }
+    )
+  },
+  [myLogAction] (context, value) {
+    axios.get(myselfApi.myLog).then(
+      response => {
+        context.commit(myLogMutation, response.data)
+      },
+      error => {
+        context.commit(myLogMutation, error.msg)
       }
     )
   }
@@ -110,7 +125,7 @@ export const mutations = {
   },
   [addFinishAnimateMutation] (state, value) {
     if (value) {
-      state[finishAnimateState] = value.data
+      state[finishAnimateState] = value
     } else {
       alert('失敗')
     }
@@ -129,11 +144,26 @@ export const mutations = {
     state[downloadMyselfAnimateState] = value
   },
   [searchMyselfAnimateMutation] (state, value) {
-    state[displayFinishAnimateState] = []
-    state[displayFinishAnimateState] = value
+    if (Object.keys(state[displayFinishAnimateState]).length > 0) {
+      const count = state[displayFinishAnimateState].data.length
+      for (let i = 0; i < count; i++) {
+        state[displayFinishAnimateState].data.pop()
+      // console.log('in', x)
+      }
+    }
+    setTimeout(() => {
+      state[displayFinishAnimateState] = value
+    }, 950)
   },
   [displayFinishAnimateMutation] (state, value) {
     state[displayFinishAnimateState] = state[finishAnimateState]
+  },
+  [myLogMutation] (state, value) {
+    if (value) {
+      state[myLogState] = value
+    } else {
+      alert('失敗')
+    }
   }
 }
 export const getters = {

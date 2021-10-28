@@ -193,6 +193,25 @@ class MyselfBase:
     @staticmethod
     @database_sync_to_async
     def filter_finish_animate(**kwargs):
+        """
+        不加 list 有時候會出現 You cannot call this from an async context - use a thread or sync_to_async.
+        :param kwargs:
+        :return:
+        """
+        return list(FinishAnimateModel.objects.filter(**kwargs))
+
+    @staticmethod
+    @database_sync_to_async
+    def All_finish_animate():
+        """
+        不加 list 有時候會出現 You cannot call this from an async context - use a thread or sync_to_async.
+        :return:
+        """
+        return list(FinishAnimateModel.objects.all())
+
+    @staticmethod
+    @database_sync_to_async
+    def filter_data(**kwargs):
         return FinishAnimateModel.objects.filter(**kwargs)
 
     @classmethod
