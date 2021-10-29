@@ -3,13 +3,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 
-from Api.serializers import FinishAnimateSerializer, AnimateEpisodeInfoSerializer
+from Api.serializers import FinishAnimateSerializer, AnimateEpisodeInfoSerializer, AnimateInfoSerializer
 from Api.views.tools import MyPageNumberPagination
 from Database.models import FinishAnimateModel, AnimateEpisodeInfoModel, AnimateEpisodeTsModel
 from Tools.db import DB
 from Tools.myself import Myself
 from Tools.tools import req_bytes
-from project.settings import MEDIA_PATH
 
 
 class WeekAnimateView(APIView):
@@ -26,14 +25,11 @@ class AnimateInfoView(APIView):
         animate_url = f'https://myself-bbs.com/{url}'
         data = Myself.animate_info(url=animate_url)
         image = req_bytes(url=data['image'])
+        video = data.pop('video')
         model = DB.Myself.update_or_create_animate_info_model(data=data, image=image)
-        models = DB.Myself.create_many_animate_episode_models(data, owner=model)
-        data['image'] = f'{MEDIA_PATH}{model.image.url}'
-        data['id'] = model.id
-        data['video'] = [m.to_dict() for m in models]
-        if data:
-            return Response(data, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        DB.Myself.create_many_animate_episode(video, owner=model)
+        serializer = AnimateInfoSerializer(model)
+        return Response(serializer.data)
 
 
 class FinishListView(APIView):

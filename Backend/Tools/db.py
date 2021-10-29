@@ -1,5 +1,7 @@
 import asyncio
+import io
 
+from django.core.files.images import ImageFile
 from django.core.paginator import Paginator
 
 from Api.serializers import FinishAnimateSerializer
@@ -43,21 +45,18 @@ class MyselfBase:
             await asyncio.wait(tasks)
 
     @staticmethod
-    def create_many_animate_episode_models(data: dict, **kwargs):
+    def create_many_animate_episode(video: list, **kwargs):
         """
         新增多個動漫集數。
-        :param data:
+        :param video:
         :return:
         """
-        models = []
-        for episode in data['video']:
-            models.append(
-                AnimateEpisodeInfoModel.objects.get_or_create(name=episode['name'], **kwargs, defaults={
-                    'name': episode['name'],
-                    'url': episode['url'],
-                    'owner': kwargs.get('owner'),
-                })[0])
-        return models
+        for episode in video:
+            AnimateEpisodeInfoModel.objects.get_or_create(name=episode['name'], **kwargs, defaults={
+                'name': episode['name'],
+                'url': episode['url'],
+                'owner': kwargs.get('owner'),
+            })
 
     @staticmethod
     @database_sync_to_async
@@ -80,16 +79,9 @@ class MyselfBase:
         :param image:
         :return:
         """
-        try:
-            model = AnimateInfoModel.objects.get(url=data['url'])
-        except AnimateInfoModel.DoesNotExist:
-            model = AnimateInfoModel()
         image_type = use_io_get_image_format(image)
-        for k, v in data.items():
-            if k != 'image':
-                setattr(model, k, v)
-        model.image.delete(save=True)
-        model.image.save(f'{data["name"]}.{image_type}', ContentFile(image))
+        data['image'] = ImageFile(io.BytesIO(image), name=f'{data["name"]}.{image_type}')
+        model, created = AnimateInfoModel.objects.update_or_create(url=data['url'], defaults=data)
         return model
 
     @classmethod

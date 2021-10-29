@@ -29,7 +29,7 @@
         </div>
       </div>
     </div>
-    <div v-for="data in animateInfo.video" :key="data.id" @click="clickCheckbox(data.id)">
+    <div v-for="data in animateInfo.episode_info_model" :key="data.id" @click="clickCheckbox(data.id)">
 <!--      <i class="bi bi-check-square">123</i>-->
       <BootstrapIcon icon="check2-square" v-show="checkCheckboxArray(data.id, data.download)"/>
       <BootstrapIcon icon="square" v-show="!checkCheckboxArray(data.id, data.download)"/>
