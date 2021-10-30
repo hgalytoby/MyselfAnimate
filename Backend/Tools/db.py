@@ -18,6 +18,11 @@ class MyselfBase:
     @classmethod
     @database_sync_to_async
     def create_finish_animate(cls, animate: dict):
+        """
+        儲存圖片到資料庫。
+        :param animate:
+        :return:
+        """
         image_type = use_io_get_image_format(animate['image'])
         model = FinishAnimateModel()
         model.name = animate['name']
@@ -27,6 +32,12 @@ class MyselfBase:
 
     @classmethod
     async def create_finish_animate_data_task(cls, animate: dict):
+        """
+        request 預覽圖
+        因為我不知道怎麼在 database_sync_to_async 下使用 await，所以我拆成兩個方法來做。
+        :param animate:
+        :return:
+        """
         animate['image'] = await aiohttp_bytes(url=animate['image'])
         await cls.create_finish_animate(animate)
 
@@ -148,6 +159,7 @@ class MyselfBase:
     @database_sync_to_async
     def get_animate_episode_info_model(**kwargs):
         """
+        取得動漫單影集資料。
         取得動漫資料 model。
         :return:
         """
@@ -177,6 +189,11 @@ class MyselfBase:
     @staticmethod
     @database_sync_to_async
     def filter_animate_episode_ts_list(**kwargs):
+        """
+        篩選 ts 檔案並轉成 ffmpeg 合併 ts 需要的 txt 格式。
+        :param kwargs:
+        :return:
+        """
         data = []
         for model in AnimateEpisodeTsModel.objects.filter(**kwargs):
             data.append(f"file '{BASE_DIR}{MEDIA_PATH}/{model.ts}'")
@@ -201,11 +218,6 @@ class MyselfBase:
         """
         return list(FinishAnimateModel.objects.all())
 
-    @staticmethod
-    @database_sync_to_async
-    def filter_data(**kwargs):
-        return FinishAnimateModel.objects.filter(**kwargs)
-
     @classmethod
     @database_sync_to_async
     def delete_filter_animate_episode_ts(cls, **kwargs):
@@ -228,7 +240,7 @@ class MyselfBase:
     @database_sync_to_async
     def save_animate_episode_ts_file(ts_content: bytes, **kwargs):
         """
-        儲存動漫某一集的 ts 檔案
+        儲存動漫某一集的 ts 檔案。
         :param ts_content:
         :return:
         """
@@ -240,7 +252,7 @@ class MyselfBase:
     @database_sync_to_async
     def save_animate_episode_video_file(video_path: str, **kwargs):
         """
-        儲存動漫某一集的 ts 檔案
+        儲存動漫某一集的檔案。
         :param video_path:
         :return:
         """
@@ -251,11 +263,17 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def test(model, page):
+    def search_finish_animate_paginator(model, page):
+        """
+        搜尋完結動漫分頁器。
+        :param model:
+        :param page:
+        :return:
+        """
         paginator = Paginator(model, 12)
         pag_obj = paginator.page(page if page else 1)
         serializer = FinishAnimateSerializer(pag_obj, many=True)
-        result = {
+        return {
             'previous': pag_obj.previous_page_number() if pag_obj.has_previous() else None,
             'page': pag_obj.number,
             'next': pag_obj.next_page_number() if pag_obj.has_next() else None,
@@ -263,7 +281,6 @@ class MyselfBase:
             'count': paginator.count,
             'data': serializer.data
         }
-        return result
 
 
 class DB:

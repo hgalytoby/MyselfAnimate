@@ -26,7 +26,7 @@ class Manage:
         await self.send(
             text_data=json.dumps({'msg': '更新完成', 'action': 'myself_finish_animate_update', 'updating': False}))
 
-    async def myself_animate_download(self, data):
+    async def myself_animate_download(self, data: dict):
         try:
             if data['episodes']:
                 try:
@@ -51,7 +51,7 @@ class Manage:
                     'action': 'download_myself_animate_array'}))
             await asyncio.sleep(0.5)
 
-    async def search_animate(self, data):
+    async def search_animate(self, data: dict):
         try:
             if data['msg']:
                 model = await DB.Myself.filter_finish_animate(name__contains=data['msg'])
@@ -63,6 +63,7 @@ class Manage:
             await self.send(text_data=json.dumps({'data': serializer_data, 'action': data['action']}))
         except Exception as e:
             print(e)
+
 
 class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
 
@@ -76,7 +77,7 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
         download_manage.ws = None
         pass
 
-    async def receive(self, text_data=None, bytes_data=None):
+    async def receive(self, text_data: str = None, bytes_data: bytes = None):
         data = json.loads(text_data)
         print(data)
         try:
@@ -93,7 +94,7 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
                         model = await DB.Myself.filter_finish_animate(name__contains=data['msg'])
                     else:
                         model = await DB.Myself.All_finish_animate()
-                    serializer_data = await DB.Myself.test(model=model, page=data.get('page'))
+                    serializer_data = await DB.Myself.search_finish_animate_paginator(model=model, page=data.get('page'))
                     await self.send(text_data=json.dumps({'data': serializer_data, 'action': data['action']}))
                     # asyncio.create_task(self.search_animate(data=data))
             # if data.get('msg') and data['msg'] == 'some message to websocket server':

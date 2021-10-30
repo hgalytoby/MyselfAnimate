@@ -19,7 +19,7 @@ class DownloadManage:
         threading.Thread(target=self.main, args=()).start()
 
     @staticmethod
-    async def download_ts(ts_semaphore, ts_uri, task_data):
+    async def download_ts(ts_semaphore: asyncio.Semaphore, ts_uri: str, task_data: dict):
         async with ts_semaphore:
             ts_content = await Myself.download_ts_content(ts_uri=ts_uri, host_list=task_data['host_list'],
                                                           video_720p=task_data['video_720p'])
@@ -30,7 +30,7 @@ class DownloadManage:
             task_data['count'] += 1
 
     @staticmethod
-    def __process_merge_video(cmd):
+    def __process_merge_video(cmd: str):
         """
         以下這三行程式碼是在 Windows 上需要這麼做，但是會報 Cannot run the event loop while another loop is running 錯誤訊息。
         我用一般 py 寫一個測試時可以這樣使用，但是在 Django 裡會不行。
@@ -51,7 +51,7 @@ class DownloadManage:
         #                                              stderr=asyncio.subprocess.PIPE)
         # _, _ = await proc.communicate()
 
-    async def _process_host(self, task_data):
+    async def _process_host(self, task_data: dict):
         task_data.update({'status': '取得 Host 資料中'})
         print(f"{task_data['animate_name']} {task_data['episode_name']} 拿 host")
         animate_video_json, host_list = await Myself.get_animate_video_json_and_host_list(url=task_data['vpx_url'])
@@ -61,7 +61,7 @@ class DownloadManage:
         })
         return animate_video_json, host_list
 
-    async def _process_m3u8(self, animate_video_json, host_list, task_data):
+    async def _process_m3u8(self, animate_video_json: dict, host_list: list, task_data: dict):
         task_data.update({'status': '取得 M3U8 資料中'})
         episode_info_model = await DB.Myself.get_animate_episode_info_model(owner__name=task_data['animate_name'],
                                                                             name=task_data['episode_name'])
@@ -70,7 +70,7 @@ class DownloadManage:
         task_data.update({'ts_count': len(task_data['ts_list'])})
         await DB.Myself.create_many_animate_episode_ts(owner=episode_info_model, ts_list=task_data['ts_list'])
 
-    async def _process_merge_video(self, task_data):
+    async def _process_merge_video(self, task_data: dict):
         task_data.update({'status': '合併影片中'})
         try:
             model = await DB.Myself.get_animate_episode_info_model(owner__name=task_data['animate_name'],

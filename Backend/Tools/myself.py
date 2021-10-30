@@ -249,12 +249,24 @@ class Myself:
 
     @classmethod
     async def get_animate_video_json_and_host_list(cls, url: str) -> tuple:
+        """
+        取得動漫影片資料。
+        :param url: str -> 要爬的網址。
+        :return: tuple -> (動漫影片資料, 排序 weight 高到低陣列, )
+        """
         animate_video_json = await cls.get_vpx_json(url=url, timeout=(60, 10))
         host_list = sorted(animate_video_json['host'], key=lambda x: x.get('weight'), reverse=True)
         return animate_video_json, host_list
 
     @classmethod
     async def download_ts_content(cls, ts_uri: str, host_list: list, video_720p: str):
+        """
+        下載 ts。
+        :param ts_uri: str -> 要爬的網址。
+        :param host_list: list -> 排序 weight 高到低陣列。
+        :param video_720p: -> 720p 的資料字串。
+        :return:
+        """
         change = 0
         host_list_len = len(host_list)
         while True:

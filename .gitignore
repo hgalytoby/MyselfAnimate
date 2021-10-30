@@ -12,6 +12,7 @@ backend/static/uploads
 # 檔案
 *.pyc
 .env
+my_test.py
 db.sqlite3
 
 # local env files

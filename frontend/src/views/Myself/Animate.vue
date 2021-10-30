@@ -1,7 +1,6 @@
 <template>
-  <div v-if="loading" class="d-flex justify-content-center align-items-center">
-      <div class="spinner-border" role="status" aria-hidden="true"></div>
-      <strong>Loading...</strong>
+  <div v-if="loading">
+       <Loading/>
     </div>
   <div v-else>
     <div class="card">
@@ -29,18 +28,19 @@
         </div>
       </div>
     </div>
-    <div v-for="data in animateInfo.episode_info_model" :key="data.id" @click="clickCheckbox(data.id)">
+    <div class="row">
+      <div class="col-sm-2" v-for="data in animateInfo.episode_info_model" :key="data.id" @click="clickCheckbox(data.id)">
 <!--      <i class="bi bi-check-square">123</i>-->
-      <BootstrapIcon icon="check2-square" v-show="checkCheckboxArray(data.id, data.download)"/>
-      <BootstrapIcon icon="square" v-show="!checkCheckboxArray(data.id, data.download)"/>
+      <BootstrapIcon icon="check2-square" v-show="checkCheckboxArray(data.id, data.download)" size="1x"/>
+      <BootstrapIcon icon="square" v-show="!checkCheckboxArray(data.id, data.download)" size="1x"/>
 <!--      <input type="checkbox" :id="data.id" :value="data" v-model="checkboxAnimateEpisode">-->
-      <span>{{ data.download }}</span>
+      <span>{{ data.name }}</span>
     </div>
-    <button type="button" class="btn btn-primary" @click="downloadAnimate">下載所選的集數</button>
-    <button type="button" class="btn btn-primary" @click="saveMyLove">儲存到我的最愛</button>
     {{checkboxAnimateEpisode}}
   </div>
-
+    </div>
+  <button type="button" class="btn btn-primary" @click="downloadAnimate">下載所選的集數</button>
+    <button type="button" class="btn btn-primary" @click="saveMyLove">儲存到我的最愛</button>
 </template>
 
 <script>
@@ -54,12 +54,14 @@ import {
   loadingState, removeCheckboxAnimateEpisodeMutation
 } from '../../variables/variablesMyself'
 import { sendSocketMessage } from '../../hooks/useWS'
+import Loading from '../../components/Loading'
 
 export default {
   name: 'Animate',
   props: {
     url: String
   },
+  components: { Loading },
   setup (props) {
     const store = useStore()
     const loading = computed(() => store.state.myself[loadingState])

@@ -1,20 +1,32 @@
 <template>
   <div class="container-fluid">
     <div class="row">
-      <div class="col-sm-auto bg-light sticky-top">
-        <div class="d-flex flex-sm-column flex-row flex-nowrap bg-light align-items-center sticky-top">
-          <a href="https://github.com/hgalytoby/MyselfAnimate" class="d-block p-3 link-dark text-decoration-none"
-             title="" data-bs-toggle="tooltip"
-             data-bs-placement="right" data-bs-original-title="Icon-only">
-            <BootstrapIcon icon="github" size="2x"/>
-          </a>
+      <div class="col-sm-auto sticky-top sidebar-bg">
+        <div class="d-flex flex-column flex-row flex-nowrap align-items-center sticky-top">
+          <div class="d-flex align-items-center justify-content-center">
+            <img src="/me.ico" alt="" class="rounded-circle">
+            <h4 class="text-white">
+              <span class="text-center">嘟嘟嚕</span>
+            </h4>
+            <BootstrapIcon icon="list" color="white" size="2x"/>
+          </div>
           <ul
-            class="nav nav-pills nav-flush flex-sm-column flex-row flex-nowrap mb-auto mx-auto text-center align-items-center items">
+            class="nav nav-pills nav-flush flex-sm-column flex-row flex-nowrap">
+            <li class="nav-item">
+              <router-link class="nav-link py-3 px-2" title="" href="https://github.com/hgalytoby/MyselfAnimate" to=""
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="right"
+                           data-bs-original-title="Home">
+                <BootstrapIcon icon="github" color="white"/>
+                <span class="text-white">GitHub</span>
+              </router-link>
+            </li>
             <li class="nav-item">
               <router-link class="nav-link py-3 px-2" title="" to="/" data-bs-toggle="tooltip"
                            data-bs-placement="right"
                            data-bs-original-title="Home">
-                <BootstrapIcon icon="house" size="2x"/>
+                <BootstrapIcon icon="house" color="white"/>
+                <span class="text-white">首頁</span>
               </router-link>
             </li>
             <div class="dropdown">
@@ -39,28 +51,32 @@
               <router-link class="nav-link py-3 px-2" title="" to="/MyDownload" data-bs-toggle="tooltip"
                            data-bs-placement="right"
                            data-bs-original-title="Orders">
-                <BootstrapIcon icon="cloud-download" size="2x"/>
+                <BootstrapIcon icon="cloud-download" color="white"/>
+                <span class="text-white">下載</span>
               </router-link>
             </li>
             <li class="nav-item">
               <router-link class="nav-link py-3 px-2" title="" to="/MyLove" data-bs-toggle="tooltip"
                            data-bs-placement="right"
                            data-bs-original-title="Products">
-                <BootstrapIcon icon="suit-heart-fill" size="2x"/>
+                <BootstrapIcon icon="suit-heart-fill" color="white"/>
+                <span class="text-white">收藏</span>
               </router-link>
             </li>
             <li class="nav-item">
               <router-link class="nav-link py-3 px-2" title="" to="/MyLog" data-bs-toggle="tooltip"
                            data-bs-placement="right"
                            data-bs-original-title="Products">
-                <BootstrapIcon icon="journal-text" size="2x"/>
+                <BootstrapIcon icon="journal-text" color="white"/>
+                <span class="text-white">日誌</span>
               </router-link>
             </li>
             <li class="nav-item">
               <router-link class="nav-link py-3 px-2" title="" to="/MySettings" data-bs-toggle="tooltip"
                            data-bs-placement="right"
                            data-bs-original-title="Products">
-                <BootstrapIcon icon="gear" size="2x"/>
+                <BootstrapIcon icon="gear" color="white"/>
+                <span class="text-white">設定</span>
               </router-link>
             </li>
           </ul>
@@ -83,5 +99,21 @@ export default {
 <style lang="scss" scoped>
   .items a {
     color: black;
+  }
+
+  ul > li {
+    &:hover {
+      background: white;
+      border-radius: 12px;
+      span {
+        color: black !important;
+      }
+      .bi {
+        color: black;
+      }
+    }
+  }
+  .sidebar-bg {
+    background: #11101D;
   }
 </style>

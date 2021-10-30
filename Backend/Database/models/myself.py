@@ -54,6 +54,10 @@ class FinishAnimateModel(models.Model):
     info = models.CharField(max_length=16)
 
     def to_dict(self):
+        """
+        轉出 json 格式。(已棄用)
+        :return:
+        """
         return {'id': self.id, 'name': self.name, 'url': self.url, 'image': f'{MEDIA_PATH}{self.image.url}', 'info': self.info}
 
     class Meta:
@@ -80,13 +84,25 @@ class AnimateEpisodeInfoModel(models.Model):
 
     @database_sync_to_async
     def get_animate_name(self):
+        """
+        在異步情況下取得動漫名字。
+        :return:
+        """
         return self.owner.name
 
     @database_sync_to_async
     def get_from_website(self):
+        """
+        在異步情況下取得哪個網站的動漫。
+        :return:
+        """
         return self.owner.from_website
 
     def to_dict(self):
+        """
+        轉出 json 格式。
+        :return:
+        """
         return {'id': self.id, 'name': self.name, 'url': self.url, 'download': self.download, 'done': self.done,
                 'owner_id': self.owner_id}
 

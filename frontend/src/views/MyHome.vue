@@ -1,5 +1,7 @@
 <template>
   <div>我的首頁</div>
+  <span>我的首頁</span>
+  <h1>我的首頁</h1>
   <button @click="onSubmit">Login</button>
   <!--  <h3>webSocket: {{ $store.getters['ws/getWsWhile'] }}</h3>-->
   <h3>webSocket: {{ $store.state.ws.wsClick }}</h3>

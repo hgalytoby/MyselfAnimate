@@ -24,8 +24,7 @@ import {
   finishAnimateAction,
   addFinishAnimateMutation,
   searchMyselfAnimateMutation,
-  displayFinishAnimateState,
-  displayFinishAnimateMutation,
+
   myLogState, myLogAction, myLogMutation
 } from '../variables/variablesMyself'
 import { myselfApi } from '../../api'
@@ -39,8 +38,8 @@ export const state = {
   [finishAnimateUpdateButtonState]: '更新資料',
   [checkboxAnimateEpisodeState]: [],
   [finishAnimateState]: [],
-  [displayFinishAnimateState]: [],
-  [myLogState]: []
+  [myLogState]: [],
+  searchTimer: null
 }
 
 export const actions = {
@@ -78,7 +77,6 @@ export const actions = {
     axios.get(myselfApi.finishAnimate).then(
       response => {
         context.commit(addFinishAnimateMutation, response.data)
-        context.commit(displayFinishAnimateMutation)
       },
       error => {
         context.commit(addFinishAnimateMutation, error.msg)
@@ -144,19 +142,18 @@ export const mutations = {
     state[downloadMyselfAnimateState] = value
   },
   [searchMyselfAnimateMutation] (state, value) {
-    if (Object.keys(state[displayFinishAnimateState]).length > 0) {
-      const count = state[displayFinishAnimateState].data.length
+    if (Object.keys(state[finishAnimateState]).length > 0) {
+      const count = state[finishAnimateState].data.length
       for (let i = 0; i < count; i++) {
-        state[displayFinishAnimateState].data.pop()
-      // console.log('in', x)
+        state[finishAnimateState].data.pop()
       }
     }
-    setTimeout(() => {
-      state[displayFinishAnimateState] = value
+    if (state.timer) {
+      clearInterval(state.timer)
+    }
+    state.timer = setTimeout(() => {
+      state[finishAnimateState] = value
     }, 950)
-  },
-  [displayFinishAnimateMutation] (state, value) {
-    state[displayFinishAnimateState] = state[finishAnimateState]
   },
   [myLogMutation] (state, value) {
     if (value) {

@@ -11,7 +11,7 @@
   <div class="row">
     <transition-group appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"
                       leave-active-class="animate__fadeOut">
-      <div class="card col-sm-5 col-lg-3 col-xxl-2" v-for="animate in displayFinishAnimate.data" :key="animate.id">
+      <div class="card col-sm-5 col-lg-3 col-xxl-2" v-for="animate in finishAnimate.data" :key="animate.id">
         <router-link :to="{
           name: 'MyselfAnimate',
           query: {
@@ -30,27 +30,28 @@
       </div>
     </transition-group>
   </div>
-  <nav aria-label="Page navigation example">
+  <transition appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"
+              leave-active-class="animate__fadeOut">
+    <nav aria-label="Page navigation example" v-show="showPagination">
     <ul class="pagination justify-content-center">
-      <li class="page-item" :class="displayFinishAnimate.previous ? '' : 'disabled'" @click="changePage(displayFinishAnimate.page - 1)">
-        <a class="page-link">Previous</a>
+      <li class="page-item" :class="previousPage" @click="changePage(finishAnimate.page - 1)">
+        <a class="page-link" href="#">Previous</a>
       </li>
-      <li class="page-item"><a class="page-link" href="#">{{ displayFinishAnimate.page }}</a></li>
-      <li class="page-item" :class="displayFinishAnimate.next ? '' : 'disabled'" @click="changePage(displayFinishAnimate.page + 1)">
-        <a class="page-link">next</a>
+      <li class="page-item"><a class="page-link" href="#">{{ finishAnimate.page }}</a></li>
+      <li class="page-item" :class="nextPage" @click="changePage(finishAnimate.page + 1)">
+        <a class="page-link" href="#">next</a>
       </li>
     </ul>
-    <p class="text-center">全部:{{ displayFinishAnimate.count }} / 總頁數:{{ displayFinishAnimate.total_pages }}</p>
+    <p class="text-center">全部:{{ finishAnimate.count }} / 總頁數:{{ finishAnimate.total_pages }}</p>
   </nav>
+  </transition>
 </template>
 
 <script>
 import { sendSocketMessage } from '../../hooks/useWS'
 import { computed, onMounted, ref } from 'vue'
 import {
-  // displayFinishAnimateMutation,
-  displayFinishAnimateState,
-  // finishAnimateAction,
+  finishAnimateAction, finishAnimateState,
   finishAnimateUpdateButtonState,
   finishAnimateUpdateState
 } from '../../variables/variablesMyself'
@@ -59,48 +60,27 @@ import { useStore } from 'vuex'
 export default {
   name: 'Search',
   setup () {
-    const show = ref(true)
     const searchText = ref('')
     const store = useStore()
-    const displayFinishAnimate = computed(() => store.state.myself[displayFinishAnimateState])
+    const finishAnimate = computed(() => store.state.myself[finishAnimateState])
+    const previousPage = computed(() => finishAnimate.value.previous ? '' : 'disabled')
+    const nextPage = computed(() => finishAnimate.value.next ? '' : 'disabled')
+    const showPagination = computed(() => finishAnimate.value.data && finishAnimate.value.data.length)
+    const finishAnimateUpdate = computed(() => store.state.myself[finishAnimateUpdateState])
+    const finishAnimateUpdateButton = computed(() => store.state.myself[finishAnimateUpdateButtonState])
     const updateFinishAnimateData = () => {
       sendSocketMessage({
         action: 'myself_finish_animate_update'
       })
     }
     onMounted(() => {
-      // store.dispatch(`myself/${finishAnimateAction}`)
-      sendSocketMessage({
-        action: 'search_myself_animate',
-        msg: searchText.value
-      })
-      // setTimeout(() => {
-      //   sendSocketMessage({
-      //     action: 'search_myself_animate',
-      //     msg: searchText.value
-      //   })
-      // }, 2000)
-      // sendSocketMessage({
-      //   action: 'search_myself_animate',
-      //   msg: searchText.value
-      // })
+      store.dispatch(`myself/${finishAnimateAction}`)
     })
-    const finishAnimateUpdate = computed(() => store.state.myself[finishAnimateUpdateState])
-    const finishAnimateUpdateButton = computed(() => store.state.myself[finishAnimateUpdateButtonState])
     const searchAnimate = () => {
-      console.log(1)
       sendSocketMessage({
         action: 'search_myself_animate',
         msg: searchText.value
       })
-      // if (searchText.value) {
-      //   sendSocketMessage({
-      //     action: 'search_myself_animate',
-      //     msg: searchText.value
-      //   })
-      // } else {
-      //   store.commit(`myself/${displayFinishAnimateMutation}`)
-      // }
     }
     function changePage (page) {
       console.log('changePage')
@@ -114,11 +94,13 @@ export default {
       updateFinishAnimateData,
       finishAnimateUpdate,
       finishAnimateUpdateButton,
-      displayFinishAnimate,
+      finishAnimate,
       searchText,
       searchAnimate,
       changePage,
-      show
+      showPagination,
+      previousPage,
+      nextPage
     }
   }
 }
@@ -128,23 +110,6 @@ export default {
   .animate-name {
     text-overflow: ellipsis;
   }
-
-  .p-main {
-    display: block;
-    max-width: 265px;
-    width: 100%;
-    height: 225px;
-    position: relative;
-  }
-
-  .p-test {
-    position: absolute;
-    z-index: 1;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-  }
-
   .p-bg {
     background: rgba(0, 0, 0, 0.6);
   }
