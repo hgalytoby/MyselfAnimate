@@ -1,24 +1,22 @@
 <template>
   <div class="row">
-    <div class="mb-3">
-      <input type="text" class="form-control shadow-sm p-3 mb-5 bg-body rounded" id="search" @keyup="searchAnimate"
-             v-model="searchText" placeholder="搜尋動漫">
-    </div>
+    <input type="text" class="form-control shadow-sm p-3 mb-2 bg-body rounded" id="search" @keyup="searchAnimate"
+           v-model="searchText" placeholder="搜尋動漫">
   </div>
-  <button type="button" class="btn btn-primary" :disabled="finishAnimateUpdate" @click="updateFinishAnimateData">
+  <button type="button" class="btn btn-primary mb-2" :disabled="finishAnimateUpdate" @click="updateFinishAnimateData">
     {{ finishAnimateUpdateButton }}
   </button>
-  <div class="row">
-    <transition-group appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"
+  <div class="row justify-content-center">
+      <transition-group appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"
                       leave-active-class="animate__fadeOut">
-      <div class="card col-sm-5 col-lg-3 col-xxl-2" v-for="animate in finishAnimate.data" :key="animate.id">
+      <div class="card col-sm-5 col-lg-3 col-xxl-2 mb-3 mx-3" v-for="animate in finishAnimate.data" :key="animate.id">
         <router-link :to="{
           name: 'MyselfAnimate',
           query: {
             url: animate.url.split('/').at(-1),
           }
         }">
-          <img :src="animate.image" class="card-img-top rounded mx-auto d-block img-thumbnail p-2 w-100"
+          <img :src="animate.image" class="card-img-top rounded d-block img-thumbnail p-2 w-100"
                alt="animate.name">
           <div class="card-body">
             <p class="card-title text-center text-white p-bg">{{ animate.info }}</p>
@@ -28,6 +26,7 @@
           </div>
         </router-link>
       </div>
+        <div class="clearfix"></div>
     </transition-group>
   </div>
   <transition appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"

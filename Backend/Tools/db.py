@@ -270,7 +270,7 @@ class MyselfBase:
         :param page:
         :return:
         """
-        paginator = Paginator(model, 12)
+        paginator = Paginator(model, 15)
         pag_obj = paginator.page(page if page else 1)
         serializer = FinishAnimateSerializer(pag_obj, many=True)
         return {

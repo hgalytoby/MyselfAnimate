@@ -3,9 +3,9 @@ from rest_framework.response import Response
 
 
 class MyPageNumberPagination(PageNumberPagination):
-    page_size = 12
+    page_size = 15
     page_size_query_param = 'size'
-    max_page_size = 50
+    max_page_size = 60
 
     def next_number(self):
         if not self.page.has_next():
