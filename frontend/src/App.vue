@@ -12,36 +12,33 @@ export default {
   components: { Sidebar },
   setup () {
     connectSocket()
-    return {
-    }
+    return {}
   }
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500&display=swap');
+
   * {
     font-family: 'Noto Sans TC', 'Poppins', sans-serif;
   }
-  #app {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-align: center;
-    color: #2c3e50;
+
+  * ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    background-color: transparent;
   }
 
-  #nav {
-    padding: 30px;
+  * ::-webkit-scrollbar {
+    width: 8px;
+    background-color: transparent;
+  }
 
-    a {
-      font-weight: bold;
-      color: #2c3e50;
-
-      &.router-link-exact-active {
-        color: #42b983;
-      }
-    }
+  * ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    background-color: rgba(109, 106, 106, 0.12);
   }
 </style>
