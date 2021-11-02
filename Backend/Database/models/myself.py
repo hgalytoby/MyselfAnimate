@@ -70,6 +70,8 @@ class AnimateEpisodeInfoModel(models.Model):
     url: 影片連結
     download: 是否開始下載
     done: 是否下載完成
+    video: 影片位置
+    hide: 判斷要不要顯示在下載頁面上
     owner: 關聯
     """
     name = models.CharField(max_length=64)
@@ -77,6 +79,7 @@ class AnimateEpisodeInfoModel(models.Model):
     download = models.BooleanField(default=False)
     done = models.BooleanField(default=False)
     video = models.FileField(upload_to=upload_video_path, null=True, blank=True)
+    hide = models.BooleanField(default=FinishAnimateModel)
     owner = models.ForeignKey(AnimateInfoModel, on_delete=models.CASCADE, related_name='episode_info_model')
 
     class Meta:
