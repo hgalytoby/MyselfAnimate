@@ -8,7 +8,8 @@ from Api.serializers import FinishAnimateSerializer
 from Api.views.tools import MyPageNumberPagination
 from Tools.setup import *
 from channels.db import database_sync_to_async
-from Database.models import FinishAnimateModel, AnimateInfoModel, AnimateEpisodeInfoModel, AnimateEpisodeTsModel
+from Database.models import FinishAnimateModel, AnimateInfoModel, AnimateEpisodeInfoModel, AnimateEpisodeTsModel, \
+    DownloadModel
 from django.core.files.base import ContentFile
 from Tools.tools import aiohttp_bytes, use_io_get_image_format, aiohttp_text
 from project.settings import MEDIA_PATH, BASE_DIR
@@ -83,6 +84,19 @@ class MyselfBase:
         AnimateEpisodeTsModel.objects.bulk_create(models)
 
     @staticmethod
+    @database_sync_to_async
+    def create_many_download(owner_id_list: list) -> list:
+        """
+        :param owner_id_list:
+        :return:
+        """
+        data = []
+        for owner_id in owner_id_list:
+            _ = DownloadModel.objects.create(owner_id=owner_id)
+            data.append(_.id)
+        return data
+
+    @staticmethod
     def update_or_create_animate_info_model(data: dict, image: bytes):
         """
         更新或新增動漫資料。
@@ -116,15 +130,15 @@ class MyselfBase:
         :return:
         """
         data = []
-        for pk in pk_list:
-            model = AnimateEpisodeInfoModel.objects.get(pk=pk)
-            model.download = True
-            model.save()
+        models = DownloadModel.objects.select_related('owner').select_related('owner__owner').filter(
+            owner_id__in=pk_list)
+        for model in models:
             data.append({
                 'id': model.id,
-                'owner_id': model.owner.id,
-                'animate_name': model.owner.name,
-                'episode_name': model.name,
+                'episode_id': model.owner.id,
+                'animate_id': model.owner.owner.id,
+                'animate_name': model.owner.owner.name,
+                'episode_name': model.owner.name,
                 'vpx_url': model.url,
                 'count': 0,
                 'status': '準備下載'
@@ -148,11 +162,13 @@ class MyselfBase:
         :return:
         """
         data = []
-        animate_models = AnimateInfoModel.objects.all()
-        for animate_model in animate_models:
-            episode_ts_models = animate_model.episode_info_model.filter(download=True, done=False)
-            if episode_ts_models:
-                data.append({'id': animate_model.id, 'name': animate_model.name, 'url': animate_model.url})
+        for model in DownloadModel.objects.all():
+            data.append(model.id)
+        # animate_models = AnimateInfoModel.objects.all()
+        # for animate_model in animate_models:
+        #     episode_ts_models = animate_model.episode_info_model.filter(download=True, done=False)
+        #     if episode_ts_models:
+        #         data.append({'id': animate_model.id, 'name': animate_model.name, 'url': animate_model.url})
         return data
 
     @staticmethod

@@ -53,13 +53,6 @@ class FinishAnimateModel(models.Model):
     image = models.ImageField(upload_to=upload_image_path)
     info = models.CharField(max_length=16)
 
-    def to_dict(self):
-        """
-        轉出 json 格式。(已棄用)
-        :return:
-        """
-        return {'id': self.id, 'name': self.name, 'url': self.url, 'image': f'{MEDIA_PATH}{self.image.url}', 'info': self.info}
-
     class Meta:
         db_table = 'MyselfFinishAnimate'
 
@@ -68,18 +61,14 @@ class AnimateEpisodeInfoModel(models.Model):
     """
     name: 動漫名字
     url: 影片連結
-    download: 是否開始下載
     done: 是否下載完成
     video: 影片位置
-    hide: 判斷要不要顯示在下載頁面上
     owner: 關聯
     """
     name = models.CharField(max_length=64)
     url = models.URLField()
-    download = models.BooleanField(default=False)
     done = models.BooleanField(default=False)
     video = models.FileField(upload_to=upload_video_path, null=True, blank=True)
-    hide = models.BooleanField(default=FinishAnimateModel)
     owner = models.ForeignKey(AnimateInfoModel, on_delete=models.CASCADE, related_name='episode_info_model')
 
     class Meta:
@@ -101,14 +90,6 @@ class AnimateEpisodeInfoModel(models.Model):
         """
         return self.owner.from_website
 
-    def to_dict(self):
-        """
-        轉出 json 格式。
-        :return:
-        """
-        return {'id': self.id, 'name': self.name, 'url': self.url, 'download': self.download, 'done': self.done,
-                'owner_id': self.owner_id}
-
 
 class AnimateEpisodeTsModel(models.Model):
     """
@@ -123,3 +104,14 @@ class AnimateEpisodeTsModel(models.Model):
 
     class Meta:
         db_table = 'AnimateEpisodeTs'
+
+
+class DownloadModel(models.Model):
+    """
+    owner: 關聯
+    """
+    owner = models.OneToOneField(AnimateEpisodeInfoModel, on_delete=models.CASCADE, related_name='download_model')
+
+    class Meta:
+        db_table = 'MyselfDownload'
+

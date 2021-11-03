@@ -133,44 +133,46 @@ class DownloadManage:
         self.now -= 1
 
     async def get_animate_episode_download_undone_data(self):
-        animate_dict = {}
-        animate_download_undone_list = await DB.Myself.get_animate_episode_download_undone_list()
-        for animate in animate_download_undone_list:
-            animate_dict.update({animate['name']: await Myself.re_animate_info_video_data(url=animate['url'])})
-            for episode_info_model in await DB.Myself.filter_animate_episode_info_downloading_models(
-                    owner_id=animate['id']):
-                new_url = animate_dict[animate['name']][episode_info_model.name]
-                if new_url != episode_info_model.url:
-                    await DB.Myself.update_animate_episode_url(new_url=new_url, model=episode_info_model)
-                    await DB.Myself.delete_filter_animate_episode_ts(owner_id=episode_info_model.id)
-                    animate_video_json, host_list = await Myself.get_animate_video_json_and_host_list(url=new_url)
-                    ts_list = await Myself.get_m3u8_uri_list(host_list=host_list,
-                                                             video_720p=animate_video_json['video']['720p'],
-                                                             timeout=(60, 10))
-                    ts_count = len(ts_list)
-                    await DB.Myself.create_many_animate_episode_ts(owner=episode_info_model, ts_list=ts_list)
-                else:
-                    ts_list = await DB.Myself.filter_animate_episode_ts_undone_uri_list(owner=episode_info_model)
-                    ts_count = await DB.Myself.get_animate_episode_ts_count(owner=episode_info_model)
-
-                self.wait_download_list.append({
-                    'id': episode_info_model.id,
-                    'owner_id': animate['id'],
-                    'animate_name': await episode_info_model.get_animate_name(),
-                    'episode_name': episode_info_model.name,
-                    'vpx_url': new_url,
-                    'ts_list': ts_list,
-                    'ts_count': ts_count,
-                    'count': ts_count - len(ts_list),
-                    'status': '準備下載'
-                })
+        # animate_dict = {}
+        # animate_download_undone_list = await DB.Myself.get_animate_episode_download_undone_list()
+        # for animate in animate_download_undone_list:
+        #     animate_dict.update({animate['name']: await Myself.re_animate_info_video_data(url=animate['url'])})
+        #     for episode_info_model in await DB.Myself.filter_animate_episode_info_downloading_models(
+        #             owner_id=animate['id']):
+        #         new_url = animate_dict[animate['name']][episode_info_model.name]
+        #         if new_url != episode_info_model.url:
+        #             await DB.Myself.update_animate_episode_url(new_url=new_url, model=episode_info_model)
+        #             await DB.Myself.delete_filter_animate_episode_ts(owner_id=episode_info_model.id)
+        #             animate_video_json, host_list = await Myself.get_animate_video_json_and_host_list(url=new_url)
+        #             ts_list = await Myself.get_m3u8_uri_list(host_list=host_list,
+        #                                                      video_720p=animate_video_json['video']['720p'],
+        #                                                      timeout=(60, 10))
+        #             ts_count = len(ts_list)
+        #             await DB.Myself.create_many_animate_episode_ts(owner=episode_info_model, ts_list=ts_list)
+        #         else:
+        #             ts_list = await DB.Myself.filter_animate_episode_ts_undone_uri_list(owner=episode_info_model)
+        #             ts_count = await DB.Myself.get_animate_episode_ts_count(owner=episode_info_model)
+        #
+        #         self.wait_download_list.append({
+        #             'id': episode_info_model.id,
+        #             'owner_id': animate['id'],
+        #             'animate_name': await episode_info_model.get_animate_name(),
+        #             'episode_name': episode_info_model.name,
+        #             'vpx_url': new_url,
+        #             'ts_list': ts_list,
+        #             'ts_count': ts_count,
+        #             'count': ts_count - len(ts_list),
+        #             'status': '準備下載'
+        #         })
         pass
 
     async def main_task(self):
-        await self.get_animate_episode_download_undone_data()
+        # await self.get_animate_episode_download_undone_data()
+        self.wait_download_list.extend(await DB.Myself.get_animate_episode_download_undone_list())
         while True:
             if self.wait_download_list and self.max > self.now:
                 self.now += 1
+                # epso = self.wait_download_list.pop(0)
                 task_data = self.wait_download_list.pop(0)
                 print('開始下載', task_data['animate_name'], task_data['episode_name'], task_data['id'])
                 self.download_list.append(task_data)

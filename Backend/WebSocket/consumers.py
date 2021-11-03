@@ -30,8 +30,9 @@ class Manage:
         try:
             if data['episodes']:
                 try:
+                    download_ids = await DB.Myself.create_many_download(owner_id_list=data['episodes'])
                     animate_episode_list = await DB.Myself.get_many_animate_episode_download_data_and_update_download(
-                        pk_list=data['episodes'])
+                        owner_id_list=download_ids)
                     download_manage.wait_download_list.extend(animate_episode_list)
                 except Exception as error:
                     print(error)
