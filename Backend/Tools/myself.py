@@ -171,7 +171,7 @@ class Myself:
         return await aiohttp_json(url=url, timeout=timeout)
 
     @staticmethod
-    async def get_m3u8_uri_list(host_list: list, video_720p=str, timeout: tuple = (10, 10)) -> m3u8:
+    async def get_m3u8_uri_list(host_list: list, video_720p=str, timeout: tuple = (10, 10)) -> list:
         """
         :param host_list:
         :param video_720p:
@@ -180,6 +180,7 @@ class Myself:
         """
         s1 = time.time()
         change = 0
+        error_count = 0
         host_list_len = len(host_list)
         while True:
             m3u8_url = f"{host_list[change]['host']}{video_720p}"
@@ -187,6 +188,9 @@ class Myself:
                 res_text = await aiohttp_text(url=m3u8_url, timeout=timeout)
                 break
             except SERVER_AND_CLIENT_ERROR:
+                if error_count == 20:
+                    return []
+                error_count += 1
                 if change > host_list_len - 1:
                     change = 0
                 else:
@@ -204,7 +208,7 @@ class Myself:
             return ts_list
         except BaseException as error:
             print(f'get_m3u8 error: {error}')
-            return None
+            return []
 
     @staticmethod
     async def finish_animate_total_page(url: str, get_res_text: bool = False) -> dict:
@@ -248,15 +252,13 @@ class Myself:
         return data
 
     @classmethod
-    async def get_animate_video_json_and_host_list(cls, url: str) -> tuple:
+    async def get_animate_video_json(cls, url: str) -> dict:
         """
         取得動漫影片資料。
         :param url: str -> 要爬的網址。
-        :return: tuple -> (動漫影片資料, 排序 weight 高到低陣列, )
+        :return: dict -> vpx 資料，如果官網 vpx 掛了就會回傳空字典。
         """
-        animate_video_json = await cls.get_vpx_json(url=url, timeout=(60, 10))
-        host_list = sorted(animate_video_json['host'], key=lambda x: x.get('weight'), reverse=True)
-        return animate_video_json, host_list
+        return await cls.get_vpx_json(url=url, timeout=(60, 10))
 
     @classmethod
     async def download_ts_content(cls, ts_uri: str, host_list: list, video_720p: str):

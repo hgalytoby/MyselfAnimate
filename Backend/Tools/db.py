@@ -92,8 +92,8 @@ class MyselfBase:
         """
         data = []
         for owner_id in owner_id_list:
-            _ = DownloadModel.objects.create(owner_id=owner_id)
-            data.append(_.id)
+            model = DownloadModel.objects.create(owner_id=owner_id)
+            data.append(model.id)
         return data
 
     @staticmethod
@@ -123,27 +123,34 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def get_many_animate_episode_download_data_and_update_download(pk_list: list) -> list:
+    def get_animate_episode_download_data(pk: int) -> dict:
         """
         取得多個動漫集數資料與更新成下載中。
-        :param pk_list:
+        :param pk:
         :return:
         """
-        data = []
-        models = DownloadModel.objects.select_related('owner').select_related('owner__owner').filter(
-            owner_id__in=pk_list)
-        for model in models:
-            data.append({
-                'id': model.id,
-                'episode_id': model.owner.id,
-                'animate_id': model.owner.owner.id,
-                'animate_name': model.owner.owner.name,
-                'episode_name': model.owner.name,
-                'vpx_url': model.url,
-                'count': 0,
-                'status': '準備下載'
-            })
-        return data
+        download_model = DownloadModel.objects.select_related('owner').select_related('owner__owner').get(
+            pk=pk)
+        ts_models = AnimateEpisodeTsModel.objects.select_related('owner').filter(owner_id=download_model.owner_id)
+        ts_count = ts_models.count()
+        ts_undone_models = ts_models.filter(done=False)
+        ts_undone_count = ts_undone_models.count()
+        ts_list = []
+        for ts_undone_model in ts_undone_models:
+            ts_list.append(ts_undone_model.uri)
+        return {
+            'id': download_model.id,
+            'episode_id': download_model.owner.id,
+            'animate_id': download_model.owner.owner.id,
+            'animate_name': download_model.owner.owner.name,
+            'episode_name': download_model.owner.name,
+            'done': download_model.owner.done,
+            'vpx_url': download_model.owner.url,
+            'ts_list': ts_list,
+            'ts_count': ts_count,
+            'count': ts_count - ts_undone_count,
+            'status': '準備下載'
+        }
 
     @staticmethod
     @database_sync_to_async
@@ -156,7 +163,7 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def get_animate_episode_download_undone_list():
+    def get_animate_episode_download_undone_id_list():
         """
         取得正在下載的動漫陣列清單。
         :return:
@@ -164,11 +171,6 @@ class MyselfBase:
         data = []
         for model in DownloadModel.objects.all():
             data.append(model.id)
-        # animate_models = AnimateInfoModel.objects.all()
-        # for animate_model in animate_models:
-        #     episode_ts_models = animate_model.episode_info_model.filter(download=True, done=False)
-        #     if episode_ts_models:
-        #         data.append({'id': animate_model.id, 'name': animate_model.name, 'url': animate_model.url})
         return data
 
     @staticmethod

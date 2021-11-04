@@ -20,14 +20,18 @@ class DownloadManage:
 
     @staticmethod
     async def download_ts(ts_semaphore: asyncio.Semaphore, ts_uri: str, task_data: dict):
-        async with ts_semaphore:
-            ts_content = await Myself.download_ts_content(ts_uri=ts_uri, host_list=task_data['host_list'],
-                                                          video_720p=task_data['video_720p'])
-            model = await DB.Myself.get_animate_episode_info_model(owner__name=task_data['animate_name'],
-                                                                   name=task_data['episode_name'])
-            await DB.Myself.save_animate_episode_ts_file(uri=ts_uri, owner=model, ts_content=ts_content)
-            task_data['ts_list'].remove(ts_uri)
-            task_data['count'] += 1
+        try:
+            async with ts_semaphore:
+                ts_content = await Myself.download_ts_content(ts_uri=ts_uri, host_list=task_data['host_list'],
+                                                              video_720p=task_data['video_720p'])
+                model = await DB.Myself.get_animate_episode_info_model(owner__name=task_data['animate_name'],
+                                                                       name=task_data['episode_name'])
+                await DB.Myself.save_animate_episode_ts_file(uri=ts_uri, owner=model, ts_content=ts_content)
+                task_data['ts_list'].remove(ts_uri)
+                task_data['count'] += 1
+        except Exception as error:
+            print(error)
+
 
     @staticmethod
     def __process_merge_video(cmd: str):
@@ -51,24 +55,33 @@ class DownloadManage:
         #                                              stderr=asyncio.subprocess.PIPE)
         # _, _ = await proc.communicate()
 
-    async def _process_host(self, task_data: dict):
+    async def _process_host(self, task_data: dict) -> bool:
         task_data.update({'status': '取得 Host 資料中'})
         print(f"{task_data['animate_name']} {task_data['episode_name']} 拿 host")
-        animate_video_json, host_list = await Myself.get_animate_video_json_and_host_list(url=task_data['vpx_url'])
+        animate_video_json = await Myself.get_animate_video_json(url=task_data['vpx_url'])
+        if not animate_video_json:
+            task_data.update({'status': '官網更新資料!請刪除後重新下載!'})
+            return False
         task_data.update({
+            'animate_video_json': animate_video_json,
             'host_list': sorted(animate_video_json['host'], key=lambda x: x.get('weight'), reverse=True),
             'video_720p': animate_video_json['video']['720p'],
         })
-        return animate_video_json, host_list
+        return True
 
-    async def _process_m3u8(self, animate_video_json: dict, host_list: list, task_data: dict):
+    async def _process_m3u8(self,task_data: dict) -> bool:
         task_data.update({'status': '取得 M3U8 資料中'})
         episode_info_model = await DB.Myself.get_animate_episode_info_model(owner__name=task_data['animate_name'],
                                                                             name=task_data['episode_name'])
-        task_data['ts_list'] = await Myself.get_m3u8_uri_list(host_list=host_list, timeout=(60, 10),
-                                                              video_720p=animate_video_json['video']['720p'])
+        ts_list = await Myself.get_m3u8_uri_list(host_list=task_data['host_list'], timeout=(60, 10),
+                                                 video_720p=task_data['animate_video_json']['video']['720p'])
+        if not ts_list:
+            task_data.update({'status': '官網更新資料!請刪除後重新下載!'})
+            return False
+        task_data['ts_list'] = ts_list
         task_data.update({'ts_count': len(task_data['ts_list'])})
         await DB.Myself.create_many_animate_episode_ts(owner=episode_info_model, ts_list=task_data['ts_list'])
+        return True
 
     async def _process_merge_video(self, task_data: dict):
         task_data.update({'status': '合併影片中'})
@@ -94,10 +107,12 @@ class DownloadManage:
 
     async def download_animate(self, task_data: dict):
         ts_semaphore = asyncio.Semaphore(value=self.connections)
-        animate_video_json, host_list = await self._process_host(task_data=task_data)
+        if not await self._process_host(task_data=task_data):
+            return
         if not task_data.get('ts_list'):
             print(f'{task_data["animate_name"]} {task_data["episode_name"]} 拿 m3u8')
-            await self._process_m3u8(animate_video_json=animate_video_json, host_list=host_list, task_data=task_data)
+            if not await self._process_m3u8(task_data=task_data):
+                return
         tasks = []
         print(f'{task_data["animate_name"]} {task_data["episode_name"]} 開始下載')
         task_data.update({'status': '下載中'})
@@ -128,52 +143,20 @@ class DownloadManage:
             await asyncio.sleep(1)
 
     async def download_animate_script(self, task_data: dict):
-        await self.download_animate(task_data=task_data)
+        if task_data['done']:
+            task_data['count'], task_data['ts_count'] = 100, 100
+        else:
+            await self.download_animate(task_data=task_data)
         task_data.update({'status': '下載完成'})
         self.now -= 1
 
-    async def get_animate_episode_download_undone_data(self):
-        # animate_dict = {}
-        # animate_download_undone_list = await DB.Myself.get_animate_episode_download_undone_list()
-        # for animate in animate_download_undone_list:
-        #     animate_dict.update({animate['name']: await Myself.re_animate_info_video_data(url=animate['url'])})
-        #     for episode_info_model in await DB.Myself.filter_animate_episode_info_downloading_models(
-        #             owner_id=animate['id']):
-        #         new_url = animate_dict[animate['name']][episode_info_model.name]
-        #         if new_url != episode_info_model.url:
-        #             await DB.Myself.update_animate_episode_url(new_url=new_url, model=episode_info_model)
-        #             await DB.Myself.delete_filter_animate_episode_ts(owner_id=episode_info_model.id)
-        #             animate_video_json, host_list = await Myself.get_animate_video_json_and_host_list(url=new_url)
-        #             ts_list = await Myself.get_m3u8_uri_list(host_list=host_list,
-        #                                                      video_720p=animate_video_json['video']['720p'],
-        #                                                      timeout=(60, 10))
-        #             ts_count = len(ts_list)
-        #             await DB.Myself.create_many_animate_episode_ts(owner=episode_info_model, ts_list=ts_list)
-        #         else:
-        #             ts_list = await DB.Myself.filter_animate_episode_ts_undone_uri_list(owner=episode_info_model)
-        #             ts_count = await DB.Myself.get_animate_episode_ts_count(owner=episode_info_model)
-        #
-        #         self.wait_download_list.append({
-        #             'id': episode_info_model.id,
-        #             'owner_id': animate['id'],
-        #             'animate_name': await episode_info_model.get_animate_name(),
-        #             'episode_name': episode_info_model.name,
-        #             'vpx_url': new_url,
-        #             'ts_list': ts_list,
-        #             'ts_count': ts_count,
-        #             'count': ts_count - len(ts_list),
-        #             'status': '準備下載'
-        #         })
-        pass
-
     async def main_task(self):
-        # await self.get_animate_episode_download_undone_data()
-        self.wait_download_list.extend(await DB.Myself.get_animate_episode_download_undone_list())
+        self.wait_download_list.extend(await DB.Myself.get_animate_episode_download_undone_id_list())
         while True:
             if self.wait_download_list and self.max > self.now:
                 self.now += 1
-                # epso = self.wait_download_list.pop(0)
-                task_data = self.wait_download_list.pop(0)
+                download_id = self.wait_download_list.pop(0)
+                task_data = await DB.Myself.get_animate_episode_download_data(pk=download_id)
                 print('開始下載', task_data['animate_name'], task_data['episode_name'], task_data['id'])
                 self.download_list.append(task_data)
                 asyncio.create_task(self.download_animate_script(task_data))

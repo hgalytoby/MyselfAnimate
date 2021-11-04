@@ -74,9 +74,11 @@ async def aiohttp_json(url: str, timeout=(10, 10)) -> dict:
         try:
             return await base_aiohttp_req(url, method='json', timeout=timeout)
         except SERVER_AND_CLIENT_ERROR:
+            if error_count == 20:
+                return {}
             error_count += 1
             print('ServerClientConnectionError')
-        await asyncio.sleep(1)
+        await asyncio.sleep(3)
 
 
 def req_bytes(url: str) -> bytes:
