@@ -30,10 +30,10 @@ class Manage:
         try:
             if data['episodes']:
                 try:
-                    download_ids = await DB.Myself.create_many_download(owner_id_list=data['episodes'])
-                    # animate_episode_list = await DB.Myself.get_many_animate_episode_download_data_and_update_download(
-                    #     owner_id_list=download_ids)
-                    download_manage.wait_download_list.extend(download_ids)
+                    download_models = await DB.Myself.create_many_download_models(owner_id_list=data['episodes'])
+                    download_data_list = await DB.Myself.get_download_animate_episode_data_list(
+                        download_models=download_models)
+                    download_manage.wait_download_list.extend(download_data_list)
                 except Exception as error:
                     print(error)
                 # print(animate_episode_list, '123')
@@ -95,7 +95,8 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
                         model = await DB.Myself.filter_finish_animate(name__contains=data['msg'])
                     else:
                         model = await DB.Myself.All_finish_animate()
-                    serializer_data = await DB.Myself.search_finish_animate_paginator(model=model, page=data.get('page'))
+                    serializer_data = await DB.Myself.search_finish_animate_paginator(model=model,
+                                                                                      page=data.get('page'))
                     await self.send(text_data=json.dumps({'data': serializer_data, 'action': data['action']}))
                     # asyncio.create_task(self.search_animate(data=data))
             # if data.get('msg') and data['msg'] == 'some message to websocket server':

@@ -17,10 +17,16 @@ class FinishAnimateSerializer(serializers.ModelSerializer):
 class AnimateEpisodeInfoSerializer(serializers.ModelSerializer):
     name = serializers.CharField(read_only=True)
     url = serializers.URLField(read_only=True)
+    video = serializers.SerializerMethodField()
+
+    def get_video(self, instance):
+        if instance.video:
+            return f'http://127.0.0.1:8000/static/uploads{instance.video.url}'
+        return None
 
     class Meta:
         model = AnimateEpisodeInfoModel
-        fields = ('id', 'name', 'url', 'download', 'done')
+        fields = ('id', 'name', 'url', 'done', 'video')
 
 
 class AnimateInfoSerializer(serializers.ModelSerializer):

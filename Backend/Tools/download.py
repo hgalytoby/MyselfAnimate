@@ -32,7 +32,6 @@ class DownloadManage:
         except Exception as error:
             print(error)
 
-
     @staticmethod
     def __process_merge_video(cmd: str):
         """
@@ -69,7 +68,7 @@ class DownloadManage:
         })
         return True
 
-    async def _process_m3u8(self,task_data: dict) -> bool:
+    async def _process_m3u8(self, task_data: dict) -> bool:
         task_data.update({'status': '取得 M3U8 資料中'})
         episode_info_model = await DB.Myself.get_animate_episode_info_model(owner__name=task_data['animate_name'],
                                                                             name=task_data['episode_name'])
@@ -99,9 +98,9 @@ class DownloadManage:
             _ = threading.Thread(target=self.__process_merge_video, args=(cmd,))
             _.start()
             _.join()
-            await DB.Myself.save_animate_episode_video_file(name=task_data['episode_name'], video_path=video_path,
-                                                            owner_id=task_data['owner_id'])
-            await DB.Myself.delete_filter_animate_episode_ts(owner_id=task_data['id'])
+            await DB.Myself.save_animate_episode_video_file(pk=task_data['episode_id'], video_path=video_path)
+            await DB.Myself.delete_filter_animate_episode_ts(owner_id=task_data['episode_id'])
+            task_data['video'] = True
         except Exception as error:
             print(error)
 
@@ -121,7 +120,6 @@ class DownloadManage:
         # send_download_msg = asyncio.create_task(self.send_download_msg(task_data=task_data))
         await asyncio.gather(*tasks)
         # send_download_msg.cancel()
-        await self._process_merge_video(task_data=task_data)
         print(f'{task_data["animate_name"]} {task_data["episode_name"]} 下載完了')
 
     async def ws_send_msg(self, msg: dict):
@@ -147,16 +145,18 @@ class DownloadManage:
             task_data['count'], task_data['ts_count'] = 100, 100
         else:
             await self.download_animate(task_data=task_data)
+        if not task_data['video']:
+            await self._process_merge_video(task_data=task_data)
         task_data.update({'status': '下載完成'})
         self.now -= 1
 
     async def main_task(self):
-        self.wait_download_list.extend(await DB.Myself.get_animate_episode_download_undone_id_list())
+        download_models = await DB.Myself.get_total_download_animate_episode_models()
+        self.wait_download_list += await DB.Myself.get_download_animate_episode_data_list(download_models=download_models)
         while True:
             if self.wait_download_list and self.max > self.now:
                 self.now += 1
-                download_id = self.wait_download_list.pop(0)
-                task_data = await DB.Myself.get_animate_episode_download_data(pk=download_id)
+                task_data = self.wait_download_list.pop(0)
                 print('開始下載', task_data['animate_name'], task_data['episode_name'], task_data['id'])
                 self.download_list.append(task_data)
                 asyncio.create_task(self.download_animate_script(task_data))
