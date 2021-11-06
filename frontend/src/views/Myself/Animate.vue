@@ -31,8 +31,18 @@
     <div class="row">
       <div class="col-sm-2" v-for="data in animateInfo.episode_info_model" :key="data.id" @click="clickCheckbox(data.id)">
 <!--      <i class="bi bi-check-square">123</i>-->
-      <BootstrapIcon icon="check2-square" v-show="checkCheckboxArray(data.id, data.download)" size="1x"/>
-      <BootstrapIcon icon="square" v-show="!checkCheckboxArray(data.id, data.download)" size="1x"/>
+        <a
+  :href="data.video"
+  data-fancybox
+  data-type="iframe"
+  data-preload="false"
+  data-width="640"
+  data-height="480"
+>
+  Iframe
+</a>
+      <BootstrapIcon icon="check2-square" v-show="checkCheckboxArray(data.id, data.download)"/>
+      <BootstrapIcon icon="square" v-show="!checkCheckboxArray(data.id, data.download)"/>
 <!--      <input type="checkbox" :id="data.id" :value="data" v-model="checkboxAnimateEpisode">-->
       <span>{{ data.name }}</span>
     </div>
@@ -55,6 +65,9 @@ import {
 } from '../../variables/variablesMyself'
 import { sendSocketMessage } from '../../hooks/useWS'
 import Loading from '../../components/Loading'
+
+import { Fancybox } from '@fancyapps/ui/src/Fancybox'
+import '@fancyapps/ui/dist/fancybox.css'
 
 export default {
   name: 'Animate',
@@ -101,6 +114,10 @@ export default {
       // console.log(checkboxAnimateEpisode.value[0])
       return checkboxAnimateEpisode.value.indexOf(id) !== -1 || download
     }
+    function startFancy () {
+      var gallery = this.imgs // your object with images
+      Fancybox.show(gallery, {}) // starts fancybox with the gallery object
+    }
     return {
       loading,
       animateInfo,
@@ -108,12 +125,12 @@ export default {
       downloadAnimate,
       saveMyLove,
       clickCheckbox,
-      checkCheckboxArray
+      checkCheckboxArray,
+      startFancy
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-
 </style>

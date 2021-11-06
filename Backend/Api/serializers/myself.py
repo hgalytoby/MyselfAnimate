@@ -7,7 +7,7 @@ class FinishAnimateSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
 
     def get_image(self, instance):
-        return f'http://127.0.0.1:8000/static/uploads{instance.image.url}'
+        return f'/static/uploads{instance.image.url}'
 
     class Meta:
         model = FinishAnimateModel
@@ -21,7 +21,7 @@ class AnimateEpisodeInfoSerializer(serializers.ModelSerializer):
 
     def get_video(self, instance):
         if instance.video:
-            return f'http://127.0.0.1:8000/static/uploads{instance.video.url}'
+            return f'/static/uploads{instance.video.url}'
         return None
 
     class Meta:
@@ -34,7 +34,7 @@ class AnimateInfoSerializer(serializers.ModelSerializer):
     episode_info_model = AnimateEpisodeInfoSerializer(many=True, read_only=True)
 
     def get_image(self, instance):
-        return f'http://127.0.0.1:8000/static/uploads{instance.image.url}'
+        return f'/static/uploads{instance.image.url}'
 
     class Meta:
         model = AnimateInfoModel
