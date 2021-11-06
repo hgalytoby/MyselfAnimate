@@ -32,11 +32,12 @@
     <div class="row">
       <div class="col-sm-2" v-for="data in animateInfo.episode_info_model" :key="data.id"
            @click="clickCheckbox(data.id)">
-        <button type="button" class="btn btn-primary" v-if="data.video" @click="startFancy(data.video)">播放</button>
         <BootstrapIcon icon="check2-square" v-show="checkCheckboxArray(data.id, data.download)"/>
         <BootstrapIcon icon="square" v-show="!checkCheckboxArray(data.id, data.download)"/>
         <!--      <input type="checkbox" :id="data.id" :value="data" v-model="checkboxAnimateEpisode">-->
         <span>{{ data.name }}</span>
+        <BootstrapIcon class="camera-video" icon="camera-video" v-if="data.video" @click="startFancy(data.video)"/>
+        <BootstrapIcon class="camera-video" icon="camera-video-off" v-else @click="startFancy(data.video)"/>
       </div>
       {{checkboxAnimateEpisode}}
     </div>
@@ -134,4 +135,7 @@ export default {
 
 <style lang="scss" scoped>
   @import '~@fancyapps/ui/dist/fancybox.css';
+  .camera-video {
+    font-size: 24px;
+  }
 </style>
