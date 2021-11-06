@@ -41,4 +41,12 @@ export default {
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
     background-color: rgba(109, 106, 106, 0.12);
   }
+
+  body {
+    .fancybox__content {
+      /*width: 80% !important;*/
+      height: 100% !important;
+      background: black;
+    }
+  }
 </style>

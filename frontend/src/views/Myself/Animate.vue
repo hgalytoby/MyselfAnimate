@@ -1,7 +1,7 @@
 <template>
   <div v-if="loading">
-       <Loading/>
-    </div>
+    <Loading/>
+  </div>
   <div v-else>
     <div class="card">
       <div class="row g-0">
@@ -23,34 +23,26 @@
             <li class="list-group-item">備註: {{ animateInfo.remarks }}</li>
             <li class="list-group-item">
               <h5>劇情簡介</h5>
-              {{ animateInfo.synopsis }}</li>
+              {{ animateInfo.synopsis }}
+            </li>
           </ul>
         </div>
       </div>
     </div>
     <div class="row">
-      <div class="col-sm-2" v-for="data in animateInfo.episode_info_model" :key="data.id" @click="clickCheckbox(data.id)">
-<!--      <i class="bi bi-check-square">123</i>-->
-        <a
-  :href="data.video"
-  data-fancybox
-  data-type="iframe"
-  data-preload="false"
-  data-width="640"
-  data-height="480"
->
-  Iframe
-</a>
-      <BootstrapIcon icon="check2-square" v-show="checkCheckboxArray(data.id, data.download)"/>
-      <BootstrapIcon icon="square" v-show="!checkCheckboxArray(data.id, data.download)"/>
-<!--      <input type="checkbox" :id="data.id" :value="data" v-model="checkboxAnimateEpisode">-->
-      <span>{{ data.name }}</span>
+      <div class="col-sm-2" v-for="data in animateInfo.episode_info_model" :key="data.id"
+           @click="clickCheckbox(data.id)">
+        <button type="button" class="btn btn-primary" v-if="data.video" @click="startFancy(data.video)">播放</button>
+        <BootstrapIcon icon="check2-square" v-show="checkCheckboxArray(data.id, data.download)"/>
+        <BootstrapIcon icon="square" v-show="!checkCheckboxArray(data.id, data.download)"/>
+        <!--      <input type="checkbox" :id="data.id" :value="data" v-model="checkboxAnimateEpisode">-->
+        <span>{{ data.name }}</span>
+      </div>
+      {{checkboxAnimateEpisode}}
     </div>
-    {{checkboxAnimateEpisode}}
   </div>
-    </div>
   <button type="button" class="btn btn-primary" @click="downloadAnimate">下載所選的集數</button>
-    <button type="button" class="btn btn-primary" @click="saveMyLove">儲存到我的最愛</button>
+  <button type="button" class="btn btn-primary" @click="saveMyLove">儲存到我的最愛</button>
 </template>
 
 <script>
@@ -65,9 +57,7 @@ import {
 } from '../../variables/variablesMyself'
 import { sendSocketMessage } from '../../hooks/useWS'
 import Loading from '../../components/Loading'
-
 import { Fancybox } from '@fancyapps/ui/src/Fancybox'
-import '@fancyapps/ui/dist/fancybox.css'
 
 export default {
   name: 'Animate',
@@ -99,9 +89,11 @@ export default {
         animateName: animateInfo.value.name
       })
     }
+
     function saveMyLove () {
       console.log(animateInfo.value)
     }
+
     function clickCheckbox (id) {
       const index = checkboxAnimateEpisode.value.indexOf(id)
       if (index === -1) {
@@ -110,14 +102,22 @@ export default {
         store.commit(`myself/${removeCheckboxAnimateEpisodeMutation}`, index)
       }
     }
+
     function checkCheckboxArray (id, download) {
       // console.log(checkboxAnimateEpisode.value[0])
       return checkboxAnimateEpisode.value.indexOf(id) !== -1 || download
     }
-    function startFancy () {
-      var gallery = this.imgs // your object with images
-      Fancybox.show(gallery, {}) // starts fancybox with the gallery object
+
+    function startFancy (video) {
+      // var gallery = this.imgs // your object with images
+      Fancybox.show([
+        {
+          src: video,
+          type: 'iframe',
+          preload: false
+        }], {}) // starts fancybox with the gallery object
     }
+
     return {
       loading,
       animateInfo,
@@ -133,4 +133,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  @import '~@fancyapps/ui/dist/fancybox.css';
 </style>

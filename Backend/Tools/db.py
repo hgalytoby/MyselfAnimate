@@ -5,13 +5,13 @@ from django.core.files.images import ImageFile
 from django.core.paginator import Paginator
 
 from Api.serializers import FinishAnimateSerializer
-from Api.views.tools import MyPageNumberPagination
-from Tools.setup import *
+# from Api.views.tools import MyPageNumberPagination
+# from Tools.setup import *
 from channels.db import database_sync_to_async
 from Database.models import FinishAnimateModel, AnimateInfoModel, AnimateEpisodeInfoModel, AnimateEpisodeTsModel, \
     DownloadModel
 from django.core.files.base import ContentFile
-from Tools.tools import aiohttp_bytes, use_io_get_image_format, aiohttp_text
+from Tools.tools import aiohttp_bytes, use_io_get_image_format
 from project.settings import MEDIA_PATH, BASE_DIR
 
 

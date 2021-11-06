@@ -40,10 +40,9 @@ service-identity==21.1.0
 six==1.16.0
 soupsieve==2.2.1
 sqlparse==0.4.2
-Twisted==21.7.0
-twisted-iocpsupport==1.0.2
 txaio==21.2.1
 typing-extensions==3.10.0.2
 urllib3==1.26.6
 yarl==1.6.3
-zope.interface==5.4.0
+uwsgi
+django_cleanup
