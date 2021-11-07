@@ -144,7 +144,7 @@ class MyselfBase:
                 'ts_count': ts_count,
                 'count': ts_count - ts_undone_count,
                 'status': '準備下載',
-                'video': True if download_model.owner.video else False
+                'video': f'{MEDIA_PATH}{download_model.owner.video.url}' if download_model.owner.video else None
             })
         return data
 
