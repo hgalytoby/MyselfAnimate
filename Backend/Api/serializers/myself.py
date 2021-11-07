@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from Database.models import FinishAnimateModel, AnimateEpisodeInfoModel, AnimateInfoModel
+from Database.models import FinishAnimateModel, AnimateEpisodeInfoModel, AnimateInfoModel, DownloadModel
 
 
 class FinishAnimateSerializer(serializers.ModelSerializer):
@@ -39,3 +39,9 @@ class AnimateInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = AnimateInfoModel
         fields = '__all__'
+
+
+class DownloadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DownloadModel
+        fields = ('id',)

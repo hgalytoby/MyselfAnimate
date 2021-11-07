@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'Api',
     'channels',
     'Database',
+    'drf_yasg',
     'django_cleanup.apps.CleanupConfig',  # 刪除資料用
 ]
 

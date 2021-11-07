@@ -1,9 +1,14 @@
 <template>
-  <div>我的下載區域</div>
+  <a href="#">
+    <BootstrapIcon class="pe-auto" icon="trash" size="2x"/>
+  </a>
   <div class="table-responsive">
     <table class="table table-hover" style="word-wrap:break-word;word-break:break-all;white-space:normal;">
       <thead>
       <tr class="table">
+        <th scope="col">
+          <BootstrapIcon icon="square"/>
+        </th>
         <th scope="col">動漫名字</th>
         <th scope="col">集數</th>
         <th scope="col">狀況</th>
@@ -12,10 +17,14 @@
       </thead>
       <tbody>
       <tr v-for="animate in downloadMyselfAnimateArray" :key="animate.id">
-        <td class="w-25">{{ animate.animate_name }}</td>
+        {{animate}}
+        <td style="width: 2%">
+          <BootstrapIcon icon="square"/>
+        </td>
+        <td>{{ animate.animate_name }}</td>
         <td>{{ animate.episode_name }}</td>
         <td>{{ animate.status }}</td>
-        <td class="w-50">
+        <td>
           <div class="progress">
             <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
                  :aria-valuenow="computeProgressRate(animate.count, animate.ts_count)"
