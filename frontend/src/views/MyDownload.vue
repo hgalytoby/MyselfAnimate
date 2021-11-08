@@ -1,7 +1,24 @@
 <template>
-  <a href="#">
-    <BootstrapIcon class="pe-auto" icon="trash" size="2x"/>
-  </a>
+  <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    <BootstrapIcon class="trash" icon="trash"/>
+  </button>
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          ...
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="table-responsive">
     <table class="table table-hover" style="word-wrap:break-word;word-break:break-all;white-space:normal;">
       <thead>
@@ -9,6 +26,7 @@
         <th scope="col">
           <BootstrapIcon icon="square"/>
         </th>
+        <th scope="col">播放</th>
         <th scope="col">動漫名字</th>
         <th scope="col">集數</th>
         <th scope="col">狀況</th>
@@ -16,10 +34,13 @@
       </tr>
       </thead>
       <tbody>
-      <tr v-for="animate in downloadMyselfAnimateArray" :key="animate.id">
-        {{animate}}
-        <td style="width: 2%">
+      <tr class="align-middle" v-for="animate in downloadMyselfAnimateArray" :key="animate.id">
+        <td style="width: 2%;">
           <BootstrapIcon icon="square"/>
+        </td>
+        <td class="text-center video-play" style="width: 4%">
+          <BootstrapIcon v-if="animate.video" icon="play-btn" @click="startFancy(animate.video)"/>
+          <BootstrapIcon v-else icon="pause-circle"/>
         </td>
         <td>{{ animate.animate_name }}</td>
         <td>{{ animate.episode_name }}</td>
@@ -44,6 +65,7 @@
 import { useStore } from 'vuex'
 import { downloadMyselfAnimateGetters } from '../variables/variablesMyself'
 import { computed } from 'vue'
+import { useStartFancy } from '../hooks/useFancybox'
 
 export default {
   name: 'MyDownload',
@@ -56,16 +78,28 @@ export default {
       return !isNaN(result) ? result : 0
     }
 
+    const startFancy = useStartFancy
     return {
       downloadMyselfAnimateArray,
-      computeProgressRate
+      computeProgressRate,
+      startFancy
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+  @import '~@fancyapps/ui/dist/fancybox.css';
+
   .animate-name {
-      text-overflow: ellipsis;
-    }
+    text-overflow: ellipsis;
+  }
+
+  .video-play {
+    font-size: 24px;
+  }
+
+  .trash {
+    font-size: 20px;
+  }
 </style>

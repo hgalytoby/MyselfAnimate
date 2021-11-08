@@ -44,9 +44,8 @@ export default {
 
   body {
     .fancybox__content {
-      /*width: 80% !important;*/
+      width: 80% !important;
       height: 100% !important;
-      background: black;
     }
   }
 </style>

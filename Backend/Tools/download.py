@@ -100,7 +100,7 @@ class DownloadManage:
             _.join()
             await DB.Myself.save_animate_episode_video_file(pk=task_data['episode_id'], video_path=video_path)
             await DB.Myself.delete_filter_animate_episode_ts(owner_id=task_data['episode_id'])
-            task_data['video'] = f'{MEDIA_PATH}{video_path}'
+            task_data['video'] = f'{MEDIA_PATH}/{video_path}'
         except Exception as error:
             print(error)
 

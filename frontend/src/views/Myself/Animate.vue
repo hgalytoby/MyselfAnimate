@@ -35,9 +35,10 @@
         <BootstrapIcon icon="check2-square" v-show="checkCheckboxArray(data.id, data.download)"/>
         <BootstrapIcon icon="square" v-show="!checkCheckboxArray(data.id, data.download)"/>
         <!--      <input type="checkbox" :id="data.id" :value="data" v-model="checkboxAnimateEpisode">-->
+        <BootstrapIcon class="video-play" icon="play-btn" v-if="data.video" @click="startFancy(data.video)"/>
+        <BootstrapIcon class="video-play" icon="pause-circle" v-else @click="startFancy(data.video)"/>
         <span>{{ data.name }}</span>
-        <BootstrapIcon class="camera-video" icon="camera-video" v-if="data.video" @click="startFancy(data.video)"/>
-        <BootstrapIcon class="camera-video" icon="camera-video-off" v-else @click="startFancy(data.video)"/>
+
       </div>
       {{checkboxAnimateEpisode}}
     </div>
@@ -58,7 +59,7 @@ import {
 } from '../../variables/variablesMyself'
 import { sendSocketMessage } from '../../hooks/useWS'
 import Loading from '../../components/Loading'
-import { Fancybox } from '@fancyapps/ui/src/Fancybox'
+import { useStartFancy } from '../../hooks/useFancybox'
 
 export default {
   name: 'Animate',
@@ -109,16 +110,7 @@ export default {
       return checkboxAnimateEpisode.value.indexOf(id) !== -1 || download
     }
 
-    function startFancy (video) {
-      // var gallery = this.imgs // your object with images
-      Fancybox.show([
-        {
-          src: video,
-          type: 'iframe',
-          preload: false
-        }], {}) // starts fancybox with the gallery object
-    }
-
+    const startFancy = useStartFancy
     return {
       loading,
       animateInfo,
@@ -135,7 +127,8 @@ export default {
 
 <style lang="scss" scoped>
   @import '~@fancyapps/ui/dist/fancybox.css';
-  .camera-video {
+
+  .video-play {
     font-size: 24px;
   }
 </style>
