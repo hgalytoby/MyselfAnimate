@@ -1,20 +1,21 @@
 <template>
-  <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">
-    <BootstrapIcon class="trash" icon="trash"/>
+  <button type="button" class="btn btn-success" @click="clearFinishDownload">清除已完成</button>
+  <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    刪除動漫
   </button>
   <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+          <h5 class="modal-title" id="exampleModalLabel">刪除動漫</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          ...
+          確定要刪除勾選的動漫?
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary">Save changes</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-danger">確認</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
         </div>
       </div>
     </div>
@@ -66,6 +67,7 @@ import { useStore } from 'vuex'
 import { downloadMyselfAnimateGetters } from '../variables/variablesMyself'
 import { computed } from 'vue'
 import { useStartFancy } from '../hooks/useFancybox'
+import { sendSocketMessage } from '../hooks/useWS'
 
 export default {
   name: 'MyDownload',
@@ -77,12 +79,23 @@ export default {
       const result = parseInt(count / tsCount * 100)
       return !isNaN(result) ? result : 0
     }
-
+    const clearFinishDownload = () => {
+      sendSocketMessage({
+        action: 'clear_finish_myself_animate'
+      })
+    }
+    function deleteAnimate () {
+      sendSocketMessage({
+        action: 'delete_myself_download_animate'
+      })
+    }
     const startFancy = useStartFancy
     return {
       downloadMyselfAnimateArray,
       computeProgressRate,
-      startFancy
+      startFancy,
+      clearFinishDownload,
+      deleteAnimate
     }
   }
 }
@@ -100,6 +113,9 @@ export default {
   }
 
   .trash {
+    font-size: 20px;
+  }
+  .trash2 {
     font-size: 20px;
   }
 </style>

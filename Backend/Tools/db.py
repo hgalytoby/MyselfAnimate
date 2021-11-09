@@ -252,12 +252,12 @@ class MyselfBase:
 
     @classmethod
     @database_sync_to_async
-    def delete_all_finish_animate(cls):
+    def delete_download_finish_animate(cls):
         """
-        刪除所有完結動漫資料。
+        刪除下載已完成動漫
         :return:
         """
-        FinishAnimateModel.objects.all().delete()
+        DownloadModel.objects.filter(owner__done=True).delete()
 
     @staticmethod
     @database_sync_to_async

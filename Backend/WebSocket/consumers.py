@@ -53,17 +53,20 @@ class Manage:
             await asyncio.sleep(0.5)
 
     async def search_animate(self, data: dict):
-        try:
-            if data['msg']:
-                model = await DB.Myself.filter_finish_animate(name__contains=data['msg'])
-                print(model, 'if')
-            else:
-                model = await DB.Myself.All_finish_animate()
-                print(model, 'model')
-            serializer_data = await DB.Myself.test(model=model, page=data.get('page'))
-            await self.send(text_data=json.dumps({'data': serializer_data, 'action': data['action']}))
-        except Exception as e:
-            print(e)
+        if data['msg']:
+            model = await DB.Myself.filter_finish_animate(name__contains=data['msg'])
+        else:
+            model = await DB.Myself.All_finish_animate()
+        serializer_data = await DB.Myself.search_finish_animate_paginator(model=model, page=data.get('page'))
+        await self.send(text_data=json.dumps({'data': serializer_data, 'action': data['action']}))
+
+    async def clear_finish_animate(self, data: dict):
+        await DB.Myself.delete_download_finish_animate()
+        download_manage.clear_finish_animate_list()
+        await self.send(text_data=json.dumps({'msg': '已清除已完成動漫', 'action': data['action']}))
+
+    async def delete_download_animate(self, data: dict):
+        pass
 
 
 class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
@@ -91,14 +94,11 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
                     await self.send(
                         text_data=json.dumps({'msg': f'我收到要下載的清單了', 'action': data['action'], 'updating': True}))
                 elif data['action'] == 'search_myself_animate':
-                    if data['msg']:
-                        model = await DB.Myself.filter_finish_animate(name__contains=data['msg'])
-                    else:
-                        model = await DB.Myself.All_finish_animate()
-                    serializer_data = await DB.Myself.search_finish_animate_paginator(model=model,
-                                                                                      page=data.get('page'))
-                    await self.send(text_data=json.dumps({'data': serializer_data, 'action': data['action']}))
-                    # asyncio.create_task(self.search_animate(data=data))
+                    asyncio.create_task(self.search_animate(data=data))
+                elif data['action'] == 'clear_finish_myself_animate':
+                    asyncio.create_task(self.clear_finish_animate(data=data))
+                elif data['action'] == 'delete_myself_download_animate':
+                    asyncio.create_task(self.delete_download_animate(data=data))
             # if data.get('msg') and data['msg'] == 'some message to websocket server':
             #     await self.send(text_data=json.dumps({'msg': f'前端在按 Login'}))
         except Exception as error:

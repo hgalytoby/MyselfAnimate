@@ -18,6 +18,10 @@ class DownloadManage:
         self.ws = None
         threading.Thread(target=self.main, args=()).start()
 
+    def clear_finish_animate_list(self):
+        self.download_list = list(filter(lambda x: not x['done'], self.download_list))
+        self.wait_download_list = list(filter(lambda x: not x['done'], self.wait_download_list))
+
     @staticmethod
     async def download_ts(ts_semaphore: asyncio.Semaphore, ts_uri: str, task_data: dict):
         try:
@@ -101,6 +105,7 @@ class DownloadManage:
             await DB.Myself.save_animate_episode_video_file(pk=task_data['episode_id'], video_path=video_path)
             await DB.Myself.delete_filter_animate_episode_ts(owner_id=task_data['episode_id'])
             task_data['video'] = f'{MEDIA_PATH}/{video_path}'
+            task_data['done'] = True
         except Exception as error:
             print(error)
 
@@ -152,7 +157,8 @@ class DownloadManage:
 
     async def main_task(self):
         download_models = await DB.Myself.get_total_download_animate_episode_models()
-        self.wait_download_list += await DB.Myself.get_download_animate_episode_data_list(download_models=download_models)
+        self.wait_download_list += await DB.Myself.get_download_animate_episode_data_list(
+            download_models=download_models)
         while True:
             if self.wait_download_list and self.max > self.now:
                 self.now += 1

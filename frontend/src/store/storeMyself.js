@@ -49,7 +49,7 @@ export const actions = {
         context.commit(addWeekAnimateMutation, response.data)
       },
       error => {
-        context.commit(addWeekAnimateMutation, error.msg)
+        alert(error.msg)
       }
     )
   },
@@ -59,7 +59,7 @@ export const actions = {
         context.commit(addAnimateInfoMutation, response.data)
       },
       error => {
-        context.commit(addAnimateInfoMutation, error.msg)
+        alert(error.msg)
       }
     )
   },
@@ -69,7 +69,7 @@ export const actions = {
         context.commit(addFinishListMutation, response.data)
       },
       error => {
-        context.commit(addFinishListMutation, error.msg)
+        alert(error.msg)
       }
     )
   },
@@ -79,7 +79,7 @@ export const actions = {
         context.commit(addFinishAnimateMutation, response.data)
       },
       error => {
-        context.commit(addFinishAnimateMutation, error.msg)
+        alert(error.msg)
       }
     )
   },
@@ -89,7 +89,7 @@ export const actions = {
         context.commit(myLogMutation, response.data)
       },
       error => {
-        context.commit(myLogMutation, error.msg)
+        alert(error.msg)
       }
     )
   }
@@ -97,36 +97,20 @@ export const actions = {
 
 export const mutations = {
   [addWeekAnimateMutation] (state, value) {
-    if (value) {
-      state[weekAnimateState] = value
-    } else {
-      alert('失敗')
-    }
+    state[weekAnimateState] = value
   },
   [addAnimateInfoMutation] (state, value) {
-    if (value) {
-      state[animateInfoState] = value
-      state[loadingState] = false
-    } else {
-      alert('失敗')
-    }
+    state[animateInfoState] = value
+    state[loadingState] = false
   },
   [loadingMutation] (state, value) {
     state[loadingState] = true
   },
   [addFinishListMutation] (state, value) {
-    if (value) {
-      state[finishListState] = value.data
-    } else {
-      alert('失敗')
-    }
+    state[finishListState] = value.data
   },
   [addFinishAnimateMutation] (state, value) {
-    if (value) {
-      state[finishAnimateState] = value
-    } else {
-      alert('失敗')
-    }
+    state[finishAnimateState] = value
   },
   [finishAnimateUpdateButtonMutation] (state, value) {
     state[finishAnimateUpdateButtonState] = value.msg
@@ -156,11 +140,7 @@ export const mutations = {
     }, 950)
   },
   [myLogMutation] (state, value) {
-    if (value) {
-      state[myLogState] = value
-    } else {
-      alert('失敗')
-    }
+    state[myLogState] = value
   }
 }
 export const getters = {
