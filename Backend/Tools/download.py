@@ -13,6 +13,7 @@ class DownloadManage:
         self.download_list = []
         self.wait_download_list = []
         self.connections = 10
+        self.tasks_dict = {}
         self.now = 0
         self.max = 2
         self.ws = None
@@ -117,9 +118,9 @@ class DownloadManage:
             print(f'{task_data["animate_name"]} {task_data["episode_name"]} 拿 m3u8')
             if not await self._process_m3u8(task_data=task_data):
                 return
-        tasks = []
         print(f'{task_data["animate_name"]} {task_data["episode_name"]} 開始下載')
         task_data.update({'status': '下載中'})
+        tasks = []
         for ts_uri in task_data['ts_list']:
             tasks.append(asyncio.create_task(self.download_ts(ts_semaphore, ts_uri, task_data)))
         # send_download_msg = asyncio.create_task(self.send_download_msg(task_data=task_data))
@@ -146,13 +147,18 @@ class DownloadManage:
             await asyncio.sleep(1)
 
     async def download_animate_script(self, task_data: dict):
-        if task_data['done']:
-            task_data['count'], task_data['ts_count'] = 100, 100
+        try:
+            if task_data['done']:
+                task_data['count'], task_data['ts_count'] = 100, 100
+            else:
+                await self.download_animate(task_data=task_data)
+        except asyncio.CancelledError:
+            print(f'取消下載: {task_data["animate_name"]} {task_data["episode_name"]}')
         else:
-            await self.download_animate(task_data=task_data)
-        if not task_data['video']:
-            await self._process_merge_video(task_data=task_data)
-        task_data.update({'status': '下載完成'})
+            print('else try')
+            if not task_data['video']:
+                await self._process_merge_video(task_data=task_data)
+            task_data.update({'status': '下載完成'})
         self.now -= 1
 
     async def main_task(self):
@@ -165,7 +171,7 @@ class DownloadManage:
                 task_data = self.wait_download_list.pop(0)
                 print('開始下載', task_data['animate_name'], task_data['episode_name'], task_data['id'])
                 self.download_list.append(task_data)
-                asyncio.create_task(self.download_animate_script(task_data))
+                self.tasks_dict.update({task_data['id']: asyncio.create_task(self.download_animate_script(task_data))})
             await asyncio.sleep(0.1)
 
     def main(self):

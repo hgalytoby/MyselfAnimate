@@ -66,7 +66,7 @@ class Manage:
         await self.send(text_data=json.dumps({'msg': '已清除已完成動漫', 'action': data['action']}))
 
     async def delete_download_animate(self, data: dict):
-        pass
+        download_manage.tasks_dict[11].cancel()
 
 
 class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):

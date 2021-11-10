@@ -14,7 +14,7 @@
           確定要刪除勾選的動漫?
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger">確認</button>
+          <button type="button" class="btn btn-danger" @click="deleteAnimate" data-bs-dismiss="modal">確認</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
         </div>
       </div>
