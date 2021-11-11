@@ -24,8 +24,9 @@
     <table class="table table-hover" style="word-wrap:break-word;word-break:break-all;white-space:normal;">
       <thead>
       <tr class="table">
-        <th scope="col">
-          <BootstrapIcon icon="square"/>
+        <th scope="col" @click="clickCheckBoxAll">
+          <BootstrapIcon v-show="!checkBoxAll" icon="square"/>
+          <BootstrapIcon class="download-checked" v-show="checkBoxAll" icon="check2-square"/>
         </th>
         <th scope="col">播放</th>
         <th scope="col">動漫名字</th>
@@ -36,8 +37,9 @@
       </thead>
       <tbody>
       <tr class="align-middle" v-for="animate in downloadMyselfAnimateArray" :key="animate.id">
-        <td style="width: 2%;">
-          <BootstrapIcon icon="square"/>
+        <td style="width: 2%;" @click="clickDownloadCheckBox(animate.id)">
+          <BootstrapIcon v-show="!filterDownloadCheckBox(animate.id)" icon="square"/>
+          <BootstrapIcon class="download-checked" v-show="filterDownloadCheckBox(animate.id)" icon="check2-square"/>
         </td>
         <td class="text-center video-play" style="width: 4%">
           <BootstrapIcon v-if="animate.video" icon="play-btn" @click="startFancy(animate.video)"/>
@@ -73,6 +75,7 @@ export default {
   name: 'MyDownload',
   setup: function () {
     const store = useStore()
+    const downloadCheckBox = []
     const downloadMyselfAnimateArray = computed(() => store.getters[`myself/${downloadMyselfAnimateGetters}`])
 
     function computeProgressRate (count, tsCount) {
@@ -85,9 +88,39 @@ export default {
       })
     }
     function deleteAnimate () {
-      sendSocketMessage({
-        action: 'delete_myself_download_animate'
-      })
+      // sendSocketMessage({
+      //   action: 'delete_myself_download_animate'
+      // })
+    }
+    function filterDownloadCheckBox (downloadID) {
+      return this.downloadCheckBox.indexOf(downloadID) !== -1
+    }
+    function clickDownloadCheckBox (downloadID) {
+      const index = this.downloadCheckBox.indexOf(downloadID)
+      if (index !== -1) {
+        this.downloadCheckBox.splice(index, 1)
+      } else {
+        this.downloadCheckBox.push(downloadID)
+      }
+    }
+    const checkBoxAll = computed(() => {
+      if (downloadMyselfAnimateArray.value && downloadCheckBox) {
+        return downloadMyselfAnimateArray.value.length === downloadCheckBox.length
+      }
+      return false
+    })
+    function clickCheckBoxAll () {
+      console.log(checkBoxAll.value)
+      if (checkBoxAll.value) {
+        downloadCheckBox.length = 0
+      } else {
+        // downloadMyselfAnimateArray.value.map((animate) => animate.id))
+        downloadMyselfAnimateArray.value.forEach((animate) => {
+          if (downloadCheckBox.indexOf(animate.id) === -1) {
+            downloadCheckBox.push(animate.id)
+          }
+        })
+      }
     }
     const startFancy = useStartFancy
     return {
@@ -95,7 +128,12 @@ export default {
       computeProgressRate,
       startFancy,
       clearFinishDownload,
-      deleteAnimate
+      deleteAnimate,
+      downloadCheckBox,
+      filterDownloadCheckBox,
+      clickDownloadCheckBox,
+      checkBoxAll,
+      clickCheckBoxAll
     }
   }
 }
@@ -117,5 +155,8 @@ export default {
   }
   .trash2 {
     font-size: 20px;
+  }
+  .download-checked {
+    font-size: 18px;
   }
 </style>

@@ -35,7 +35,7 @@ class DownloadManage:
                 task_data['ts_list'].remove(ts_uri)
                 task_data['count'] += 1
         except Exception as error:
-            print(error)
+            print(error, 'download_ts')
 
     @staticmethod
     def __process_merge_video(cmd: str):
@@ -95,7 +95,6 @@ class DownloadManage:
             from_website = await model.get_from_website()
             ts_list_path = f"{from_website}/{task_data['animate_name']}/video/ts/{task_data['episode_name']}/ts_list.txt"
             video_path = f"{from_website}/{task_data['animate_name']}/video/{task_data['episode_name']}.mp4"
-            print(video_path)
             ts_path_list = await DB.Myself.filter_animate_episode_ts_list(owner=model)
             with open(f"{ROOT_MEDIA_PATH}{ts_list_path}", 'w', encoding='utf-8') as f:
                 f.write('\n'.join(ts_path_list))
@@ -108,7 +107,7 @@ class DownloadManage:
             task_data['video'] = f'{MEDIA_PATH}/{video_path}'
             task_data['done'] = True
         except Exception as error:
-            print(error)
+            print(error, '_process_merge_video')
 
     async def download_animate(self, task_data: dict):
         ts_semaphore = asyncio.Semaphore(value=self.connections)
@@ -124,7 +123,7 @@ class DownloadManage:
         for ts_uri in task_data['ts_list']:
             tasks.append(asyncio.create_task(self.download_ts(ts_semaphore, ts_uri, task_data)))
         # send_download_msg = asyncio.create_task(self.send_download_msg(task_data=task_data))
-        await asyncio.gather(*tasks)
+        await asyncio.gather(*tasks, return_exceptions=True)
         # send_download_msg.cancel()
         print(f'{task_data["animate_name"]} {task_data["episode_name"]} 下載完了')
 
@@ -171,7 +170,7 @@ class DownloadManage:
                 task_data = self.wait_download_list.pop(0)
                 print('開始下載', task_data['animate_name'], task_data['episode_name'], task_data['id'])
                 self.download_list.append(task_data)
-                self.tasks_dict.update({task_data['id']: asyncio.create_task(self.download_animate_script(task_data))})
+                # self.tasks_dict.update({task_data['id']: asyncio.create_task(self.download_animate_script(task_data))})
             await asyncio.sleep(0.1)
 
     def main(self):
