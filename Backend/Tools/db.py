@@ -234,6 +234,19 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
+    def delete_download_and_ts(**kwargs):
+        """
+        刪除 Download 與 TS 的資料庫資料。
+        :param kwargs:
+        :return:
+        """
+        models = AnimateEpisodeInfoModel.objects.filter(**kwargs)
+        for model in models:
+            DownloadModel.objects.filter(owner_id=model.pk).delete()
+            AnimateEpisodeTsModel.objects.filter(owner_id=model.pk).delete()
+
+    @staticmethod
+    @database_sync_to_async
     def All_finish_animate():
         """
         不加 list 有時候會出現 You cannot call this from an async context - use a thread or sync_to_async.
@@ -254,10 +267,19 @@ class MyselfBase:
     @database_sync_to_async
     def delete_download_finish_animate(cls):
         """
-        刪除下載已完成動漫
+        刪除下載已完成動漫。
         :return:
         """
         DownloadModel.objects.filter(owner__done=True).delete()
+
+    @classmethod
+    @database_sync_to_async
+    def delete_download_animate(cls, **kwargs):
+        """
+        刪除下載資料庫的資料。
+        :return:
+        """
+        DownloadModel.objects.filter(**kwargs).delete()
 
     @staticmethod
     @database_sync_to_async

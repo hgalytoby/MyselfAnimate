@@ -88,9 +88,12 @@ export default {
       })
     }
     function deleteAnimate () {
-      // sendSocketMessage({
-      //   action: 'delete_myself_download_animate'
-      // })
+      console.log('del')
+      sendSocketMessage({
+        action: 'delete_myself_download_animate',
+        deletes: downloadCheckBox
+      })
+      downloadCheckBox.length = 0
     }
     function filterDownloadCheckBox (downloadID) {
       return this.downloadCheckBox.indexOf(downloadID) !== -1

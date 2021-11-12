@@ -282,7 +282,8 @@ class Myself:
                     change += 1
                 print('ServerClientConnectionError')
             except Exception as error:
-                print(error)
+                # print(error, 'download_ts_content')
+                pass
             await asyncio.sleep(1)
 
 

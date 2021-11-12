@@ -66,7 +66,9 @@ class Manage:
         await self.send(text_data=json.dumps({'msg': '已清除已完成動漫', 'action': data['action']}))
 
     async def delete_download_animate(self, data: dict):
-        download_manage.tasks_dict[11].cancel()
+        download_manage.delete_download_animate_list(data['deletes'])
+        await DB.Myself.delete_download_and_ts(download_model__id__in=data['deletes'])
+        await self.send(text_data=json.dumps({'msg': '已取消勾選的下載動漫', 'action': data['action']}))
 
 
 class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
