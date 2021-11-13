@@ -32,6 +32,43 @@ class DownloadManage:
             filter(lambda x: x if x['id'] not in deletes else False if x['done'] else not self.tasks_dict[
                 x['id']].cancel(), self.download_list))
 
+    async def switch_download_order(self, data):
+        download_len = len(self.download_list)
+        if data['method'] == 'up' and data['index'] != 0:
+            if download_len > data['index']:
+                await DB.Myself.switch_download(switch_data1=self.download_list[data['index'] - 1],
+                                                switch_data2=self.download_list[data['index']])
+                self.download_list[data['index'] - 1], self.download_list[data['index']] = \
+                    self.download_list[data['index']], self.download_list[data['index'] - 1]
+            else:
+                if data['index'] - download_len == 0:
+                    await DB.Myself.switch_download(switch_data1=self.wait_download_list[0],
+                                                    switch_data2=self.download_list[-1])
+                    self.download_list.insert(-1, self.wait_download_list.pop(0))
+                else:
+                    _ = data['index'] - download_len
+                    await DB.Myself.switch_download(switch_data1=self.wait_download_list[_],
+                                                    switch_data2=self.wait_download_list[_ - 1])
+                    self.wait_download_list[_], self.wait_download_list[_ - 1] = \
+                        self.wait_download_list[_ - 1], self.wait_download_list[_]
+        elif data['method'] == 'down' and data['index'] != download_len + len(self.wait_download_list) - 1:
+            if download_len > data['index'] + 1:
+                await DB.Myself.switch_download(switch_data1=self.download_list[data['index']],
+                                                switch_data2=self.download_list[data['index'] + 1])
+                self.download_list[data['index']], self.download_list[data['index'] + 1] = \
+                    self.download_list[data['index'] + 1], self.download_list[data['index']]
+            else:
+                _ = data['index'] + 1 - download_len
+                if data['index'] + 1 - download_len == 0:
+                    await DB.Myself.switch_download(switch_data1=self.wait_download_list[0],
+                                                    switch_data2=self.download_list[-1])
+                    self.download_list.insert(-1, self.wait_download_list.pop(0))
+                else:
+                    await DB.Myself.switch_download(switch_data1=self.wait_download_list[_ - 1],
+                                                    switch_data2=self.wait_download_list[_])
+                    self.wait_download_list[_ - 1], self.wait_download_list[_] = \
+                        self.wait_download_list[_], self.wait_download_list[_ - 1]
+
     @staticmethod
     async def download_ts(ts_semaphore: asyncio.Semaphore, ts_uri: str, task_data: dict):
         try:

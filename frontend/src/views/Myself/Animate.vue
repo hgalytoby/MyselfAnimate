@@ -30,15 +30,15 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-sm-2" v-for="data in animateInfo.episode_info_model" :key="data.id"
-           @click="clickCheckbox(data.id)">
-        <BootstrapIcon icon="check2-square" v-show="checkCheckboxArray(data.id, data.download)"/>
-        <BootstrapIcon icon="square" v-show="!checkCheckboxArray(data.id, data.download)"/>
+      <div class="col-sm-2" v-for="data in animateInfo.episode_info_model" :key="data.id">
+        <BootstrapIcon icon="check2-square" v-show="checkCheckboxArray(data.id, data.download)"
+                       @click="clickCheckbox(data.id)"/>
+        <BootstrapIcon icon="square" v-show="!checkCheckboxArray(data.id, data.download)"
+                       @click="clickCheckbox(data.id)"/>
         <!--      <input type="checkbox" :id="data.id" :value="data" v-model="checkboxAnimateEpisode">-->
-        <BootstrapIcon class="video-play" icon="play-btn" v-if="data.video" @click="startFancy(data.video)"/>
-        <BootstrapIcon class="video-play" icon="pause-circle" v-else @click="startFancy(data.video)"/>
+        <BootstrapIcon class="video-play" icon="play-btn" v-if="data.done" @click="startFancy(data.video)"/>
+        <BootstrapIcon class="video-play" icon="pause-circle"/>
         <span>{{ data.name }}</span>
-
       </div>
       {{checkboxAnimateEpisode}}
     </div>

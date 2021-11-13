@@ -38,12 +38,14 @@
       </thead>
       <tbody>
       <tr class="align-middle" v-for="(animate, index) of downloadMyselfAnimateArray" :key="animate.id">
-        <td @click="clickDownloadCheckBox(animate.id)">
-          <BootstrapIcon v-show="!filterDownloadCheckBox(animate.id)" icon="square"/>
-          <BootstrapIcon class="download-checked" v-show="filterDownloadCheckBox(animate.id)" icon="check2-square"/>
+        <td>
+          <BootstrapIcon v-show="!filterDownloadCheckBox(animate.id)" @click="clickDownloadCheckBox(animate.id)"
+                         icon="square"/>
+          <BootstrapIcon class="download-checked" v-show="filterDownloadCheckBox(animate.id)"
+                         @click="clickDownloadCheckBox(animate.id)" icon="check2-square"/>
         </td>
         <td class="video-play">
-          <BootstrapIcon v-if="animate.video" icon="play-btn" @click="startFancy(animate.video)"/>
+          <BootstrapIcon v-if="animate.done" icon="play-btn" @click="startFancy(animate.video)"/>
           <BootstrapIcon v-else icon="pause-circle"/>
         </td>
         <td>
@@ -87,11 +89,13 @@ export default {
       const result = parseInt(count / tsCount * 100)
       return !isNaN(result) ? result : 0
     }
+
     const clearFinishDownload = () => {
       sendSocketMessage({
         action: 'clear_finish_myself_animate'
       })
     }
+
     function deleteAnimate () {
       sendSocketMessage({
         action: 'delete_myself_download_animate',
@@ -99,9 +103,11 @@ export default {
       })
       downloadCheckBox.length = 0
     }
+
     function filterDownloadCheckBox (downloadID) {
       return this.downloadCheckBox.indexOf(downloadID) !== -1
     }
+
     function clickDownloadCheckBox (downloadID) {
       const index = this.downloadCheckBox.indexOf(downloadID)
       if (index !== -1) {
@@ -110,6 +116,7 @@ export default {
         this.downloadCheckBox.push(downloadID)
       }
     }
+
     const checkBoxAll = computed(() => {
       if (downloadMyselfAnimateArray.value && downloadCheckBox) {
         if (downloadMyselfAnimateArray.value.length > 0) {
@@ -118,6 +125,7 @@ export default {
       }
       return false
     })
+
     function clickCheckBoxAll () {
       console.log(checkBoxAll.value)
       if (checkBoxAll.value) {
@@ -130,6 +138,7 @@ export default {
         })
       }
     }
+
     function orderUpOrDown (method, index) {
       sendSocketMessage({
         action: 'download_order_myself_animate',
@@ -137,6 +146,7 @@ export default {
         index
       })
     }
+
     const startFancy = useStartFancy
     return {
       downloadMyselfAnimateArray,
@@ -162,11 +172,11 @@ export default {
     text-overflow: ellipsis;
   }
 
-  .video-play, .order{
+  .video-play, .order {
     font-size: 24px;
   }
 
-  .download-checked{
+  .download-checked {
     font-size: 18px;
   }
 </style>
