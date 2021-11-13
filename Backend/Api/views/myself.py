@@ -2,7 +2,6 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, DestroyAPIView
-
 from Api.serializers import FinishAnimateSerializer, AnimateEpisodeInfoSerializer, AnimateInfoSerializer, DownloadSerializer
 from Api.views.tools import MyPageNumberPagination
 from Database.models import FinishAnimateModel, AnimateEpisodeInfoModel, AnimateEpisodeTsModel, DownloadModel

@@ -1,5 +1,4 @@
 from rest_framework.generics import ListAPIView
-
 from Api.serializers import LogSerializer, HistorySerializer
 from Database.models import LogModel, HistoryModel
 

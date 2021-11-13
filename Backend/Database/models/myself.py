@@ -1,10 +1,6 @@
-import uuid
-
 from channels.db import database_sync_to_async
 from django.db import models
-
 from Database.models.my import upload_image_path, upload_ts_path, upload_video_path
-from project.settings import MEDIA_PATH
 
 
 class AnimateInfoModel(models.Model):

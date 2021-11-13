@@ -1,11 +1,9 @@
 import asyncio
-import json
 import threading
 import subprocess
 from Tools.db import DB
 from Tools.myself import Myself
-from project.settings import BASE_DIR, MEDIA_PATH, ROOT_MEDIA_PATH
-import threading
+from project.settings import MEDIA_PATH, ROOT_MEDIA_PATH
 
 
 class DownloadManage:
@@ -20,10 +18,19 @@ class DownloadManage:
         threading.Thread(target=self.main, args=()).start()
 
     def clear_finish_animate_list(self):
+        """
+        清除陣列已完成的動漫。
+        :return:
+        """
         self.download_list = list(filter(lambda x: not x['done'], self.download_list))
         self.wait_download_list = list(filter(lambda x: not x['done'], self.wait_download_list))
 
-    def delete_download_animate_list(self, deletes):
+    def delete_download_animate_list(self, deletes: list):
+        """
+        刪除陣列中的動漫。
+        :param deletes:
+        :return:
+        """
         self.wait_download_list = list(filter(lambda x: x['id'] not in deletes, self.wait_download_list))
         # self.tasks_dict[x['id']].cancel() 這個方法是要取消 async 的任務，如果成功取消會回傳 True。
         # 因為回傳 True 導致這個 filter 判斷明明進入到 else 卻因為拿到 True 然後跳回 if 成立接著將 x 回傳出去。
@@ -32,7 +39,12 @@ class DownloadManage:
             filter(lambda x: x if x['id'] not in deletes else False if x['done'] else not self.tasks_dict[
                 x['id']].cancel(), self.download_list))
 
-    async def switch_download_order(self, data):
+    async def switch_download_order(self, data: dict):
+        """
+        交換下載順序。
+        :param data: dict -> 動漫集數的資料。
+        :return:
+        """
         download_len = len(self.download_list)
         if data['method'] == 'up' and data['index'] != 0:
             if download_len > data['index']:
@@ -71,6 +83,13 @@ class DownloadManage:
 
     @staticmethod
     async def download_ts(ts_semaphore: asyncio.Semaphore, ts_uri: str, task_data: dict):
+        """
+        下載 ts 檔案。
+        :param ts_semaphore: asyncio.Semaphore -> 最大同時數量。
+        :param ts_uri: str -> ts url。
+        :param task_data: dict -> 動漫集數的資料。
+        :return:
+        """
         try:
             async with ts_semaphore:
                 ts_content = await Myself.download_ts_content(ts_uri=ts_uri, host_list=task_data['host_list'],
@@ -96,7 +115,7 @@ class DownloadManage:
         loop = asyncio.ProactorEventLoop()
         asyncio.set_event_loop(loop)
         loop.run_until_complete(self.__process_merge_video(cmd=cmd))
-        :param cmd:
+        :param cmd: str - ffmpeg 合併的指令。
         :return:
         """
         run = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
@@ -106,7 +125,13 @@ class DownloadManage:
         #                                              stderr=asyncio.subprocess.PIPE)
         # _, _ = await proc.communicate()
 
-    async def _process_host(self, task_data: dict) -> bool:
+    @staticmethod
+    async def _process_host(task_data: dict) -> bool:
+        """
+        取得動漫集數的 host 資料。
+        :param task_data: dict -> 動漫集數的資料。
+        :return: bool
+        """
         task_data.update({'status': '取得 Host 資料中'})
         print(f"{task_data['animate_name']} {task_data['episode_name']} 拿 host")
         animate_video_json = await Myself.get_animate_video_json(url=task_data['vpx_url'])
@@ -120,7 +145,13 @@ class DownloadManage:
         })
         return True
 
-    async def _process_m3u8(self, task_data: dict) -> bool:
+    @staticmethod
+    async def _process_m3u8(task_data: dict) -> bool:
+        """
+        取得動漫集數的 m3u8 資料。
+        :param task_data: dict -> 動漫集數的資料。
+        :return: bool
+        """
         task_data.update({'status': '取得 M3U8 資料中'})
         episode_info_model = await DB.Myself.get_animate_episode_info_model(owner__name=task_data['animate_name'],
                                                                             name=task_data['episode_name'])
@@ -135,6 +166,11 @@ class DownloadManage:
         return True
 
     async def _process_merge_video(self, task_data: dict):
+        """
+        將 ts 影片合併成 mp4。
+        :param task_data:  dict -> 動漫集數的資料。
+        :return:
+        """
         task_data.update({'status': '合併影片中'})
         try:
             model = await DB.Myself.get_animate_episode_info_model(owner__name=task_data['animate_name'],
@@ -157,6 +193,11 @@ class DownloadManage:
             print(error, '_process_merge_video')
 
     async def download_animate(self, task_data: dict):
+        """
+        開始下載動漫集數。
+        :param task_data: 動漫集數的資料。
+        :return:
+        """
         ts_semaphore = asyncio.Semaphore(value=self.connections)
         if not await self._process_host(task_data=task_data):
             return
@@ -169,23 +210,15 @@ class DownloadManage:
         tasks = []
         for ts_uri in task_data['ts_list']:
             tasks.append(asyncio.create_task(self.download_ts(ts_semaphore, ts_uri, task_data)))
-        # send_download_msg = asyncio.create_task(self.send_download_msg(task_data=task_data))
         await asyncio.gather(*tasks)
-        # send_download_msg.cancel()
         print(f'{task_data["animate_name"]} {task_data["episode_name"]} 下載完了')
 
-    async def send_download_msg(self, task_data: dict):
-        name = f'{task_data["animate_name"]}{task_data["episode_name"]}'
-        while True:
-            await self.ws_send_msg(msg={
-                'type': 'download',
-                'status': '下載中',
-                'name': name,
-                'progress_rate': int(task_data["count"] / task_data["ts_count"] * 100)
-            })
-            await asyncio.sleep(1)
-
     async def download_animate_script(self, task_data: dict):
+        """
+        下載動漫腳本。
+        :param task_data: 動漫集數的資料。
+        :return:
+        """
         try:
             if task_data['done']:
                 task_data['count'], task_data['ts_count'] = 100, 100
@@ -201,6 +234,10 @@ class DownloadManage:
         self.now -= 1
 
     async def main_task(self):
+        """
+        主要方法。
+        :return:
+        """
         download_models = await DB.Myself.get_total_download_animate_episode_models()
         self.wait_download_list += await DB.Myself.get_download_animate_episode_data_list(
             download_models=download_models)
@@ -214,4 +251,8 @@ class DownloadManage:
             await asyncio.sleep(0.1)
 
     def main(self):
+        """
+        開始異步執行。
+        :return:
+        """
         asyncio.run(self.main_task())
