@@ -72,12 +72,41 @@ class Manage:
 
     async def download_order(self, data):
         download_len = len(download_manage.download_list)
-        wait_len = len(download_manage.wait_download_list)
-        if data['index'] != 0 and data['index'] != download_len + wait_len:
-            if data['method'] == 'up':
-                pass
-        elif data['method'] == 'down':
-            pass
+        if data['method'] == 'up' and data['index'] != 0:
+            if download_len > data['index']:
+                await DB.Myself.switch_download(switch_data1=download_manage.download_list[data['index'] - 1],
+                                                switch_data2=download_manage.download_list[data['index']])
+                download_manage.download_list[data['index'] - 1], download_manage.download_list[data['index']] = \
+                    download_manage.download_list[data['index']], download_manage.download_list[data['index'] - 1]
+            else:
+                if data['index'] - download_len == 0:
+                    await DB.Myself.switch_download(switch_data1=download_manage.wait_download_list[0],
+                                                    switch_data2=download_manage.download_list[-1])
+                    download_manage.download_list.insert(-1, download_manage.wait_download_list.pop(0))
+                else:
+                    _ = data['index'] - download_len
+                    await DB.Myself.switch_download(switch_data1=download_manage.wait_download_list[_],
+                                                    switch_data2=download_manage.wait_download_list[_ - 1])
+                    download_manage.wait_download_list[_], download_manage.wait_download_list[_ - 1] = \
+                        download_manage.wait_download_list[_ - 1], download_manage.wait_download_list[_]
+        elif data['method'] == 'down' and data['index'] != download_len + len(download_manage.wait_download_list) - 1:
+            if download_len > data['index'] + 1:
+                await DB.Myself.switch_download(switch_data1=download_manage.download_list[data['index']],
+                                                switch_data2=download_manage.download_list[data['index'] + 1])
+                download_manage.download_list[data['index']], download_manage.download_list[data['index'] + 1] = \
+                    download_manage.download_list[data['index'] + 1], download_manage.download_list[data['index']]
+            else:
+                _ = data['index'] + 1 - download_len
+                if data['index'] + 1 - download_len == 0:
+                    await DB.Myself.switch_download(switch_data1=download_manage.wait_download_list[0],
+                                                    switch_data2=download_manage.download_list[-1])
+                    download_manage.download_list.insert(-1, download_manage.wait_download_list.pop(0))
+                else:
+                    await DB.Myself.switch_download(switch_data1=download_manage.wait_download_list[_ - 1],
+                                                    switch_data2=download_manage.wait_download_list[_])
+                    download_manage.wait_download_list[_ - 1], download_manage.wait_download_list[_] = \
+                        download_manage.wait_download_list[_], download_manage.wait_download_list[_ - 1]
+        await self.send(text_data=json.dumps({'msg': '已更新下載順序', 'action': data['action']}))
 
 
 class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):

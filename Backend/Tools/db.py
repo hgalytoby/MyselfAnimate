@@ -330,6 +330,14 @@ class MyselfBase:
             'data': serializer.data
         }
 
+    @staticmethod
+    @database_sync_to_async
+    def switch_download(switch_data1, switch_data2):
+        DownloadModel.objects.filter(pk__in=[switch_data1['id'], switch_data2['id']]).delete()
+        switch_data1['id'], switch_data2['id'] = switch_data2['id'], switch_data1['id']
+        DownloadModel.objects.create(pk=switch_data1['id'], owner_id=switch_data1['episode_id'])
+        DownloadModel.objects.create(pk=switch_data2['id'], owner_id=switch_data2['episode_id'])
+
 
 class DB:
     Myself = MyselfBase
