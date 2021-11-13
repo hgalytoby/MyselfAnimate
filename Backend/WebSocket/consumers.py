@@ -70,6 +70,15 @@ class Manage:
         await DB.Myself.delete_download_and_ts(download_model__id__in=data['deletes'])
         await self.send(text_data=json.dumps({'msg': '已取消勾選的下載動漫', 'action': data['action']}))
 
+    async def download_order(self, data):
+        download_len = len(download_manage.download_list)
+        wait_len = len(download_manage.wait_download_list)
+        if data['index'] != 0 and data['index'] != download_len + wait_len:
+            if data['method'] == 'up':
+                pass
+        elif data['method'] == 'down':
+            pass
+
 
 class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
 
@@ -101,6 +110,8 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
                     asyncio.create_task(self.clear_finish_animate(data=data))
                 elif data['action'] == 'delete_myself_download_animate':
                     asyncio.create_task(self.delete_download_animate(data=data))
+                elif data['action'] == 'download_order_myself_animate':
+                    asyncio.create_task(self.download_order(data=data))
             # if data.get('msg') and data['msg'] == 'some message to websocket server':
             #     await self.send(text_data=json.dumps({'msg': f'前端在按 Login'}))
         except Exception as error:

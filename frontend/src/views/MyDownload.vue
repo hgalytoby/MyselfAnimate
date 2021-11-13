@@ -29,6 +29,7 @@
           <BootstrapIcon class="download-checked" v-show="checkBoxAll" icon="check2-square"/>
         </th>
         <th scope="col">播放</th>
+        <th scope="col">下載順序</th>
         <th scope="col">動漫名字</th>
         <th scope="col">集數</th>
         <th scope="col">狀況</th>
@@ -36,14 +37,18 @@
       </tr>
       </thead>
       <tbody>
-      <tr class="align-middle" v-for="animate in downloadMyselfAnimateArray" :key="animate.id">
-        <td style="width: 2%;" @click="clickDownloadCheckBox(animate.id)">
+      <tr class="align-middle" v-for="(animate, index) of downloadMyselfAnimateArray" :key="animate.id">
+        <td @click="clickDownloadCheckBox(animate.id)">
           <BootstrapIcon v-show="!filterDownloadCheckBox(animate.id)" icon="square"/>
           <BootstrapIcon class="download-checked" v-show="filterDownloadCheckBox(animate.id)" icon="check2-square"/>
         </td>
-        <td class="text-center video-play" style="width: 4%">
+        <td class="video-play">
           <BootstrapIcon v-if="animate.video" icon="play-btn" @click="startFancy(animate.video)"/>
           <BootstrapIcon v-else icon="pause-circle"/>
+        </td>
+        <td>
+          <BootstrapIcon class="order me-3" @click="orderUpOrDown('up', index)" icon="arrow-up-circle"/>
+          <BootstrapIcon class="order" @click="orderUpOrDown('down', index)" icon="arrow-down-circle"/>
         </td>
         <td>{{ animate.animate_name }}</td>
         <td>{{ animate.episode_name }}</td>
@@ -88,7 +93,6 @@ export default {
       })
     }
     function deleteAnimate () {
-      console.log('del')
       sendSocketMessage({
         action: 'delete_myself_download_animate',
         deletes: downloadCheckBox
@@ -108,7 +112,9 @@ export default {
     }
     const checkBoxAll = computed(() => {
       if (downloadMyselfAnimateArray.value && downloadCheckBox) {
-        return downloadMyselfAnimateArray.value.length === downloadCheckBox.length
+        if (downloadMyselfAnimateArray.value.length > 0) {
+          return downloadMyselfAnimateArray.value.length === downloadCheckBox.length
+        }
       }
       return false
     })
@@ -117,13 +123,19 @@ export default {
       if (checkBoxAll.value) {
         downloadCheckBox.length = 0
       } else {
-        // downloadMyselfAnimateArray.value.map((animate) => animate.id))
         downloadMyselfAnimateArray.value.forEach((animate) => {
           if (downloadCheckBox.indexOf(animate.id) === -1) {
             downloadCheckBox.push(animate.id)
           }
         })
       }
+    }
+    function orderUpOrDown (method, index) {
+      sendSocketMessage({
+        action: 'download_order_myself_animate',
+        method,
+        index
+      })
     }
     const startFancy = useStartFancy
     return {
@@ -136,7 +148,8 @@ export default {
       filterDownloadCheckBox,
       clickDownloadCheckBox,
       checkBoxAll,
-      clickCheckBoxAll
+      clickCheckBoxAll,
+      orderUpOrDown
     }
   }
 }
@@ -149,17 +162,11 @@ export default {
     text-overflow: ellipsis;
   }
 
-  .video-play {
+  .video-play, .order{
     font-size: 24px;
   }
 
-  .trash {
-    font-size: 20px;
-  }
-  .trash2 {
-    font-size: 20px;
-  }
-  .download-checked {
+  .download-checked{
     font-size: 18px;
   }
 </style>

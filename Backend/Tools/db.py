@@ -244,6 +244,9 @@ class MyselfBase:
         for model in models:
             DownloadModel.objects.filter(owner_id=model.pk).delete()
             AnimateEpisodeTsModel.objects.filter(owner_id=model.pk).delete()
+            model.done = False
+            model.video = None
+            model.save()
 
     @staticmethod
     @database_sync_to_async

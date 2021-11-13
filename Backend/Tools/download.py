@@ -25,12 +25,12 @@ class DownloadManage:
 
     def delete_download_animate_list(self, deletes):
         self.wait_download_list = list(filter(lambda x: x['id'] not in deletes, self.wait_download_list))
-        # 靠北: self.tasks_dict[x['id']].cancel() 這個方法是要取消 async 的任務，如果成功取消會回傳 True。
-        # 因為回傳 True 導致這個 filter 判斷明明進入到 else 卻因為拿到 True 就跳回 if 成立接著將 x 回傳出去。
+        # self.tasks_dict[x['id']].cancel() 這個方法是要取消 async 的任務，如果成功取消會回傳 True。
+        # 因為回傳 True 導致這個 filter 判斷明明進入到 else 卻因為拿到 True 然後跳回 if 成立接著將 x 回傳出去。
         # 所以要用 not self.tasks_dict[x['id']]，才能防止不回傳值時會回傳值的問題。
         self.download_list = list(
-            filter(lambda x: x if x['id'] not in deletes else not self.tasks_dict[x['id']].cancel(),
-                   self.download_list))
+            filter(lambda x: x if x['id'] not in deletes else False if x['done'] else not self.tasks_dict[
+                x['id']].cancel(), self.download_list))
 
     @staticmethod
     async def download_ts(ts_semaphore: asyncio.Semaphore, ts_uri: str, task_data: dict):
@@ -173,7 +173,7 @@ class DownloadManage:
                 task_data = self.wait_download_list.pop(0)
                 print('開始下載', task_data['animate_name'], task_data['episode_name'], task_data['id'])
                 self.download_list.append(task_data)
-                self.tasks_dict.update({task_data['id']: asyncio.create_task(self.download_animate_script(task_data))})
+                # self.tasks_dict.update({task_data['id']: asyncio.create_task(self.download_animate_script(task_data))})
             await asyncio.sleep(0.1)
 
     def main(self):
