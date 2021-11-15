@@ -38,6 +38,12 @@ class DownloadManage:
         self.download_list = list(
             filter(lambda x: x if x['id'] not in deletes else False if x['done'] else not self.tasks_dict[
                 x['id']].cancel(), self.download_list))
+        # 下面的 for 就是上面 filter 在做的事情。
+        # for item in self.download_list:
+        #     if item['id'] in deletes:
+        #         if not item['done']:
+        #             self.tasks_dict[item['id']].cancel()
+        #         self.download_list.remove(item)
 
     async def switch_download_order(self, data: dict):
         """

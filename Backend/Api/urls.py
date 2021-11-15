@@ -1,6 +1,6 @@
 from django.urls import path
 from Api.views import WeekAnimateView, TestView, AnimateInfoView, FinishListView, FinishAnimateView, LogView, \
-    HistoryView, AnimateEpisodeInfoView, DownloadView
+    HistoryView, AnimateEpisodeInfoView, DownloadView, AnimateEpisodeDoneView
 
 app_name = 'api'
 
@@ -11,6 +11,7 @@ myself_api = [
     path('myself/finish-animate/', FinishAnimateView.as_view(), name='myself_finish_animate'),
     path('myself/animate-episode-info/<str:pk>/', AnimateEpisodeInfoView.as_view(), name='myself_animate_episode_info'),
     path('myself/download/<str:pk>/', DownloadView.as_view(), name='myself_download'),
+    path('myself/animate-episode-done/', AnimateEpisodeDoneView.as_view(), name='myself_animate_episode_done'),
 ]
 
 my_api = [

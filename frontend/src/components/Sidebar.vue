@@ -40,7 +40,7 @@
               <router-link class="nav-link px-2" title="" to="/MyLove" data-bs-toggle="tooltip"
                            data-bs-placement="right"
                            data-bs-original-title="Products">
-                <BootstrapIcon icon="suit-heart-fill" color="white"/>
+                <BootstrapIcon icon="collection-play" color="white"/>
                 <span class="text-white ms-2">收藏</span>
               </router-link>
             </li>

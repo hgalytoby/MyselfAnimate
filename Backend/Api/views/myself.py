@@ -1,10 +1,13 @@
+from django.db.models import Prefetch
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, DestroyAPIView
-from Api.serializers import FinishAnimateSerializer, AnimateEpisodeInfoSerializer, AnimateInfoSerializer, DownloadSerializer
+from Api.serializers import FinishAnimateSerializer, AnimateEpisodeInfoSerializer, AnimateInfoSerializer, \
+    DownloadSerializer
 from Api.views.tools import MyPageNumberPagination
-from Database.models import FinishAnimateModel, AnimateEpisodeInfoModel, AnimateEpisodeTsModel, DownloadModel
+from Database.models import FinishAnimateModel, AnimateEpisodeInfoModel, AnimateEpisodeTsModel, DownloadModel, \
+    AnimateInfoModel
 from Tools.db import DB
 from Tools.myself import Myself
 from Tools.tools import req_bytes
@@ -54,6 +57,19 @@ class AnimateEpisodeInfoView(RetrieveUpdateAPIView):
             model = AnimateEpisodeInfoModel.objects.get(pk=kwargs.get('pk'))
             AnimateEpisodeTsModel.objects.filter(owner=model).delete()
         return self.update(request, *args, **kwargs)
+
+
+class AnimateEpisodeDoneView(ListAPIView):
+    serializer_class = AnimateInfoSerializer
+    queryset = AnimateInfoModel.objects.all()
+    pagination_class = MyPageNumberPagination
+
+    def list(self, request, *args, **kwargs):
+        prefetch = Prefetch('episode_info_model', queryset=AnimateEpisodeInfoModel.objects.filter(done=True))
+        queryset = AnimateInfoModel.objects.prefetch_related(prefetch).filter(episode_info_model__done=True)
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
 
 class DownloadView(DestroyAPIView):
