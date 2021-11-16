@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MyHome from '../views/MyHome'
-import MyLove from '../views/MyLove'
+import MyLove from '../views/MyCollect'
 import MyDownload from '../views/MyDownload'
 import MyHistory from '../views/MyHistory'
 import Myself from '../views/Myself'

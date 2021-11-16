@@ -38,7 +38,7 @@ import { useStore } from 'vuex'
 import {
   weekAnimateAction,
   weekAnimateState
-} from '../variables/variablesMyself'
+} from '../variables/myself'
 
 export default {
   name: 'Myself',

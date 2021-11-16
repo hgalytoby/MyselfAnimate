@@ -56,7 +56,7 @@ import {
   checkboxAnimateEpisodeState,
   loadingMutation,
   loadingState, removeCheckboxAnimateEpisodeMutation
-} from '../../variables/variablesMyself'
+} from '../../variables/myself'
 import { sendSocketMessage } from '../../hooks/useWS'
 import Loading from '../../components/Loading'
 import { useStartFancy } from '../../hooks/useFancybox'

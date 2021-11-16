@@ -73,7 +73,7 @@
 
 <script>
 import { useStore } from 'vuex'
-import { downloadMyselfAnimateGetters } from '../variables/variablesMyself'
+import { downloadMyselfAnimateGetters } from '../variables/myself'
 import { computed } from 'vue'
 import { useStartFancy } from '../hooks/useFancybox'
 import { sendSocketMessage } from '../hooks/useWS'

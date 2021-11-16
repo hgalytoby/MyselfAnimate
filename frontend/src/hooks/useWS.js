@@ -1,5 +1,5 @@
 import { useStore } from 'vuex'
-import { finishAnimateUpdateButtonMutation } from '../variables/variablesMyself'
+import { finishAnimateUpdateButtonMutation } from '../variables/myself'
 const wsUrl = 'ws://127.0.0.1:8000/ws/'
 // const wsUrl = `ws://${location.host}/ws/`
 const socket = new WebSocket(wsUrl)

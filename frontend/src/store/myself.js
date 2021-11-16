@@ -24,9 +24,8 @@ import {
   finishAnimateAction,
   addFinishAnimateMutation,
   searchMyselfAnimateMutation,
-
-  myLogState, myLogAction, myLogMutation
-} from '../variables/variablesMyself'
+  animateCollectState, animateCollectAction, animateCollectMutation
+} from '../variables/myself'
 import { myselfApi } from '../../api'
 
 export const state = {
@@ -38,7 +37,7 @@ export const state = {
   [finishAnimateUpdateButtonState]: '更新資料',
   [checkboxAnimateEpisodeState]: [],
   [finishAnimateState]: [],
-  [myLogState]: [],
+  [animateCollectState]: [],
   searchTimer: null
 }
 
@@ -83,10 +82,10 @@ export const actions = {
       }
     )
   },
-  [myLogAction] (context, value) {
-    axios.get(myselfApi.myLog).then(
+  [animateCollectAction] (context, value) {
+    axios.get(myselfApi.animateEpisodeDone).then(
       response => {
-        context.commit(myLogMutation, response.data)
+        context.commit(animateCollectMutation, response.data)
       },
       error => {
         alert(error.msg)
@@ -139,8 +138,9 @@ export const mutations = {
       state[finishAnimateState] = value
     }, 950)
   },
-  [myLogMutation] (state, value) {
-    state[myLogState] = value
+  [animateCollectMutation] (state, value) {
+    console.log(value)
+    state[animateCollectState] = value
   }
 }
 export const getters = {

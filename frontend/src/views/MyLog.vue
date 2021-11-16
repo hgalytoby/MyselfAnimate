@@ -21,15 +21,15 @@
 <script>
 import { onMounted, computed } from 'vue'
 import { useStore } from 'vuex'
-import { myLogAction, myLogState } from '../variables/variablesMyself'
+import { myLogAction, myLogState } from '../variables/my'
 
 export default {
   name: 'MyLog',
   setup () {
     const store = useStore()
-    const logs = computed(() => store.state.myself[myLogState])
+    const logs = computed(() => store.state.my[myLogState])
     onMounted(() => {
-      store.dispatch(`myself/${myLogAction}`)
+      store.dispatch(`my/${myLogAction}`)
     })
     return {
       logs

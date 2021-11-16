@@ -34,7 +34,7 @@
 <script>
 import { onMounted, computed } from 'vue'
 import { useStore } from 'vuex'
-import { finishListAction, finishListState } from '../../variables/variablesMyself'
+import { finishListAction, finishListState } from '../../variables/myself'
 
 export default {
   name: 'Finish',
