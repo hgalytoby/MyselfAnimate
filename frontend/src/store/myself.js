@@ -1,4 +1,3 @@
-import axios from 'axios'
 import {
   weekAnimateState,
   animateInfoState,
@@ -26,7 +25,8 @@ import {
   searchMyselfAnimateMutation,
   animateCollectState, animateCollectAction, animateCollectMutation
 } from '../variables/myself'
-import { myselfApi } from '../../api'
+import { myselfApi } from '../api'
+import { axiosGet } from '../tools'
 
 export const state = {
   [weekAnimateState]: {},
@@ -43,54 +43,19 @@ export const state = {
 
 export const actions = {
   [weekAnimateAction] (context, value) {
-    axios.get(myselfApi.weekAnimate).then(
-      response => {
-        context.commit(addWeekAnimateMutation, response.data)
-      },
-      error => {
-        alert(error.msg)
-      }
-    )
+    axiosGet(myselfApi.weekAnimate, context, addWeekAnimateMutation)
   },
   [animateInfoAction] (context, value) {
-    axios.get(`${myselfApi.animateInfo}?url=${value}`).then(
-      response => {
-        context.commit(addAnimateInfoMutation, response.data)
-      },
-      error => {
-        alert(error.msg)
-      }
-    )
+    axiosGet(`${myselfApi.animateInfo}?url=${value}`, context, addAnimateInfoMutation)
   },
   [finishListAction] (context, value) {
-    axios.get(myselfApi.finishList).then(
-      response => {
-        context.commit(addFinishListMutation, response.data)
-      },
-      error => {
-        alert(error.msg)
-      }
-    )
+    axiosGet(myselfApi.finishList, context, addFinishListMutation)
   },
   [finishAnimateAction] (context, value) {
-    axios.get(myselfApi.finishAnimate).then(
-      response => {
-        context.commit(addFinishAnimateMutation, response.data)
-      },
-      error => {
-        alert(error.msg)
-      }
-    )
+    axiosGet(myselfApi.finishAnimate, context, addFinishAnimateMutation)
   },
   [animateCollectAction] (context, value) {
-    axios.get(myselfApi.animateEpisodeDone).then(
-      response => {
-        context.commit(animateCollectMutation, response.data)
-      },
-      error => {
-        alert(error.msg)
-      }
-    )
+    axiosGet(myselfApi.animateEpisodeDone, context, animateCollectMutation)
   }
 }
 

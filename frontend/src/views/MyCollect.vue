@@ -1,5 +1,4 @@
 <template>
-  <!--  {{myselfAnimateCollect}}-->
   <transition-group appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"
                     leave-active-class="animate__fadeOut">
     <div class="card" v-for="animate in myselfAnimateCollect.data" :key="animate.id">
@@ -39,21 +38,15 @@
 import { useStore } from 'vuex'
 import { onMounted, computed } from 'vue'
 import { animateCollectState, animateCollectAction } from '../variables/myself'
-import { useStartFancy } from '../hooks/useFancybox'
+import useWindowsFocus from '../hooks/useWindowsFocus'
+import { startFancy } from '../tools'
 
-document.addEventListener('visibilitychange', event => {
-  if (document.visibilityState === 'visible') {
-    console.log('tab is active')
-  } else {
-    console.log('tab is inactive')
-  }
-})
 export default {
   name: 'MyCollect',
   setup () {
     const store = useStore()
     const myselfAnimateCollect = computed(() => store.state.myself[animateCollectState])
-    const startFancy = useStartFancy
+    useWindowsFocus()
     onMounted(() => {
       store.dispatch(`myself/${animateCollectAction}`)
     })

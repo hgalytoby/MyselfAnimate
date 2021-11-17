@@ -59,7 +59,7 @@ import {
 } from '../../variables/myself'
 import { sendSocketMessage } from '../../hooks/useWS'
 import Loading from '../../components/Loading'
-import { useStartFancy } from '../../hooks/useFancybox'
+import { startFancy } from '../../tools'
 
 export default {
   name: 'Animate',
@@ -109,8 +109,6 @@ export default {
       // console.log(checkboxAnimateEpisode.value[0])
       return checkboxAnimateEpisode.value.indexOf(id) !== -1 || download
     }
-
-    const startFancy = useStartFancy
     return {
       loading,
       animateInfo,

@@ -75,8 +75,8 @@
 import { useStore } from 'vuex'
 import { downloadMyselfAnimateGetters } from '../variables/myself'
 import { computed } from 'vue'
-import { useStartFancy } from '../hooks/useFancybox'
 import { sendSocketMessage } from '../hooks/useWS'
+import { startFancy } from '../tools'
 
 export default {
   name: 'MyDownload',
@@ -85,15 +85,23 @@ export default {
     const downloadCheckBox = []
     const downloadMyselfAnimateArray = computed(() => store.getters[`myself/${downloadMyselfAnimateGetters}`])
 
-    function computeProgressRate (count, tsCount) {
-      const result = parseInt(count / tsCount * 100)
-      return !isNaN(result) ? result : 0
-    }
-
     const clearFinishDownload = () => {
       sendSocketMessage({
         action: 'clear_finish_myself_animate'
       })
+    }
+
+    const checkBoxAll = computed(() => {
+      if (downloadMyselfAnimateArray.value && downloadCheckBox) {
+        if (downloadMyselfAnimateArray.value.length > 0) {
+          return downloadMyselfAnimateArray.value.length === downloadCheckBox.length
+        }
+      }
+      return false
+    })
+    function computeProgressRate (count, tsCount) {
+      const result = parseInt(count / tsCount * 100)
+      return !isNaN(result) ? result : 0
     }
 
     function deleteAnimate () {
@@ -117,15 +125,6 @@ export default {
       }
     }
 
-    const checkBoxAll = computed(() => {
-      if (downloadMyselfAnimateArray.value && downloadCheckBox) {
-        if (downloadMyselfAnimateArray.value.length > 0) {
-          return downloadMyselfAnimateArray.value.length === downloadCheckBox.length
-        }
-      }
-      return false
-    })
-
     function clickCheckBoxAll () {
       console.log(checkBoxAll.value)
       if (checkBoxAll.value) {
@@ -147,7 +146,6 @@ export default {
       })
     }
 
-    const startFancy = useStartFancy
     return {
       downloadMyselfAnimateArray,
       computeProgressRate,

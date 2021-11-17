@@ -110,4 +110,3 @@ class DownloadModel(models.Model):
 
     class Meta:
         db_table = 'MyselfDownload'
-
