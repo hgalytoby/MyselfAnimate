@@ -37,7 +37,7 @@
               </router-link>
             </li>
             <li class="nav-item m-1">
-              <router-link class="nav-link px-2" title="" to="/MyLove" data-bs-toggle="tooltip"
+              <router-link class="nav-link px-2" title="" to="/MyCollect" data-bs-toggle="tooltip"
                            data-bs-placement="right"
                            data-bs-original-title="Products">
                 <BootstrapIcon icon="collection-play" color="white"/>

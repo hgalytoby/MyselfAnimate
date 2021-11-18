@@ -96,10 +96,10 @@ export const mutations = {
         state[finishAnimateState].data.pop()
       }
     }
-    if (state.timer) {
-      clearInterval(state.timer)
+    if (state.searchTimer) {
+      clearInterval(state.searchTimer)
     }
-    state.timer = setTimeout(() => {
+    state.searchTimer = setTimeout(() => {
       state[finishAnimateState] = value
     }, 950)
   },

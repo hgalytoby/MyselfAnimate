@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MyHome from '../views/MyHome'
-import MyLove from '../views/MyCollect'
+import MyCollect from '../views/MyCollect'
 import MyDownload from '../views/MyDownload'
 import MyHistory from '../views/MyHistory'
 import Myself from '../views/Myself'
@@ -25,8 +25,8 @@ const routes = [
     component: MyDownload
   },
   {
-    path: '/MyLove',
-    component: MyLove
+    path: '/MyCollect',
+    component: MyCollect
   },
   {
     path: '/Myself',

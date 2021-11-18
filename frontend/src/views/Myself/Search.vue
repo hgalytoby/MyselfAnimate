@@ -28,21 +28,22 @@
       </div>
     </transition-group>
   </div>
-  <transition appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"
-              leave-active-class="animate__fadeOut">
-    <nav aria-label="Page navigation example" v-show="showPagination">
-      <ul class="pagination justify-content-center">
-        <li class="page-item" :class="previousPage" @click="changePage(finishAnimate.page - 1)">
-          <a class="page-link" href="#">Previous</a>
-        </li>
-        <li class="page-item"><a class="page-link" href="#">{{ finishAnimate.page }}</a></li>
-        <li class="page-item" :class="nextPage" @click="changePage(finishAnimate.page + 1)">
-          <a class="page-link" href="#">next</a>
-        </li>
-      </ul>
-      <p class="text-center">全部:{{ finishAnimate.count }} / 總頁數:{{ finishAnimate.total_pages }}</p>
-    </nav>
-  </transition>
+<!--  <transition appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"-->
+<!--              leave-active-class="animate__fadeOut">-->
+    <pagination v-if="finishAnimate.page && finishAnimate.data.length > 0" v-model="finishAnimate.page" :records="finishAnimate.count" :per-page="25" @paginate="myCallback"/>
+<!--    <nav aria-label="Page navigation example" v-show="showPagination">-->
+<!--      <ul class="pagination justify-content-center">-->
+<!--        <li class="page-item" :class="previousPage" @click="changePage(finishAnimate.page - 1)">-->
+<!--          <a class="page-link" href="#">Previous</a>-->
+<!--        </li>-->
+<!--        <li class="page-item"><a class="page-link" href="#">{{ finishAnimate.page }}</a></li>-->
+<!--        <li class="page-item" :class="nextPage" @click="changePage(finishAnimate.page + 1)">-->
+<!--          <a class="page-link" href="#">next</a>-->
+<!--        </li>-->
+<!--      </ul>-->
+<!--      <p class="text-center">全部:{{ finishAnimate.count }} / 總頁數:{{ finishAnimate.total_pages }}</p>-->
+<!--    </nav>-->
+<!--  </transition>-->
 </template>
 
 <script>
@@ -90,6 +91,10 @@ export default {
       })
     }
 
+    function myCallback (page) {
+      console.log(page)
+    }
+
     return {
       updateFinishAnimateData,
       finishAnimateUpdate,
@@ -100,7 +105,8 @@ export default {
       changePage,
       showPagination,
       previousPage,
-      nextPage
+      nextPage,
+      myCallback
     }
   }
 }

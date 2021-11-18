@@ -44,7 +44,6 @@
     </div>
   </div>
   <button type="button" class="btn btn-primary" @click="downloadAnimate">下載所選的集數</button>
-  <button type="button" class="btn btn-primary" @click="saveMyLove">儲存到我的最愛</button>
 </template>
 
 <script>
@@ -92,10 +91,6 @@ export default {
       })
     }
 
-    function saveMyLove () {
-      console.log(animateInfo.value)
-    }
-
     function clickCheckbox (id) {
       const index = checkboxAnimateEpisode.value.indexOf(id)
       if (index === -1) {
@@ -114,7 +109,6 @@ export default {
       animateInfo,
       checkboxAnimateEpisode,
       downloadAnimate,
-      saveMyLove,
       clickCheckbox,
       checkCheckboxArray,
       startFancy
