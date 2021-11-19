@@ -28,22 +28,30 @@
       </div>
     </transition-group>
   </div>
-<!--  <transition appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"-->
-<!--              leave-active-class="animate__fadeOut">-->
-    <pagination v-if="finishAnimate.page && finishAnimate.data.length > 0" v-model="finishAnimate.page" :records="finishAnimate.count" :per-page="25" @paginate="myCallback"/>
-<!--    <nav aria-label="Page navigation example" v-show="showPagination">-->
-<!--      <ul class="pagination justify-content-center">-->
-<!--        <li class="page-item" :class="previousPage" @click="changePage(finishAnimate.page - 1)">-->
-<!--          <a class="page-link" href="#">Previous</a>-->
-<!--        </li>-->
-<!--        <li class="page-item"><a class="page-link" href="#">{{ finishAnimate.page }}</a></li>-->
-<!--        <li class="page-item" :class="nextPage" @click="changePage(finishAnimate.page + 1)">-->
-<!--          <a class="page-link" href="#">next</a>-->
-<!--        </li>-->
-<!--      </ul>-->
-<!--      <p class="text-center">全部:{{ finishAnimate.count }} / 總頁數:{{ finishAnimate.total_pages }}</p>-->
-<!--    </nav>-->
-<!--  </transition>-->
+  <transition appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"
+              leave-active-class="animate__fadeOut">
+<!--    <pagination v-if="finishAnimate.page && finishAnimate.data.length > 0" v-model="finishAnimate.page" :records="finishAnimate.count" :per-page="25" @paginate="myCallback"/>-->
+    <nav aria-label="Page navigation example" v-show="showPagination">
+      <ul class="pagination justify-content-center">
+        <li class="page-item" :class="previousPage10" @click="changePage(finishAnimate.page - 10)">
+          <a class="page-link" href="#">&lt;&lt;</a>
+        </li>
+        <li class="page-item" :class="previousPage" @click="changePage(finishAnimate.page - 1)">
+          <a class="page-link" href="#">&lt;</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="#">{{ finishAnimate.page }}</a>
+        </li>
+        <li class="page-item" :class="nextPage" @click="changePage(finishAnimate.page + 1)">
+          <a class="page-link" href="#">&gt;</a>
+        </li>
+        <li class="page-item" :class="nextPage10" @click="changePage(finishAnimate.page + 10)">
+          <a class="page-link" href="#">&gt;&gt;</a>
+        </li>
+      </ul>
+      <p class="text-center">顯示 {{ pageMsg.startNum }} 到 {{ pageMsg.endNum }} 共 {{ finishAnimate.count }} 個動漫</p>
+    </nav>
+  </transition>
 </template>
 
 <script>
@@ -63,10 +71,18 @@ export default {
     const store = useStore()
     const finishAnimate = computed(() => store.state.myself[finishAnimateState])
     const previousPage = computed(() => finishAnimate.value.previous ? '' : 'disabled')
+    const previousPage10 = computed(() => finishAnimate.value.total_pages > 10 && finishAnimate.value.page - 10 > 0 ? '' : 'disabled')
     const nextPage = computed(() => finishAnimate.value.next ? '' : 'disabled')
+    const nextPage10 = computed(() => finishAnimate.value.total_pages > 10 && finishAnimate.value.total_pages - 10 > finishAnimate.value.page ? '' : 'disabled')
     const showPagination = computed(() => finishAnimate.value.data && finishAnimate.value.data.length)
     const finishAnimateUpdate = computed(() => store.state.myself[finishAnimateUpdateState])
     const finishAnimateUpdateButton = computed(() => store.state.myself[finishAnimateUpdateButtonState])
+    const pageMsg = computed(() => {
+      return {
+        startNum: finishAnimate.value.page * 15 - 14,
+        endNum: finishAnimate.value.count > finishAnimate.value.page * 15 ? finishAnimate.value.page * 15 : finishAnimate.value.count
+      }
+    })
     const updateFinishAnimateData = () => {
       sendSocketMessage({
         action: 'myself_finish_animate_update'
@@ -105,8 +121,11 @@ export default {
       changePage,
       showPagination,
       previousPage,
+      previousPage10,
       nextPage,
-      myCallback
+      nextPage10,
+      myCallback,
+      pageMsg
     }
   }
 }
