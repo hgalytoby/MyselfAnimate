@@ -7,7 +7,7 @@ from channels.db import database_sync_to_async
 from Database.models import FinishAnimateModel, AnimateInfoModel, AnimateEpisodeInfoModel, AnimateEpisodeTsModel, \
     DownloadModel
 from django.core.files.base import ContentFile
-from Tools.tools import aiohttp_bytes, use_io_get_image_format
+from Tools.tools import aiohttp_bytes, use_io_get_image_format, page_range
 from project.settings import MEDIA_PATH, BASE_DIR
 
 
@@ -323,7 +323,8 @@ class MyselfBase:
             'next': pag_obj.next_page_number() if pag_obj.has_next() else None,
             'total_pages': paginator.num_pages,
             'count': paginator.count,
-            'data': serializer.data
+            'data': serializer.data,
+            'range': page_range(page=pag_obj.number, total=paginator.num_pages)
         }
 
     @staticmethod

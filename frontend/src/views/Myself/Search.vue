@@ -39,8 +39,8 @@
         <li class="page-item" :class="previousPage" @click="changePage(finishAnimate.page - 1)">
           <a class="page-link" href="#">&lt;</a>
         </li>
-        <li class="page-item">
-          <a class="page-link" href="#">{{ finishAnimate.page }}</a>
+        <li class="page-item" v-for="page in finishAnimate.range" :key="page">
+          <a class="page-link" href="#" @click="changePage(page)">{{ page }}</a>
         </li>
         <li class="page-item" :class="nextPage" @click="changePage(finishAnimate.page + 1)">
           <a class="page-link" href="#">&gt;</a>
@@ -49,7 +49,7 @@
           <a class="page-link" href="#">&gt;&gt;</a>
         </li>
       </ul>
-      <p class="text-center">顯示 {{ pageMsg.startNum }} 到 {{ pageMsg.endNum }} 共 {{ finishAnimate.count }} 個動漫</p>
+      <p class="text-center">顯示 {{ pageMsg.startMsgNum }} 到 {{ pageMsg.endMsgNum }} 共 {{ finishAnimate.count }} 個動漫</p>
     </nav>
   </transition>
 </template>
@@ -79,8 +79,8 @@ export default {
     const finishAnimateUpdateButton = computed(() => store.state.myself[finishAnimateUpdateButtonState])
     const pageMsg = computed(() => {
       return {
-        startNum: finishAnimate.value.page * 15 - 14,
-        endNum: finishAnimate.value.count > finishAnimate.value.page * 15 ? finishAnimate.value.page * 15 : finishAnimate.value.count
+        startMsgNum: finishAnimate.value.page * 15 - 14,
+        endMsgNum: finishAnimate.value.count > finishAnimate.value.page * 15 ? finishAnimate.value.page * 15 : finishAnimate.value.count
       }
     })
     const updateFinishAnimateData = () => {

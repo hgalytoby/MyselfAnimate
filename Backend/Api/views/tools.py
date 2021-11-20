@@ -1,6 +1,8 @@
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
+from Tools.tools import page_range
+
 
 class MyPageNumberPagination(PageNumberPagination):
     page_size = 15
@@ -24,5 +26,6 @@ class MyPageNumberPagination(PageNumberPagination):
             'next': self.next_number(),
             'total_pages': self.page.paginator.num_pages,
             'count': self.page.paginator.count,
-            'data': data
+            'data': data,
+            'range': page_range(page=self.page.number, total=self.page.paginator.num_pages)
         })
