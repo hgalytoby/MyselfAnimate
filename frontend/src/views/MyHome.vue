@@ -3,7 +3,6 @@
   <span>我的首頁</span>
   <h1>我的首頁</h1>
   <button @click="onSubmit">Login</button>
-  <pagination v-model="page" :records="500" :per-page="25" @paginate="myCallback"/>
   <!--  <h3>webSocket: {{ $store.getters['ws/getWsWhile'] }}</h3>-->
   <h3>webSocket: {{ $store.state.ws.wsClick }}</h3>
 </template>

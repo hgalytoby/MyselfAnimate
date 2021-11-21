@@ -30,27 +30,7 @@
   </div>
   <transition appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"
               leave-active-class="animate__fadeOut">
-<!--    <pagination v-if="finishAnimate.page && finishAnimate.data.length > 0" v-model="finishAnimate.page" :records="finishAnimate.count" :per-page="25" @paginate="myCallback"/>-->
-    <nav aria-label="Page navigation example" v-show="showPagination">
-      <ul class="pagination justify-content-center">
-        <li class="page-item" :class="previousPage10" @click="changePage(finishAnimate.page - 10)">
-          <a class="page-link" href="#">&lt;&lt;</a>
-        </li>
-        <li class="page-item" :class="previousPage" @click="changePage(finishAnimate.page - 1)">
-          <a class="page-link" href="#">&lt;</a>
-        </li>
-        <li class="page-item" v-for="page in finishAnimate.range" :key="page">
-          <a class="page-link" href="#" @click="changePage(page)">{{ page }}</a>
-        </li>
-        <li class="page-item" :class="nextPage" @click="changePage(finishAnimate.page + 1)">
-          <a class="page-link" href="#">&gt;</a>
-        </li>
-        <li class="page-item" :class="nextPage10" @click="changePage(finishAnimate.page + 10)">
-          <a class="page-link" href="#">&gt;&gt;</a>
-        </li>
-      </ul>
-      <p class="text-center">顯示 {{ pageMsg.startMsgNum }} 到 {{ pageMsg.endMsgNum }} 共 {{ finishAnimate.count }} 個動漫</p>
-    </nav>
+    <Pagination :pageDataObj="finishAnimate" :changePageFunction="changePage" :pageShowMsg="pageMsg"/>
   </transition>
 </template>
 
@@ -63,25 +43,21 @@ import {
   finishAnimateUpdateState
 } from '../../variables/myself'
 import { useStore } from 'vuex'
+import Pagination from '../../components/Pagination'
 
 export default {
   name: 'Search',
+  components: { Pagination },
   setup () {
     const searchText = ref('')
     const store = useStore()
     const finishAnimate = computed(() => store.state.myself[finishAnimateState])
-    const previousPage = computed(() => finishAnimate.value.previous ? '' : 'disabled')
-    const previousPage10 = computed(() => finishAnimate.value.total_pages > 10 && finishAnimate.value.page - 10 > 0 ? '' : 'disabled')
-    const nextPage = computed(() => finishAnimate.value.next ? '' : 'disabled')
-    const nextPage10 = computed(() => finishAnimate.value.total_pages > 10 && finishAnimate.value.total_pages - 10 > finishAnimate.value.page ? '' : 'disabled')
-    const showPagination = computed(() => finishAnimate.value.data && finishAnimate.value.data.length)
     const finishAnimateUpdate = computed(() => store.state.myself[finishAnimateUpdateState])
     const finishAnimateUpdateButton = computed(() => store.state.myself[finishAnimateUpdateButtonState])
     const pageMsg = computed(() => {
-      return {
-        startMsgNum: finishAnimate.value.page * 15 - 14,
-        endMsgNum: finishAnimate.value.count > finishAnimate.value.page * 15 ? finishAnimate.value.page * 15 : finishAnimate.value.count
-      }
+      const startMsgNum = finishAnimate.value.page * 15 - 14
+      const endMsgNum = finishAnimate.value.count > finishAnimate.value.page * 15 ? finishAnimate.value.page * 15 : finishAnimate.value.count
+      return `顯示 ${startMsgNum} 到 ${endMsgNum} 共 ${finishAnimate.value.count} 個動漫`
     })
     const updateFinishAnimateData = () => {
       sendSocketMessage({
@@ -107,10 +83,6 @@ export default {
       })
     }
 
-    function myCallback (page) {
-      console.log(page)
-    }
-
     return {
       updateFinishAnimateData,
       finishAnimateUpdate,
@@ -119,19 +91,13 @@ export default {
       searchText,
       searchAnimate,
       changePage,
-      showPagination,
-      previousPage,
-      previousPage10,
-      nextPage,
-      nextPage10,
-      myCallback,
       pageMsg
     }
   }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   .animate-name {
     text-overflow: ellipsis;
   }
