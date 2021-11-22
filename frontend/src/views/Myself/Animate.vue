@@ -37,7 +37,7 @@
                        @click="clickCheckbox(data.id)"/>
         <!--      <input type="checkbox" :id="data.id" :value="data" v-model="checkboxAnimateEpisode">-->
         <BootstrapIcon class="video-play" icon="play-btn" v-if="data.done" @click="startFancy(data.video)"/>
-        <BootstrapIcon class="video-play" icon="pause-circle"/>
+        <BootstrapIcon class="video-play" icon="pause-circle" v-else/>
         <span>{{ data.name }}</span>
       </div>
       {{checkboxAnimateEpisode}}
@@ -59,6 +59,7 @@ import {
 import { sendSocketMessage } from '../../hooks/useWS'
 import Loading from '../../components/Loading'
 import { startFancy } from '../../tools'
+import useWindowsFocus from '../../hooks/useWindowsFocus'
 
 export default {
   name: 'Animate',
@@ -82,6 +83,13 @@ export default {
     onMounted(() => {
       store.dispatch(`myself/${animateInfoAction}`, props.url)
     })
+    function windowsFocus () {
+      if (document.visibilityState === 'visible') {
+        // store.dispatch(`myself/${animateInfoAction}`, props.url)
+        console.log('myself animateInfoAction')
+      }
+    }
+    useWindowsFocus(windowsFocus)
     const downloadAnimate = () => {
       sendSocketMessage({
         action: 'download_myself_animate',

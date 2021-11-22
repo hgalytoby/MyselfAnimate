@@ -110,8 +110,13 @@ def create_log(msg: str, action: str):
 def page_range(page: int, total: int):
     x, y = divmod(page, 10)
     computed = (x + 1) * 10
+    print('x', 'y', x, y, 'computed', computed)
     if total > computed:
-        return list(range(x * 10 + 1, computed + 1))
+        if y != 0:
+            return list(range(x * 10 + 1, computed + 1))
+        return list(range((x - 1) * 10 + 1, (x - 1) * 10 + 11))
     elif total == computed and 11 > page:
         return list(range(x + 1, total + 1))
+    elif total == computed and y == 0 or computed > total:
+        return list(range((x - 1) * 10 + 1, (x - 1) * 10 + 11))
     return list(range(x * 10 + 1, total + 1))

@@ -52,6 +52,11 @@ class AnimateEpisodeInfoView(RetrieveUpdateAPIView):
     serializer_class = AnimateEpisodeInfoSerializer
     queryset = AnimateEpisodeInfoModel.objects.select_related('owner').all()
 
+    def retrieve(self, request, *args, **kwargs):
+        model = AnimateEpisodeInfoModel.objects.filter(owner_id=kwargs.get('pk'))
+        serializer = AnimateEpisodeInfoSerializer(model, many=True)
+        return Response(serializer.data)
+
     def put(self, request, *args, **kwargs):
         if request.data.get('download'):
             model = AnimateEpisodeInfoModel.objects.get(pk=kwargs.get('pk'))

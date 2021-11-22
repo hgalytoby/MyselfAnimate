@@ -46,7 +46,14 @@ export default {
   setup () {
     const store = useStore()
     const myselfAnimateCollect = computed(() => store.state.myself[animateCollectState])
-    useWindowsFocus()
+    function windowsFocus () {
+      if (document.visibilityState === 'visible') {
+        console.log('tab is active')
+      } else {
+        console.log('tab is inactive')
+      }
+    }
+    useWindowsFocus(windowsFocus)
     onMounted(() => {
       store.dispatch(`myself/${animateCollectAction}`)
     })
