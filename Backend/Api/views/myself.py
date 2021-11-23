@@ -52,16 +52,23 @@ class AnimateEpisodeInfoView(RetrieveUpdateAPIView):
     serializer_class = AnimateEpisodeInfoSerializer
     queryset = AnimateEpisodeInfoModel.objects.select_related('owner').all()
 
-    def retrieve(self, request, *args, **kwargs):
-        model = AnimateEpisodeInfoModel.objects.filter(owner_id=kwargs.get('pk'))
-        serializer = AnimateEpisodeInfoSerializer(model, many=True)
-        return Response(serializer.data)
-
     def put(self, request, *args, **kwargs):
         if request.data.get('download'):
             model = AnimateEpisodeInfoModel.objects.get(pk=kwargs.get('pk'))
             AnimateEpisodeTsModel.objects.filter(owner=model).delete()
         return self.update(request, *args, **kwargs)
+
+
+class AnimateInfoEpisode(ListAPIView):
+    serializer_class = AnimateEpisodeInfoSerializer
+    queryset = AnimateEpisodeInfoModel.objects.select_related('owner').all()
+
+    def list(self, request, *args, **kwargs):
+        model = AnimateEpisodeInfoModel.objects.filter(owner_id=kwargs.get('animate_id'))
+        if not model:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = AnimateEpisodeInfoSerializer(model, many=True)
+        return Response(serializer.data)
 
 
 class AnimateEpisodeDoneView(ListAPIView):
