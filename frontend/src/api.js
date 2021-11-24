@@ -3,7 +3,8 @@ export const myselfApi = {
   animateInfo: '/api/myself/animate-info/',
   finishList: '/api/myself/finish-list/',
   finishAnimate: '/api/myself/finish-animate/',
-  animateEpisodeDone: '/api/myself/animate-episode-done/'
+  animateEpisodeDone: '/api/myself/animate-episode-done/',
+  animateInfoEpisodeInfo: '/api/myself/animate-info/{animateID}/episode-info/'
 }
 
 export const myApi = {

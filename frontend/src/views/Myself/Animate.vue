@@ -54,7 +54,7 @@ import {
   animateInfoState, addCheckboxAnimateEpisodeMutation,
   checkboxAnimateEpisodeState,
   loadingMutation,
-  loadingState, removeCheckboxAnimateEpisodeMutation
+  loadingState, removeCheckboxAnimateEpisodeMutation, animateInfoEpisodeInfoAction
 } from '../../variables/myself'
 import { sendSocketMessage } from '../../hooks/useWS'
 import Loading from '../../components/Loading'
@@ -84,9 +84,8 @@ export default {
       store.dispatch(`myself/${animateInfoAction}`, props.url)
     })
     function windowsFocus () {
-      if (document.visibilityState === 'visible') {
-        // store.dispatch(`myself/${animateInfoAction}`, props.url)
-        console.log('myself animateInfoAction')
+      if (document.visibilityState === 'visible' && animateInfo.value.id) {
+        store.dispatch(`myself/${animateInfoEpisodeInfoAction}`, animateInfo.value.id)
       }
     }
     useWindowsFocus(windowsFocus)

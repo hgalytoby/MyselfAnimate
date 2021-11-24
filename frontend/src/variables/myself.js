@@ -14,6 +14,7 @@ export const animateInfoAction = 'animateInfoAction'
 export const finishListAction = 'finishListAction'
 export const finishAnimateAction = 'finishAnimateAction'
 export const animateCollectAction = 'animateCollectAction'
+export const animateInfoEpisodeInfoAction = 'animateInfoEpisodeInfoAction'
 
 export const addWeekAnimateMutation = 'addWeekAnimateMutation'
 export const addAnimateInfoMutation = 'addAnimateInfoMutation'
@@ -26,6 +27,7 @@ export const removeCheckboxAnimateEpisodeMutation = 'removeCheckboxAnimateEpisod
 export const downloadMyselfAnimateMutation = 'downloadMyselfAnimateMutation'
 export const searchMyselfAnimateMutation = 'searchMyselfAnimateMutation'
 export const animateCollectMutation = 'animateCollectMutation'
+export const animateInfoEpisodeInfoMutation = 'animateInfoEpisodeInfoMutation'
 
 export const downloadMyselfAnimateGetters = 'downloadMyselfAnimateGetters'
 export const finishAnimateGetters = 'finishAnimateGetters'

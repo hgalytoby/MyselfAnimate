@@ -23,7 +23,11 @@ import {
   finishAnimateAction,
   addFinishAnimateMutation,
   searchMyselfAnimateMutation,
-  animateCollectState, animateCollectAction, animateCollectMutation
+  animateCollectState,
+  animateCollectAction,
+  animateCollectMutation,
+  animateInfoEpisodeInfoAction,
+  animateInfoEpisodeInfoMutation
 } from '../variables/myself'
 import { myselfApi } from '../api'
 import { axiosGet } from '../tools'
@@ -56,6 +60,9 @@ export const actions = {
   },
   [animateCollectAction] (context, value) {
     axiosGet(myselfApi.animateEpisodeDone, context, animateCollectMutation)
+  },
+  [animateInfoEpisodeInfoAction] (context, value) {
+    axiosGet(myselfApi.animateInfoEpisodeInfo.replace('{animateID}', value), context, animateInfoEpisodeInfoMutation)
   }
 }
 
@@ -106,6 +113,10 @@ export const mutations = {
   [animateCollectMutation] (state, value) {
     console.log(value)
     state[animateCollectState] = value
+  },
+  [animateInfoEpisodeInfoMutation] (state, value) {
+    console.log(value)
+    state[animateInfoState].episode_info_model = value
   }
 }
 export const getters = {
