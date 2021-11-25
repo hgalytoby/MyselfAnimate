@@ -1,7 +1,7 @@
 <template>
   <transition-group appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"
                     leave-active-class="animate__fadeOut">
-    <div class="card" v-for="animate in myselfAnimateCollect.data" :key="animate.id">
+    <div class="card bg-transparent" v-for="animate in myselfAnimateCollect.data" :key="animate.id">
       <div class="row g-0">
         <div class="col-md-2">
           <h5 class="card-title">{{ animate.name }}</h5>
@@ -48,9 +48,7 @@ export default {
     const myselfAnimateCollect = computed(() => store.state.myself[animateCollectState])
     function windowsFocus () {
       if (document.visibilityState === 'visible') {
-        console.log('tab is active')
-      } else {
-        console.log('tab is inactive')
+        store.dispatch(`myself/${animateCollectAction}`)
       }
     }
     useWindowsFocus(windowsFocus)
@@ -65,6 +63,6 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 
 </style>

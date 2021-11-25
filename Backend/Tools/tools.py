@@ -67,16 +67,7 @@ async def aiohttp_json(url: str, timeout=(10, 10)) -> dict:
     :param timeout: tuple -> 設定請求與讀取時間。
     :return:
     """
-    error_count = 0
-    while True:
-        try:
-            return await base_aiohttp_req(url, method='json', timeout=timeout)
-        except SERVER_AND_CLIENT_ERROR:
-            if error_count == 20:
-                return {}
-            error_count += 1
-            print('ServerClientConnectionError')
-        await asyncio.sleep(3)
+    return await base_aiohttp_req(url, method='json', timeout=timeout)
 
 
 def req_bytes(url: str) -> bytes:

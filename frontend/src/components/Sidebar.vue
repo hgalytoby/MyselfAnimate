@@ -63,9 +63,13 @@
           </ul>
         </div>
       </div>
-      <div class="col-sm min-vh-100 content-bg p-0">
+      <div class=" col-sm min-vh-100 content-bg p-0">
         <!-- content -->
         <Navbar/>
+        <transition appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn animate__slower"
+                    leave-active-class="animate__fadeOut">
+          <img class="wb2-image" src="@/assets/wb2.png" alt="">
+        </transition>
         <div class="mt-4 mx-4">
           <router-view></router-view>
         </div>
@@ -91,10 +95,13 @@ export default {
   .bi {
     font-size: 24px;
   }
+
   ul li {
     border-radius: 12px;
+
     &:hover {
       background: white;
+
       span {
         color: black !important;
       }
@@ -105,10 +112,19 @@ export default {
     }
   }
 
+  .wb2-image {
+    position: fixed !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    z-index: -1;
+  }
+
   .sidebar-bg {
     background: #11101D;
   }
+
   .content-bg {
-    background: rgba(203,203,210,.15);
+    background: rgba(203, 203, 210, .15);
   }
 </style>

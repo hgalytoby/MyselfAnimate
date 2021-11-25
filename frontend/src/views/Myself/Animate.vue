@@ -83,12 +83,13 @@ export default {
     onMounted(() => {
       store.dispatch(`myself/${animateInfoAction}`, props.url)
     })
+
     function windowsFocus () {
       if (document.visibilityState === 'visible' && animateInfo.value.id) {
         store.dispatch(`myself/${animateInfoEpisodeInfoAction}`, animateInfo.value.id)
       }
     }
-    useWindowsFocus(windowsFocus)
+
     const downloadAnimate = () => {
       sendSocketMessage({
         action: 'download_myself_animate',
@@ -111,6 +112,8 @@ export default {
       // console.log(checkboxAnimateEpisode.value[0])
       return checkboxAnimateEpisode.value.indexOf(id) !== -1 || download
     }
+
+    useWindowsFocus(windowsFocus)
     return {
       loading,
       animateInfo,

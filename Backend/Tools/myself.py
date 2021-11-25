@@ -168,7 +168,16 @@ class Myself:
         :param timeout:
         :return:
         """
-        return await aiohttp_json(url=url, timeout=timeout)
+        error_count = 0
+        while True:
+            try:
+                return await aiohttp_json(url, timeout=timeout)
+            except SERVER_AND_CLIENT_ERROR:
+                if error_count == 20:
+                    return {}
+                error_count += 1
+                print('ServerClientConnectionError')
+            await asyncio.sleep(3)
 
     @staticmethod
     async def get_m3u8_uri_list(host_list: list, video_720p=str, timeout: tuple = (10, 10)) -> list:

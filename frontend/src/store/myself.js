@@ -111,11 +111,9 @@ export const mutations = {
     }, 950)
   },
   [animateCollectMutation] (state, value) {
-    console.log(value)
     state[animateCollectState] = value
   },
   [animateInfoEpisodeInfoMutation] (state, value) {
-    console.log(value)
     state[animateInfoState].episode_info_model = value
   }
 }

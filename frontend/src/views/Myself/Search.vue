@@ -9,7 +9,7 @@
   <div class="row justify-content-center">
     <transition-group appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"
                       leave-active-class="animate__fadeOut">
-      <div class="card col-sm-5 col-lg-3 col-xxl-2 mb-3 mx-3" v-for="animate in finishAnimate.data" :key="animate.id">
+      <div class="card bg-transparent col-sm-5 col-lg-3 col-xxl-2 mb-3 mx-3" v-for="animate in finishAnimate.data" :key="animate.id">
         <router-link :to="{
           name: 'MyselfAnimate',
           query: {
