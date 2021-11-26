@@ -15,9 +15,10 @@ class DownloadManage:
         self.now = 0
         self.max = 2
         self.ws = None
+        self.from_website = 'Myself'
         threading.Thread(target=self.main, args=()).start()
 
-    def clear_finish_animate_list(self):
+    async def clear_finish_animate_list(self):
         """
         清除陣列已完成的動漫。
         :return:
@@ -25,7 +26,7 @@ class DownloadManage:
         self.download_list = list(filter(lambda x: not x['done'], self.download_list))
         self.wait_download_list = list(filter(lambda x: not x['done'], self.wait_download_list))
 
-    def delete_download_animate_list(self, deletes: list):
+    async def delete_download_animate_list(self, deletes: list):
         """
         刪除陣列中的動漫。
         :param deletes:
@@ -236,6 +237,8 @@ class DownloadManage:
             print('else try')
             if not task_data['video']:
                 await self._process_merge_video(task_data=task_data)
+            await DB.My.create_history(animate_website_name=self.from_website, animate_name=task_data["animate_name"],
+                                       episode_name=task_data["episode_name"])
             task_data.update({'status': '下載完成'})
         self.now -= 1
 

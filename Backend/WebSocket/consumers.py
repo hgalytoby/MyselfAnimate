@@ -2,7 +2,6 @@ import json
 import asyncio
 from Tools.db import DB
 from Tools.myself import Myself
-from Tools.tools import create_log
 from Tools.download import DownloadManage
 from Tools.urls import FinishAnimateUrl, FinishAnimateBaseUrl
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -16,6 +15,7 @@ class Manage:
         更新完結動漫。
         :return:
         """
+        await DB.My.create_log(msg='Myself 更新完結動漫', action='update')
         total_page_data = await Myself.finish_animate_total_page(url=FinishAnimateUrl, get_res_text=True)
         for page in range(1, total_page_data['total_page'] + 1):
             if page == 1:
@@ -24,7 +24,7 @@ class Manage:
             else:
                 page_data = await Myself.finish_animate_page_data(url=FinishAnimateBaseUrl.format(page))
             await DB.Myself.create_many_finish_animate(data=page_data)
-        await create_log(msg='updated', action='myself_finish_animate_update')
+        await DB.My.create_log(msg='Myself 完結動漫更新完成', action='updated')
         await self.send(
             text_data=json.dumps({'msg': '更新完成', 'action': 'myself_finish_animate_update', 'updating': False}))
 
@@ -36,6 +36,7 @@ class Manage:
         """
         try:
             if data['episodes']:
+                await DB.My.create_log(msg='Myself 下載動漫', action='download')
                 try:
                     download_models = await DB.Myself.create_many_download_models(owner_id_list=data['episodes'])
                     download_data_list = await DB.Myself.get_download_animate_episode_data_list(
@@ -69,6 +70,7 @@ class Manage:
         :param data: dict -> 前端傳來要搜尋動漫的資料。
         :return:
         """
+        await DB.My.create_log(msg='Myself 搜尋動漫', action='search')
         if data['msg']:
             model = await DB.Myself.filter_finish_animate(name__contains=data['msg'])
         else:
@@ -83,7 +85,8 @@ class Manage:
         :return:
         """
         await DB.Myself.delete_download_finish_animate()
-        download_manage.clear_finish_animate_list()
+        await DB.My.create_log(msg='Myself 清除下載已完成', action='delete')
+        await download_manage.clear_finish_animate_list()
         await self.send(text_data=json.dumps({'msg': '已清除已完成動漫', 'action': data['action']}))
 
     async def delete_download_animate(self, data: dict):
@@ -92,8 +95,9 @@ class Manage:
         :param data: dict -> 前端傳來要刪除正在下載動漫資料。
         :return:
         """
-        download_manage.delete_download_animate_list(data['deletes'])
         await DB.Myself.delete_download_and_ts(download_model__id__in=data['deletes'])
+        await DB.My.create_log(msg='Myself 刪除已選取動漫', action='delete')
+        await download_manage.delete_download_animate_list(data['deletes'])
         await self.send(text_data=json.dumps({'msg': '已取消勾選的下載動漫', 'action': data['action']}))
 
     async def download_order(self, data):
@@ -103,6 +107,7 @@ class Manage:
         :return:
         """
         await download_manage.switch_download_order(data=data)
+        await DB.My.create_log(msg='Myself 已更新下載順序', action='switch')
         await self.send(text_data=json.dumps({'msg': '已更新下載順序', 'action': data['action']}))
 
 
@@ -114,6 +119,7 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
         :return:
         """
         await self.accept()
+        await DB.My.create_log(msg='已連線', action='connect')
         await self.send(text_data=json.dumps({'type': 'connect', 'msg': f'連線成功!!'}))
         download_manage.ws = self
         asyncio.create_task(self.download_tasks())

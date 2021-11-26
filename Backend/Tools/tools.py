@@ -93,11 +93,6 @@ def use_io_get_image_format(image_bytes: bytes) -> str:
     return image_type
 
 
-@database_sync_to_async
-def create_log(msg: str, action: str):
-    LogModel.objects.create(msg=msg, action=action)
-
-
 def page_range(page: int, total: int):
     x, y = divmod(page, 10)
     computed = (x + 1) * 10

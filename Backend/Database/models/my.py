@@ -23,7 +23,7 @@ class HistoryModel(models.Model):
     animate_website_name = models.CharField(max_length=32)
     animate_name = models.CharField(max_length=128)
     episode_name = models.CharField(max_length=64)
-    download_date = models.DateTimeField()
+    download_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'History'

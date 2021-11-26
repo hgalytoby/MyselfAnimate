@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 from Api.serializers import FinishAnimateSerializer
 from channels.db import database_sync_to_async
 from Database.models import FinishAnimateModel, AnimateInfoModel, AnimateEpisodeInfoModel, AnimateEpisodeTsModel, \
-    DownloadModel
+    DownloadModel, HistoryModel, LogModel
 from django.core.files.base import ContentFile
 from Tools.tools import aiohttp_bytes, use_io_get_image_format, page_range
 from project.settings import MEDIA_PATH, BASE_DIR
@@ -336,5 +336,18 @@ class MyselfBase:
         DownloadModel.objects.create(pk=switch_data2['id'], owner_id=switch_data2['episode_id'])
 
 
+class MyBase:
+    @staticmethod
+    @database_sync_to_async
+    def create_history(**kwargs):
+        HistoryModel.objects.create(**kwargs)
+
+    @staticmethod
+    @database_sync_to_async
+    def create_log(msg: str, action: str):
+        LogModel.objects.create(msg=msg, action=action)
+
+
 class DB:
     Myself = MyselfBase
+    My = MyBase
