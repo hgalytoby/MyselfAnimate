@@ -36,6 +36,7 @@ class LogModel(models.Model):
 
     class Meta:
         db_table = 'Log'
+        ordering = ('-datetime', )
 
 
 class LoveGroupModel(models.Model):

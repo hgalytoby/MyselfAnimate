@@ -56,7 +56,6 @@ class Manage:
         :return:
         """
         while True:
-            # dict(map(lambda kv:: x[''], download_manage.download_list + download_manage.wait_download_list))
             await self.send(
                 text_data=json.dumps({
                     'msg': '目前下載列表',
