@@ -1,12 +1,8 @@
 import io
-import asyncio
 import aiohttp
 import requests
 from PIL import Image
-from channels.db import database_sync_to_async
-from Tools.setup import *
 from functools import reduce
-from Database.models import LogModel
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36',
@@ -93,9 +89,10 @@ def use_io_get_image_format(image_bytes: bytes) -> str:
     return image_type
 
 
-def page_range(page: int, total: int):
+def page_range(page: int, total: int, page_item: int = 10):
     x, y = divmod(page, 10)
     computed = (x + 1) * 10
+    print(f'page: {page}, total: {total}, computed: {computed}')
     if total > computed:
         if y != 0:
             return list(range(x * 10 + 1, computed + 1))

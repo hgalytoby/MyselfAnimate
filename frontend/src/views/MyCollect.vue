@@ -17,21 +17,6 @@
       </div>
     </div>
   </transition-group>
-  <!--  <transition appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"-->
-  <!--              leave-active-class="animate__fadeOut">-->
-  <!--    <nav aria-label="Page navigation example" v-show="showPagination">-->
-  <!--      <ul class="pagination justify-content-center">-->
-  <!--        <li class="page-item" :class="previousPage" @click="changePage(myselfAnimateCollect.page - 1)">-->
-  <!--          <a class="page-link" href="#">Previous</a>-->
-  <!--        </li>-->
-  <!--        <li class="page-item"><a class="page-link" href="#">{{ finishAnimate.page }}</a></li>-->
-  <!--        <li class="page-item" :class="nextPage" @click="changePage(finishAnimate.page + 1)">-->
-  <!--          <a class="page-link" href="#">next</a>-->
-  <!--        </li>-->
-  <!--      </ul>-->
-  <!--      <p class="text-center">全部:{{ finishAnimate.count }} / 總頁數:{{ finishAnimate.total_pages }}</p>-->
-  <!--    </nav>-->
-  <!--  </transition>-->
 </template>
 
 <script>
@@ -46,12 +31,7 @@ export default {
   setup () {
     const store = useStore()
     const myselfAnimateCollect = computed(() => store.state.myself[animateCollectState])
-    function windowsFocus () {
-      if (document.visibilityState === 'visible') {
-        store.dispatch(`myself/${animateCollectAction}`)
-      }
-    }
-    useWindowsFocus(windowsFocus)
+    useWindowsFocus(store.dispatch, `myself/${animateCollectAction}`)
     onMounted(() => {
       store.dispatch(`myself/${animateCollectAction}`)
     })
