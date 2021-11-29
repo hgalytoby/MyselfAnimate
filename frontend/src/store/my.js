@@ -11,7 +11,8 @@ export const state = {
 
 export const actions = {
   [myLogAction] (context, value) {
-    axios.get(myApi.myLog).then(
+    console.log('value', value)
+    axios.get(myApi.myLog(value.page, value.size)).then(
       response => {
         context.commit(myLogMutation, response.data)
       },

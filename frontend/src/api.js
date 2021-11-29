@@ -8,5 +8,5 @@ export const myselfApi = {
 }
 
 export const myApi = {
-  myLog: '/api/my/log/'
+  myLog: (page, size) => `/api/my/log/?page=${page}&size=${size}`
 }

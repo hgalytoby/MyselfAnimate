@@ -1,24 +1,16 @@
 import { onMounted, onBeforeUnmount } from 'vue'
 
 export default function (func, action, args) {
-  function getTimestamp () {
-    return Math.floor(Date.now() / 1000)
-  }
-
   function windowsFocus () {
-    const newTimestamp = getTimestamp()
-    if (document.visibilityState === 'visible' && newTimestamp - nowTimestamp > 5) {
-      func(action, args)
-      nowTimestamp = newTimestamp
-    }
+    console.log('focus')
+    func(action, args)
   }
-  let nowTimestamp = Math.floor(Date.now() / 1000)
   onMounted(() => {
-    console.log('addEventListener: visibilitychange')
-    window.addEventListener('visibilitychange', windowsFocus)
+    console.log('addEventListener: focus')
+    window.addEventListener('focus', windowsFocus)
   })
   onBeforeUnmount(() => {
-    console.log('removeEventListener: visibilitychange')
-    window.removeEventListener('visibilitychange', windowsFocus)
+    console.log('removeEventListener: focus')
+    window.removeEventListener('focus', windowsFocus)
   })
 }
