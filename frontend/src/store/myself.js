@@ -62,7 +62,9 @@ export const actions = {
     axiosGet(myselfApi.animateEpisodeDone, context, animateCollectMutation)
   },
   [animateInfoEpisodeInfoAction] (context, value) {
-    axiosGet(myselfApi.animateInfoEpisodeInfo.replace('{animateID}', value), context, animateInfoEpisodeInfoMutation)
+    if (value.value.id) {
+      axiosGet(myselfApi.animateInfoEpisodeInfo.replace('{animateID}', value.value.id), context, animateInfoEpisodeInfoMutation)
+    }
   }
 }
 

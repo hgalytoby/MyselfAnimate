@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { onMounted, computed } from 'vue'
+import { computed } from 'vue'
 import { useStore } from 'vuex'
 import {
   animateInfoAction,
@@ -80,10 +80,8 @@ export default {
       }
     })
     store.commit(`myself/${loadingMutation}`)
-    onMounted(() => {
-      store.dispatch(`myself/${animateInfoAction}`, props.url)
-    })
-
+    store.dispatch(`myself/${animateInfoAction}`, props.url)
+    useWindowsFocus(store.dispatch, `myself/${animateInfoEpisodeInfoAction}`, animateInfo)
     const downloadAnimate = () => {
       sendSocketMessage({
         action: 'download_myself_animate',
@@ -106,8 +104,6 @@ export default {
       // console.log(checkboxAnimateEpisode.value[0])
       return checkboxAnimateEpisode.value.indexOf(id) !== -1 || download
     }
-
-    useWindowsFocus(store.dispatch, `myself/${animateInfoEpisodeInfoAction}`, animateInfo.value.id)
     return {
       loading,
       animateInfo,
