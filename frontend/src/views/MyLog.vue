@@ -36,9 +36,9 @@
 </template>
 
 <script>
-import { onMounted, computed, reactive } from 'vue'
+import { computed, reactive } from 'vue'
 import { useStore } from 'vuex'
-import { myLogAction, myLogState } from '../variables/my'
+import { myHistoryAction, myHistoryState, myLogAction, myLogState } from '../variables/my'
 import useWindowsFocus from '../hooks/useWindowsFocus'
 import Pagination from '../components/Pagination'
 
@@ -52,6 +52,7 @@ export default {
     })
     const store = useStore()
     const logs = computed(() => store.state.my[myLogState])
+    const history = computed(() => store.state.my[myHistoryState])
     const pageMsg = computed(() => {
       const startMsgNum = logs.value.page * 15 - 14
       const endMsgNum = logs.value.count > logs.value.page * 15 ? logs.value.page * 15 : logs.value.count
@@ -59,18 +60,18 @@ export default {
     })
 
     function changePage (page) {
+      pageConfig.page = page
       store.dispatch(`my/${myLogAction}`, { page: page, size: pageConfig.size })
     }
 
-    const test = useWindowsFocus(store.dispatch, `my/${myLogAction}`)
-    console.log(test.test)
-    onMounted(() => {
-      store.dispatch(`my/${myLogAction}`, { page: pageConfig.page, size: pageConfig.size })
-    })
+    useWindowsFocus(store.dispatch, `my/${myLogAction}`, pageConfig)
+    store.dispatch(`my/${myLogAction}`, { page: pageConfig.page, size: pageConfig.size })
+    store.dispatch(`my/${myHistoryAction}`, { page: pageConfig.page, size: pageConfig.size })
     return {
       logs,
       pageMsg,
-      changePage
+      changePage,
+      history
     }
   }
 }

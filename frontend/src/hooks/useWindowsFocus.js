@@ -2,7 +2,7 @@ import { onMounted, onBeforeUnmount } from 'vue'
 
 export default function (func, action, args) {
   function windowsFocus () {
-    console.log(args)
+    console.log('arg', args)
     func(action, args)
   }
   onMounted(() => {

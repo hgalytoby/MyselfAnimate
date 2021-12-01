@@ -1,3 +1,6 @@
 export const myLogState = 'myLogState'
+export const myHistoryState = 'myHistoryState'
 export const myLogAction = 'myLogAction'
+export const myHistoryAction = 'myHistoryAction'
 export const myLogMutation = 'myLogMutation'
+export const myHistoryMutation = 'myHistoryMutation'
