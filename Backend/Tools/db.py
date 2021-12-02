@@ -4,8 +4,10 @@ from django.core.files.images import ImageFile
 from django.core.paginator import Paginator
 from Api.serializers import FinishAnimateSerializer
 from channels.db import database_sync_to_async
+
+from Api.views.tools import MyPageNumberPagination
 from Database.models import FinishAnimateModel, AnimateInfoModel, AnimateEpisodeInfoModel, AnimateEpisodeTsModel, \
-    DownloadModel, HistoryModel, LogModel
+    DownloadModel, HistoryModel, SystemModel
 from django.core.files.base import ContentFile
 from Tools.tools import aiohttp_bytes, use_io_get_image_format, page_range
 from project.settings import MEDIA_PATH, BASE_DIR
@@ -305,6 +307,7 @@ class MyselfBase:
         model.video = video_path
         model.save()
 
+    # TODO 與 MyBase.get_custom_log_data 相似極大以後改善。
     @staticmethod
     @database_sync_to_async
     def search_finish_animate_paginator(model, page):
@@ -317,15 +320,7 @@ class MyselfBase:
         paginator = Paginator(model, 15)
         pag_obj = paginator.page(page if page else 1)
         serializer = FinishAnimateSerializer(pag_obj, many=True)
-        return {
-            'previous': pag_obj.previous_page_number() if pag_obj.has_previous() else None,
-            'page': pag_obj.number,
-            'next': pag_obj.next_page_number() if pag_obj.has_next() else None,
-            'total_pages': paginator.num_pages,
-            'count': paginator.count,
-            'data': serializer.data,
-            'range': page_range(page=pag_obj.number, total=paginator.num_pages)
-        }
+        return MyPageNumberPagination.paginated(pag_obj=pag_obj, paginator=paginator, data=serializer.data)
 
     @staticmethod
     @database_sync_to_async
@@ -345,7 +340,14 @@ class MyBase:
     @staticmethod
     @database_sync_to_async
     def create_log(msg: str, action: str):
-        LogModel.objects.create(msg=msg, action=action)
+        SystemModel.objects.create(msg=msg, action=action)
+
+    @staticmethod
+    def get_custom_log_data(model, serializer):
+        paginator = Paginator(model, 15)
+        pag_obj = paginator.page(1)
+        serializer = serializer(pag_obj, many=True)
+        return MyPageNumberPagination.paginated(pag_obj=pag_obj, paginator=paginator, data=serializer.data)
 
 
 class DB:

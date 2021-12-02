@@ -1,13 +1,13 @@
 from django.urls import path
-from Api.views import WeekAnimateView, TestView, AnimateInfoView, FinishListView, FinishAnimateView, LogView, \
-    HistoryView, AnimateEpisodeInfoView, DownloadView, AnimateEpisodeDoneView, AnimateInfoEpisode
+from Api.views import WeekAnimateView, TestView, AnimateInfoView, FinishListView, FinishAnimateView, SystemView, \
+    HistoryView, AnimateEpisodeInfoView, DownloadView, AnimateEpisodeDoneView, AnimateInfoEpisodeView, LogView
 
 app_name = 'api'
 
 myself_api = [
     path('myself/week-animate/', WeekAnimateView.as_view(), name='myself_week_animate'),
     path('myself/animate-info/', AnimateInfoView.as_view(), name='myself_animate_info'),
-    path('myself/animate-info/<str:animate_id>/episode-info/', AnimateInfoEpisode.as_view(),
+    path('myself/animate-info/<str:animate_id>/episode-info/', AnimateInfoEpisodeView.as_view(),
          name='myself_animate_info_episode_info'),
     path('myself/finish-list/', FinishListView.as_view(), name='myself_finish_list'),
     path('myself/finish-animate/', FinishAnimateView.as_view(), name='myself_finish_animate'),
@@ -17,8 +17,9 @@ myself_api = [
 ]
 
 my_api = [
+    path('my/log/system/', SystemView.as_view(), name='my_log_system'),
+    path('my/log/history/', HistoryView.as_view(), name='my_log_history'),
     path('my/log/', LogView.as_view(), name='my_log'),
-    path('my/history/', HistoryView.as_view(), name='my_history'),
 ]
 
 test_api = [

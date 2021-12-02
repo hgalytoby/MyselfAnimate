@@ -1,2 +1,2 @@
 from .myself import FinishAnimateSerializer, AnimateEpisodeInfoSerializer, AnimateInfoSerializer, DownloadSerializer
-from .my import HistorySerializer, LogSerializer
+from .my import HistorySerializer, SystemSerializer, LogSerializer

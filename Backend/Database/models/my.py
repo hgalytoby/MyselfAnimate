@@ -29,13 +29,13 @@ class HistoryModel(models.Model):
         db_table = 'History'
 
 
-class LogModel(models.Model):
+class SystemModel(models.Model):
     msg = models.TextField()
     action = models.CharField(max_length=32)
     datetime = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'Log'
+        db_table = 'System'
         ordering = ('-datetime', )
 
 

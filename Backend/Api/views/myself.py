@@ -59,7 +59,7 @@ class AnimateEpisodeInfoView(RetrieveUpdateAPIView):
         return self.update(request, *args, **kwargs)
 
 
-class AnimateInfoEpisode(ListAPIView):
+class AnimateInfoEpisodeView(ListAPIView):
     serializer_class = AnimateEpisodeInfoSerializer
     queryset = AnimateEpisodeInfoModel.objects.select_related('owner').all()
 

@@ -9,23 +9,17 @@ class MyPageNumberPagination(PageNumberPagination):
     page_size_query_param = 'size'
     max_page_size = 60
 
-    def next_number(self):
-        if not self.page.has_next():
-            return None
-        return self.page.next_page_number()
-
-    def previous_number(self):
-        if not self.page.has_previous():
-            return None
-        return self.page.previous_page_number()
-
     def get_paginated_response(self, data):
-        return Response({
-            'previous': self.previous_number(),
-            'page': self.page.number,
-            'next': self.next_number(),
-            'total_pages': self.page.paginator.num_pages,
-            'count': self.page.paginator.count,
+        return Response(self.paginated(pag_obj=self.page, paginator=self.page.paginator, data=data))
+
+    @staticmethod
+    def paginated(pag_obj, paginator, data):
+        return {
+            'previous': pag_obj.previous_page_number() if pag_obj.has_previous() else None,
+            'page': pag_obj.number,
+            'next': pag_obj.next_page_number() if pag_obj.has_next() else None,
+            'total_pages': paginator.num_pages,
+            'count': paginator.count,
             'data': data,
-            'range': page_range(page=self.page.number, total=self.page.paginator.num_pages)
-        })
+            'range': page_range(page=pag_obj.number, total=paginator.num_pages)
+        }

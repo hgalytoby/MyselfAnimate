@@ -1,32 +1,39 @@
 import {
-  myHistoryAction, myHistoryMutation,
-  myHistoryState,
-  myLogAction, myLogMutation,
-  myLogState
+  historyAction, historyMutation,
+  historyState,
+  logAction, logMutation,
+  logState, systemAction, systemMutation, systemState
 } from '../variables/my'
 import { myApi } from '../api'
 import { axiosGet } from '../tools'
 
 export const state = {
-  [myLogState]: [],
-  [myHistoryState]: []
+  [logState]: [],
+  [historyState]: [],
+  [systemState]: []
 }
 
 export const actions = {
-  [myLogAction] (context, value) {
-    console.log(value)
-    axiosGet(myApi.myLog(value.page, value.size), context, myLogMutation)
+  [logAction] (context, value) {
+    axiosGet(myApi.log, context, logMutation)
   },
-  [myHistoryAction] (context, value) {
-    axiosGet(myApi.myHistory(value.page, value.size), context, myHistoryMutation)
+  [historyAction] (context, value) {
+    axiosGet(myApi.history(value.page, value.size), context, historyMutation)
+  },
+  [systemAction] (context, value) {
+    axiosGet(myApi.system(value.page, value.size), context, systemMutation)
   }
 }
 export const mutations = {
-  [myLogMutation] (state, value) {
-    state[myLogState] = value
+  [logMutation] (state, value) {
+    state[systemState] = value.system
+    state[historyState] = value.history
   },
-  [myHistoryMutation] (state, value) {
-    state[myHistoryState] = value
+  [historyMutation] (state, value) {
+    state[historyState] = value
+  },
+  [systemMutation] (state, value) {
+    state[systemState] = value
   }
 }
 export const getters = {
