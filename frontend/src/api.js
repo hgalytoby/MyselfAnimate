@@ -9,6 +9,6 @@ export const myselfApi = {
 
 export const myApi = {
   log: '/api/my/log/',
-  system: (page, size) => `/api/my/log/?page=${page}&size=${size}`,
-  history: (page, size) => `/api/my/history/?page=${page}&size=${size}`
+  system: (page, size) => `/api/my/log/system/?page=${page}&size=${size}`,
+  history: (page, size) => `/api/my/log/history/?page=${page}&size=${size}`
 }

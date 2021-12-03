@@ -21,7 +21,7 @@
 import Pagination from './Pagination'
 import { computed, reactive } from 'vue'
 import { useStore } from 'vuex'
-// import useWindowsFocus from '../hooks/useWindowsFocus'
+import useWindowsFocus from '../hooks/useWindowsFocus'
 
 export default {
   name: 'Log',
@@ -52,7 +52,7 @@ export default {
       pageConfig.page = page
       store.dispatch(storeAction.value, { page: page, size: pageConfig.size })
     }
-    // useWindowsFocus(store.dispatch, storeAction.value)
+    useWindowsFocus(store.dispatch, storeAction.value, pageConfig)
     return {
       pageMsg,
       changePage,

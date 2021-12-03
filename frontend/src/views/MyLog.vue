@@ -12,8 +12,8 @@
     </li>
   </ul>
   <div class="tab-content" id="pills-tabContent">
-    <Log :state="systemState" :action="systemAction" type="system" :itemTable="systemTable"/>
-    <Log :state="historyState" :action="historyAction" type="history" :itemTable="historyTable"/>
+    <Log :state="systemState" :action="`my/${systemAction}`" type="system" :itemTable="systemTable"/>
+    <Log :state="historyState" :action="`my/${historyAction}`" type="history" :itemTable="historyTable"/>
   </div>
 </template>
 

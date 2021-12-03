@@ -1,9 +1,8 @@
-from django.core.paginator import Paginator
 from rest_framework.generics import ListAPIView, ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from Api.serializers import SystemSerializer, HistorySerializer, LogSerializer
+from Api.serializers import SystemSerializer, HistorySerializer
 from Api.views.tools import MyPageNumberPagination
 from Database.models import SystemModel, HistoryModel
 from Tools.db import DB
