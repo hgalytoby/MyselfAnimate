@@ -2,15 +2,52 @@ import io
 import asyncio
 from django.core.files.images import ImageFile
 from django.core.paginator import Paginator
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+
 from Api.serializers import FinishAnimateSerializer
 from channels.db import database_sync_to_async
 
-from Api.views.tools import MyPageNumberPagination
 from Database.models import FinishAnimateModel, AnimateInfoModel, AnimateEpisodeInfoModel, AnimateEpisodeTsModel, \
     DownloadModel, HistoryModel, SystemModel
 from django.core.files.base import ContentFile
-from Tools.tools import aiohttp_bytes, use_io_get_image_format, page_range
+from Tools.tools import aiohttp_bytes, use_io_get_image_format
 from project.settings import MEDIA_PATH, BASE_DIR
+
+
+class MyPageNumberPagination(PageNumberPagination):
+    page_size = 15
+    page_size_query_param = 'size'
+    max_page_size = 60
+
+    def get_paginated_response(self, data):
+        return Response(self.paginated(pag_obj=self.page, paginator=self.page.paginator, data=data))
+
+    @classmethod
+    def paginated(cls, pag_obj, paginator, data):
+        return {
+            'previous': pag_obj.previous_page_number() if pag_obj.has_previous() else None,
+            'page': pag_obj.number,
+            'next': pag_obj.next_page_number() if pag_obj.has_next() else None,
+            'total_pages': paginator.num_pages,
+            'count': paginator.count,
+            'data': data,
+            'range': cls.page_range(page=pag_obj.number, total=paginator.num_pages)
+        }
+
+    @staticmethod
+    def page_range(page: int, total: int, page_item: int = 10):
+        quotient, remainder = divmod(page, page_item)
+        print(f'page: {page}, total: {total}')
+        remainder_x_page_item = quotient * page_item
+        if remainder == 0:
+            return list(range((quotient - 1) * page_item + 1, remainder_x_page_item + 1))
+        else:
+            start = list(range(remainder_x_page_item + 1, remainder_x_page_item + remainder + 1))
+            end = remainder_x_page_item + page_item + 1
+            if end > total:
+                return start + list(range(remainder_x_page_item + remainder + 1, total + 1))
+            return start + list(range(remainder_x_page_item + remainder + 1, remainder_x_page_item + page_item + 1))
 
 
 class MyselfBase:

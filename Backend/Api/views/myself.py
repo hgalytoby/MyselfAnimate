@@ -5,10 +5,9 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, DestroyAPIView
 from Api.serializers import FinishAnimateSerializer, AnimateEpisodeInfoSerializer, AnimateInfoSerializer, \
     DownloadSerializer
-from Api.views.tools import MyPageNumberPagination
 from Database.models import FinishAnimateModel, AnimateEpisodeInfoModel, AnimateEpisodeTsModel, DownloadModel, \
     AnimateInfoModel
-from Tools.db import DB
+from Tools.db import DB, MyPageNumberPagination
 from Tools.myself import Myself
 from Tools.tools import req_bytes
 

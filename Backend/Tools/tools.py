@@ -46,7 +46,7 @@ async def aiohttp_text(url: str, timeout: tuple = (10, 10)) -> str:
     return await base_aiohttp_req(url, method='text', timeout=timeout, encoding='utf-8', errors='ignore')
 
 
-async def aiohttp_bytes(url: str, timeout=(10, 10)) -> bytes:
+async def aiohttp_bytes(url: str, timeout: tuple = (10, 10)) -> bytes:
     """
     用異步請求取得 bytes。
     :param url: str -> 要爬的 url。
@@ -87,17 +87,3 @@ def use_io_get_image_format(image_bytes: bytes) -> str:
     open_image.close()
     image_io.close()
     return image_type
-
-
-def page_range(page: int, total: int, page_item: int = 10):
-    quotient, remainder = divmod(page, page_item)
-    print(f'page: {page}, total: {total}')
-    remainder_x_page_item = quotient * page_item
-    if remainder == 0:
-        return list(range((quotient - 1) * page_item + 1, remainder_x_page_item + 1))
-    else:
-        start = list(range(remainder_x_page_item + 1, remainder_x_page_item + remainder + 1))
-        end = remainder_x_page_item + page_item + 1
-        if end > total:
-            return start + list(range(remainder_x_page_item + remainder + 1, total + 1))
-        return start + list(range(remainder_x_page_item + remainder + 1, remainder_x_page_item + page_item + 1))

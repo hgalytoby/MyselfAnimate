@@ -107,7 +107,7 @@ class DownloadManage:
                 task_data['ts_list'].remove(ts_uri)
                 task_data['count'] += 1
         except Exception as error:
-            # print(error, 'download_ts')
+            print(error, 'download_ts')
             pass
 
     @staticmethod
@@ -256,7 +256,7 @@ class DownloadManage:
                 task_data = self.wait_download_list.pop(0)
                 print('開始下載', task_data['animate_name'], task_data['episode_name'], task_data['id'])
                 self.download_list.append(task_data)
-                # self.tasks_dict.update({task_data['id']: asyncio.create_task(self.download_animate_script(task_data))})
+                self.tasks_dict.update({task_data['id']: asyncio.create_task(self.download_animate_script(task_data))})
             await asyncio.sleep(0.1)
 
     def main(self):

@@ -207,8 +207,6 @@ class Myself:
                 print('ServerClientConnectionError')
             await asyncio.sleep(1)
         print(time.time() - s1)
-        with open('m3u8.txt', 'w', encoding='utf-8') as f:
-            f.write(res_text)
         try:
             m3u8_obj = m3u8.loads(res_text)
             ts_list = []

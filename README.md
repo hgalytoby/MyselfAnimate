@@ -21,16 +21,14 @@
 
 # 目前狀況
 ## 只有基本下載與網頁觀看影片
-`Docker build` `Docker run` 我試過沒問題了
+`docker-compose up` 我試過沒問題了
 
 # 問題
 - 1.不知道 npm run serve 怎麼設定 websocket url，不然每次用 Docker 我都要改一下 websocket url。
 - 2.自己學 HTML CSS JavaScript 都還沒很熟我就直接學 Vue 了，遇到前端問題會卡很久。
-- 3.一堆資料與功能還沒串起來。
-- 4.`Docker compose` 我還沒研究，所以目前我把一大堆東西都塞在一個 Dockerfile 裡面。
-- 5.還沒試過 volume 動漫影片。
-- 6.版面設計 RWD 還在學習中。
-- 7.不知道何時完成。
+- 3.很多資料與功能還沒串起來。
+- 4.版面設計 RWD 還在學習中。
+- 5.不知道何時完成。
 
 
 

@@ -1,0 +1,10 @@
+FROM python:3.7-alpine
+WORKDIR /usr/src/app
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+RUN apk update && apk add python3-dev gcc libc-dev libffi-dev libwebp-dev
+RUN apk add --no-cache jpeg-dev zlib-dev ffmpeg
+RUN apk add --no-cache --virtual .build-deps build-base linux-headers 
+COPY requirements.txt .
+RUN python3 -m pip install --upgrade pip && pip install -r requirements.txt 
+COPY . /usr/src/app

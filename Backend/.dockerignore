@@ -10,7 +10,6 @@
 # 檔案
 *.pyc
 .env
-*.sqlite3
 
 # local env files
 .env.local
