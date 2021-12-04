@@ -30,4 +30,8 @@
 
 ## Docker
 - `docker build -t test .`
-- `docker run -p 48763:48763 test`
+- `docker run -p 44200:44200 test`
+- `docker compose up`
+- `docker compose build --no-cache`
+- `docker compose up --build`
+- `docker compose build`
