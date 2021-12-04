@@ -1,7 +1,7 @@
 import { useStore } from 'vuex'
 import { finishAnimateUpdateButtonMutation } from '../variables/myself'
-// const wsUrl = 'ws://127.0.0.1:8000/ws/'
-const wsUrl = `ws://${location.host}/ws/`
+
+const wsUrl = process.env.VUE_APP_WS === 'dev' ? 'ws://127.0.0.1:8000/ws/' : `ws://${location.host}/ws/`
 const socket = new WebSocket(wsUrl)
 
 export const sendSocketMessage = msg => {
