@@ -9,7 +9,8 @@
   <div class="row justify-content-center">
     <transition-group appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"
                       leave-active-class="animate__fadeOut">
-      <div class="card bg-transparent col-sm-5 col-lg-3 col-xxl-2 mb-3 mx-3" v-for="animate in finishAnimate.data" :key="animate.id">
+      <div class="card bg-transparent col-sm-5 col-lg-3 col-xxl-2 mb-3 mx-3" v-for="animate in finishAnimate.data"
+           :key="animate.id">
         <router-link :to="{
           name: 'MyselfAnimate',
           query: {
@@ -36,7 +37,7 @@
 
 <script>
 import { sendSocketMessage } from '../../hooks/useWS'
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import {
   finishAnimateAction, finishAnimateState,
   finishAnimateUpdateButtonState,
@@ -59,14 +60,12 @@ export default {
       const endMsgNum = finishAnimate.value.count > finishAnimate.value.page * 15 ? finishAnimate.value.page * 15 : finishAnimate.value.count
       return `顯示 ${startMsgNum} 到 ${endMsgNum} 共 ${finishAnimate.value.count} 個動漫`
     })
+    store.dispatch(`myself/${finishAnimateAction}`)
     const updateFinishAnimateData = () => {
       sendSocketMessage({
         action: 'myself_finish_animate_update'
       })
     }
-    onMounted(() => {
-      store.dispatch(`myself/${finishAnimateAction}`)
-    })
     const searchAnimate = () => {
       sendSocketMessage({
         action: 'search_myself_animate',

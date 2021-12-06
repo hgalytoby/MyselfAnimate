@@ -21,7 +21,7 @@
 
 <script>
 import { useStore } from 'vuex'
-import { onMounted, computed } from 'vue'
+import { computed } from 'vue'
 import { animateCollectState, animateCollectAction } from '../variables/myself'
 import useWindowsFocus from '../hooks/useWindowsFocus'
 import { startFancy } from '../tools'
@@ -32,9 +32,7 @@ export default {
     const store = useStore()
     const myselfAnimateCollect = computed(() => store.state.myself[animateCollectState])
     useWindowsFocus(store.dispatch, `myself/${animateCollectAction}`)
-    onMounted(() => {
-      store.dispatch(`myself/${animateCollectAction}`)
-    })
+    store.dispatch(`myself/${animateCollectAction}`)
     return {
       myselfAnimateCollect,
       startFancy

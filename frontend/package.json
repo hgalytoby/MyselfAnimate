@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@aacassandra/vue3-progressbar": "^1.0.3",
     "@dvuckovic/vue3-bootstrap-icons": "^1.0.4",
     "@fancyapps/ui": "^4.0.8",
     "animate.css": "^4.1.1",

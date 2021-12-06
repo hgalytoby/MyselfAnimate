@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { onMounted, computed } from 'vue'
+import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { finishListAction, finishListState } from '../../variables/myself'
 
@@ -41,9 +41,7 @@ export default {
   setup () {
     const store = useStore()
     const finishList = computed(() => store.state.myself[finishListState])
-    onMounted(() => {
-      store.dispatch(`myself/${finishListAction}`)
-    })
+    store.dispatch(`myself/${finishListAction}`)
     return {
       finishList
     }

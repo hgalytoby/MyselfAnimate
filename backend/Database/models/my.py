@@ -27,6 +27,7 @@ class HistoryModel(models.Model):
 
     class Meta:
         db_table = 'History'
+        ordering = ('-download_date',)
 
 
 class SystemModel(models.Model):

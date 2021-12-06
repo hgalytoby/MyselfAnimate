@@ -1,7 +1,10 @@
 import io
 import asyncio
+from typing import Union, List
+
 from django.core.files.images import ImageFile
 from django.core.paginator import Paginator
+from django.db.models import QuerySet
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
@@ -20,19 +23,19 @@ class MyPageNumberPagination(PageNumberPagination):
     page_size_query_param = 'size'
     max_page_size = 60
 
-    def get_paginated_response(self, data):
-        return Response(self.paginated(pag_obj=self.page, paginator=self.page.paginator, data=data))
+    def get_paginated_response(self, data: list):
+        return Response(self.get_paginated(page_obj=self.page, paginator=self.page.paginator, data=data))
 
     @classmethod
-    def paginated(cls, pag_obj, paginator, data):
+    def get_paginated(cls, page_obj, paginator, data: list):
         return {
-            'previous': pag_obj.previous_page_number() if pag_obj.has_previous() else None,
-            'page': pag_obj.number,
-            'next': pag_obj.next_page_number() if pag_obj.has_next() else None,
+            'previous': page_obj.previous_page_number() if page_obj.has_previous() else None,
+            'page': page_obj.number,
+            'next': page_obj.next_page_number() if page_obj.has_next() else None,
             'total_pages': paginator.num_pages,
             'count': paginator.count,
             'data': data,
-            'range': cls.page_range(page=pag_obj.number, total=paginator.num_pages)
+            'range': cls.page_range(page=page_obj.number, total=paginator.num_pages)
         }
 
     @staticmethod
@@ -86,7 +89,7 @@ class MyselfBase:
         """
         tasks = []
         for animate in data:
-            if not await database_sync_to_async(list)(FinishAnimateModel.objects.filter(url=animate['url'])):
+            if not await cls.filter_finish_animate(url=animate['url']):
                 tasks.append(asyncio.create_task(cls.create_finish_animate_data_task(animate)))
         if tasks:
             await asyncio.wait(tasks)
@@ -145,7 +148,7 @@ class MyselfBase:
 
     @classmethod
     @database_sync_to_async
-    def update_animate_episode_url(cls, new_url: str, model):
+    def update_animate_episode_url(cls, new_url: str, model: Union[QuerySet, AnimateEpisodeInfoModel]):
         """
         更新 AnimateEpisodeInfoModel 的 URL。
         :param new_url:
@@ -157,7 +160,7 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def get_download_animate_episode_data_list(download_models):
+    def get_download_animate_episode_data_list(download_models: Union[QuerySet, List[DownloadModel]]) -> list:
         data = []
         for download_model in download_models:
             ts_models = AnimateEpisodeTsModel.objects.select_related('owner').filter(owner_id=download_model.owner_id)
@@ -185,7 +188,7 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def get_total_download_animate_episode_models() -> list:
+    def get_total_download_animate_episode_models() -> Union[QuerySet, List[DownloadModel]]:
         """
         取得多個動漫集數資料與更新成下載中。
         :return:
@@ -194,7 +197,7 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def get_animate_episode_ts_count(**kwargs):
+    def get_animate_episode_ts_count(**kwargs) -> int:
         """
         取得動漫某一集 ts 總數量。
         :return:
@@ -355,9 +358,9 @@ class MyselfBase:
         :return:
         """
         paginator = Paginator(model, 15)
-        pag_obj = paginator.page(page if page else 1)
-        serializer = FinishAnimateSerializer(pag_obj, many=True)
-        return MyPageNumberPagination.paginated(pag_obj=pag_obj, paginator=paginator, data=serializer.data)
+        page_obj = paginator.page(page if page else 1)
+        serializer = FinishAnimateSerializer(page_obj, many=True)
+        return MyPageNumberPagination.paginated(page_obj=page_obj, paginator=paginator, data=serializer.data)
 
     @staticmethod
     @database_sync_to_async
@@ -382,9 +385,9 @@ class MyBase:
     @staticmethod
     def get_custom_log_data(model, serializer):
         paginator = Paginator(model, 15)
-        pag_obj = paginator.page(1)
-        serializer = serializer(pag_obj, many=True)
-        return MyPageNumberPagination.paginated(pag_obj=pag_obj, paginator=paginator, data=serializer.data)
+        page_obj = paginator.page(1)
+        serializer = serializer(page_obj, many=True)
+        return MyPageNumberPagination.get_paginated(page_obj=page_obj, paginator=paginator, data=serializer.data)
 
 
 class DB:

@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useStore } from 'vuex'
 import {
   weekAnimateAction,
@@ -54,9 +54,7 @@ export default {
     }
     const store = useStore()
     const weekAnimate = computed(() => store.state.myself[weekAnimateState])
-    onMounted(() => {
-      store.dispatch(`myself/${weekAnimateAction}`)
-    })
+    store.dispatch(`myself/${weekAnimateAction}`)
     return {
       weekAnimate,
       weekDict
