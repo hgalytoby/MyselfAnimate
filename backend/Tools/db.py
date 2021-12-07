@@ -206,7 +206,7 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def get_animate_episode_download_undone_id_list():
+    def get_animate_episode_download_undone_id_list() -> list:
         """
         取得正在下載的動漫陣列清單。
         :return:
@@ -218,7 +218,7 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def get_animate_episode_info_model(**kwargs):
+    def get_animate_episode_info_model(**kwargs) -> Union[QuerySet, AnimateEpisodeInfoModel]:
         """
         取得動漫單影集資料。
         取得動漫資料 model。
@@ -228,7 +228,7 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def filter_animate_episode_info_downloading_models(**kwargs):
+    def filter_animate_episode_info_downloading_models(**kwargs) -> Union[QuerySet, List[AnimateEpisodeInfoModel]]:
         """
         取得指定動漫有哪些集數正在下載的 model。
         :return:
@@ -237,7 +237,7 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def filter_animate_episode_ts_undone_uri_list(**kwargs):
+    def filter_animate_episode_ts_undone_uri_list(**kwargs) -> list:
         """
         取得指定動漫某一集尚未下載的 ts uri 陣列清單。
         :return:
@@ -249,7 +249,7 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def filter_animate_episode_ts_list(**kwargs):
+    def filter_animate_episode_ts_list(**kwargs) -> list:
         """
         篩選 ts 檔案並轉成 ffmpeg 合併 ts 需要的 txt 格式。
         :param kwargs:
@@ -262,7 +262,7 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def filter_finish_animate(**kwargs):
+    def filter_finish_animate(**kwargs) -> Union[QuerySet, List[FinishAnimateModel]]:
         """
         不加 list 有時候會出現 You cannot call this from an async context - use a thread or sync_to_async.
         :param kwargs:
@@ -288,7 +288,7 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def All_finish_animate():
+    def All_finish_animate()-> Union[QuerySet, List[FinishAnimateModel]]:
         """
         不加 list 有時候會出現 You cannot call this from an async context - use a thread or sync_to_async.
         :return:
@@ -350,7 +350,7 @@ class MyselfBase:
     # TODO 與 MyBase.get_custom_log_data 相似極大以後改善。
     @staticmethod
     @database_sync_to_async
-    def search_finish_animate_paginator(model, page):
+    def search_finish_animate_paginator(model, page: int):
         """
         搜尋完結動漫分頁器。
         :param model:
@@ -364,7 +364,7 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def switch_download(switch_data1, switch_data2):
+    def switch_download(switch_data1: dict, switch_data2: dict):
         DownloadModel.objects.filter(pk__in=[switch_data1['id'], switch_data2['id']]).delete()
         switch_data1['id'], switch_data2['id'] = switch_data2['id'], switch_data1['id']
         DownloadModel.objects.create(pk=switch_data1['id'], owner_id=switch_data1['episode_id'])
