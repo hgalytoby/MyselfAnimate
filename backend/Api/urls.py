@@ -1,6 +1,7 @@
 from django.urls import path
 from Api.views import WeekAnimateView, TestView, AnimateInfoView, FinishListView, FinishAnimateView, SystemView, \
     HistoryView, AnimateEpisodeInfoView, DownloadView, AnimateEpisodeDoneView, AnimateInfoEpisodeView, LogView
+from project.settings import DEBUG
 
 app_name = 'api'
 
@@ -26,4 +27,7 @@ test_api = [
     path('test/', TestView.as_view(), name='test'),
 ]
 
-urlpatterns = myself_api + my_api + test_api
+urlpatterns = myself_api + my_api
+
+if DEBUG:
+    urlpatterns += test_api

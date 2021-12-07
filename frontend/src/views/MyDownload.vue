@@ -20,55 +20,58 @@
       </div>
     </div>
   </div>
-  <div class="table-responsive">
-    <table class="table table-hover" style="word-wrap:break-word;word-break:break-all;white-space:normal;">
-      <thead>
-      <tr class="table">
-        <th scope="col" @click="clickCheckBoxAll">
-          <BootstrapIcon v-show="!checkBoxAll" icon="square"/>
-          <BootstrapIcon class="download-checked" v-show="checkBoxAll" icon="check2-square"/>
-        </th>
-        <th scope="col">播放</th>
-        <th scope="col">下載順序</th>
-        <th scope="col">動漫名字</th>
-        <th scope="col">集數</th>
-        <th scope="col">狀況</th>
-        <th scope="col">下載進度</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr class="align-middle" v-for="(animate, index) of downloadMyselfAnimateArray" :key="animate.id">
-        <td>
-          <BootstrapIcon v-show="!filterDownloadCheckBox(animate.id)" @click="clickDownloadCheckBox(animate.id)"
-                         icon="square"/>
-          <BootstrapIcon class="download-checked" v-show="filterDownloadCheckBox(animate.id)"
-                         @click="clickDownloadCheckBox(animate.id)" icon="check2-square"/>
-        </td>
-        <td class="video-play">
-          <BootstrapIcon v-if="animate.done" icon="play-btn" @click="startFancy(animate.video)"/>
-          <BootstrapIcon v-else icon="pause-circle"/>
-        </td>
-        <td>
-          <BootstrapIcon class="order me-3" @click="orderUpOrDown('up', index)" icon="arrow-up-circle"/>
-          <BootstrapIcon class="order" @click="orderUpOrDown('down', index)" icon="arrow-down-circle"/>
-        </td>
-        <td>{{ animate.animate_name }}</td>
-        <td>{{ animate.episode_name }}</td>
-        <td>{{ animate.status }}</td>
-        <td>
-          <div class="progress">
-            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
-                 :aria-valuenow="computeProgressRate(animate.count, animate.ts_count)"
-                 aria-valuemin="0" aria-valuemax="100"
-                 :style="`width: ${computeProgressRate(animate.count, animate.ts_count)}%`">
-              {{ computeProgressRate(animate.count, animate.ts_count) }}%
+  <transition appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"
+              leave-active-class="animate__fadeOut">
+    <div class="table-responsive">
+      <table class="table table-hover" style="word-wrap:break-word;word-break:break-all;white-space:normal;">
+        <thead>
+        <tr class="table">
+          <th scope="col" @click="clickCheckBoxAll">
+            <BootstrapIcon v-show="!checkBoxAll" icon="square"/>
+            <BootstrapIcon class="download-checked" v-show="checkBoxAll" icon="check2-square"/>
+          </th>
+          <th scope="col">播放</th>
+          <th scope="col">下載順序</th>
+          <th scope="col">動漫名字</th>
+          <th scope="col">集數</th>
+          <th scope="col">狀況</th>
+          <th scope="col">下載進度</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="align-middle" v-for="(animate, index) of downloadMyselfAnimateArray" :key="animate.id">
+          <td>
+            <BootstrapIcon v-show="!filterDownloadCheckBox(animate.id)" @click="clickDownloadCheckBox(animate.id)"
+                           icon="square"/>
+            <BootstrapIcon class="download-checked" v-show="filterDownloadCheckBox(animate.id)"
+                           @click="clickDownloadCheckBox(animate.id)" icon="check2-square"/>
+          </td>
+          <td class="video-play">
+            <BootstrapIcon v-if="animate.done" icon="play-btn" @click="startFancy(animate.video)"/>
+            <BootstrapIcon v-else icon="pause-circle"/>
+          </td>
+          <td>
+            <BootstrapIcon class="order me-3" @click="orderUpOrDown('up', index)" icon="arrow-up-circle"/>
+            <BootstrapIcon class="order" @click="orderUpOrDown('down', index)" icon="arrow-down-circle"/>
+          </td>
+          <td>{{ animate.animate_name }}</td>
+          <td>{{ animate.episode_name }}</td>
+          <td>{{ animate.status }}</td>
+          <td>
+            <div class="progress">
+              <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                   :aria-valuenow="computeProgressRate(animate.count, animate.ts_count)"
+                   aria-valuemin="0" aria-valuemax="100"
+                   :style="`width: ${computeProgressRate(animate.count, animate.ts_count)}%`">
+                {{ computeProgressRate(animate.count, animate.ts_count) }}%
+              </div>
             </div>
-          </div>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-  </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </transition>
 </template>
 
 <script>
@@ -99,6 +102,7 @@ export default {
       }
       return false
     })
+
     function computeProgressRate (count, tsCount) {
       const result = parseInt(count / tsCount * 100)
       return !isNaN(result) ? result : 0
