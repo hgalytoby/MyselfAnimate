@@ -24,7 +24,9 @@ class Manage:
             else:
                 page_data = await Myself.finish_animate_page_data(url=FinishAnimateBaseUrl.format(page))
             await DB.Myself.create_many_finish_animate(data=page_data)
+
         await DB.My.create_log(msg='Myself 完結動漫更新完成', action='updated')
+        await asyncio.sleep(5)
         await self.send(
             text_data=json.dumps({'msg': '更新完成', 'action': 'myself_finish_animate_update', 'updating': False}))
 
@@ -69,10 +71,11 @@ class Manage:
         :param data: dict -> 前端傳來要搜尋動漫的資料。
         :return:
         """
-        await DB.My.create_log(msg='Myself 搜尋動漫', action='search')
         if data['msg']:
+            await DB.My.create_log(msg=f'Myself 搜尋{data["msg"]}動漫', action='search')
             model = await DB.Myself.filter_finish_animate(name__contains=data['msg'])
         else:
+            await DB.My.create_log(msg=f'Myself 搜尋動漫', action='search')
             model = await DB.Myself.All_finish_animate()
         serializer_data = await DB.Myself.search_finish_animate_paginator(model=model, page=data.get('page'))
         await self.send(text_data=json.dumps({'data': serializer_data, 'action': data['action']}))

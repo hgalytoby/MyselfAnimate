@@ -60,11 +60,11 @@
           <td>
             <div class="progress">
               <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
-                   :aria-valuenow="computeProgressRate(animate.count, animate.ts_count)"
+                   :aria-valuenow="animate.progressValue"
                    aria-valuemin="0" aria-valuemax="100"
-                   :style="`width: ${computeProgressRate(animate.count, animate.ts_count)}%`">
-                {{ computeProgressRate(animate.count, animate.ts_count) }}%
+                   :style="`width: ${animate.progressValue}%`">
               </div>
+              <span class="progress-value" :style="{color: animate.progressColor}">{{ animate.progressValue }}%</span>
             </div>
           </td>
         </tr>
@@ -102,11 +102,6 @@ export default {
       }
       return false
     })
-
-    function computeProgressRate (count, tsCount) {
-      const result = parseInt(count / tsCount * 100)
-      return !isNaN(result) ? result : 0
-    }
 
     function deleteAnimate () {
       sendSocketMessage({
@@ -152,7 +147,6 @@ export default {
 
     return {
       downloadMyselfAnimateArray,
-      computeProgressRate,
       startFancy,
       clearFinishDownload,
       deleteAnimate,
@@ -180,5 +174,17 @@ export default {
 
   .download-checked {
     font-size: 18px;
+  }
+
+  .progress {
+    position: relative;
+  }
+
+  .progress span {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    z-index: 2;
   }
 </style>

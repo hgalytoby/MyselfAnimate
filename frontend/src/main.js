@@ -8,7 +8,7 @@ import BootstrapIcon from '@dvuckovic/vue3-bootstrap-icons'
 import VueProgressBar from '@aacassandra/vue3-progressbar'
 
 const options = {
-  color: '#7fc7fd',
+  color: '#478aff',
   failedColor: '#ff0000',
   thickness: '4px',
   transition: {

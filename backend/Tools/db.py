@@ -264,7 +264,6 @@ class MyselfBase:
     @database_sync_to_async
     def filter_finish_animate(**kwargs) -> Union[QuerySet, List[FinishAnimateModel]]:
         """
-        不加 list 有時候會出現 You cannot call this from an async context - use a thread or sync_to_async.
         :param kwargs:
         :return:
         """
@@ -288,7 +287,7 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def All_finish_animate()-> Union[QuerySet, List[FinishAnimateModel]]:
+    def All_finish_animate() -> Union[QuerySet, List[FinishAnimateModel]]:
         """
         不加 list 有時候會出現 You cannot call this from an async context - use a thread or sync_to_async.
         :return:
@@ -360,7 +359,7 @@ class MyselfBase:
         paginator = Paginator(model, 15)
         page_obj = paginator.page(page if page else 1)
         serializer = FinishAnimateSerializer(page_obj, many=True)
-        return MyPageNumberPagination.paginated(page_obj=page_obj, paginator=paginator, data=serializer.data)
+        return MyPageNumberPagination.get_paginated(page_obj=page_obj, paginator=paginator, data=serializer.data)
 
     @staticmethod
     @database_sync_to_async

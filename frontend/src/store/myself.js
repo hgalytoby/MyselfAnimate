@@ -42,6 +42,7 @@ export const state = {
   [checkboxAnimateEpisodeState]: [],
   [finishAnimateState]: [],
   [animateCollectState]: [],
+  [downloadMyselfAnimateState]: [],
   searchTimer: null
 }
 
@@ -124,7 +125,12 @@ export const getters = {
     return state[weekAnimateState]
   },
   [downloadMyselfAnimateGetters] (state) {
-    return state[downloadMyselfAnimateState]
+    return state[downloadMyselfAnimateState].map((item) => {
+      const progress = parseInt(item.count / item.ts_count * 100)
+      item.progressValue = !isNaN(progress) ? progress : 0
+      item.progressColor = progress > 50 ? 'white' : 'black'
+      return item
+    })
   }
 }
 
