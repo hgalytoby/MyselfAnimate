@@ -34,4 +34,7 @@ export const connectSocket = () => {
   socket.onerror = function (err) {
     console.log('error', err)
   }
+  socket.onclose = function (err) {
+    console.log('onclose', err)
+  }
 }

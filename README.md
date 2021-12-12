@@ -1,6 +1,7 @@
 # 現在還在開發中，隨時都可能放棄。
 
 ## 目標是想做一個整合下載的網頁
+- 我現在只有 [Myself](https://myself-bbs.com/portal.php) 與 [Anime1.me](https://anime1.me/) 不需登入會員就能下載 `720p` 影片。
 - 前端使用 Vue3
 - 後端使用 Django
 - 因為只給自己使用的，所以資料庫用 Sqlite
