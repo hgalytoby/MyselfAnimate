@@ -3,7 +3,7 @@ import asyncio
 from Tools.db import DB
 from Tools.myself import Myself
 from Tools.download import DownloadManage
-from Tools.urls import FinishAnimateUrl, FinishAnimateBaseUrl
+from Tools.urls import MyselfFinishAnimateUrl, MyselfFinishAnimateBaseUrl
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 download_manage = DownloadManage()
@@ -16,13 +16,13 @@ class Manage:
         :return:
         """
         await DB.My.create_log(msg='Myself 更新完結動漫', action='update')
-        total_page_data = await Myself.finish_animate_total_page(url=FinishAnimateUrl, get_res_text=True)
+        total_page_data = await Myself.finish_animate_total_page(url=MyselfFinishAnimateUrl, get_res_text=True)
         for page in range(1, total_page_data['total_page'] + 1):
             if page == 1:
-                page_data = await Myself.finish_animate_page_data(url=FinishAnimateBaseUrl.format(page),
+                page_data = await Myself.finish_animate_page_data(url=MyselfFinishAnimateBaseUrl.format(page),
                                                                   res_text=total_page_data['res_text'])
             else:
-                page_data = await Myself.finish_animate_page_data(url=FinishAnimateBaseUrl.format(page))
+                page_data = await Myself.finish_animate_page_data(url=MyselfFinishAnimateBaseUrl.format(page))
             await DB.Myself.create_many_finish_animate(data=page_data)
 
         await DB.My.create_log(msg='Myself 完結動漫更新完成', action='updated')

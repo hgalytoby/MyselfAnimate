@@ -2,3 +2,4 @@ from .myself import WeekAnimateView, AnimateInfoView, FinishListView, FinishAnim
     DownloadView, AnimateEpisodeDoneView, AnimateInfoEpisodeView
 from .test import TestView
 from .my import SystemView, HistoryView, LogView
+from .anime1 import HomeAnimateView

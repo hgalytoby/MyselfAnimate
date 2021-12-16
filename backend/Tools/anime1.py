@@ -3,15 +3,17 @@ import re
 import requests
 import asyncio
 import aiohttp
+from bs4 import BeautifulSoup
 
-from Tools.tools import aiohttp_text
+from Tools.tools import aiohttp_text, badname
+from Tools.urls import Anime1AnimateUrl
+
+headers = {
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36'
+}
 
 
 def request_version():
-    headers = {
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36'
-    }
-
     r = requests.get(url='https://v.anime1.me/watch?v=MvAdi&autoplay=1', headers=headers)
     api_data = re.findall(r"send\S{2}(.*?)[']", r.text)[0]
     api_key, api_value = api_data.split('=')
@@ -28,9 +30,6 @@ def request_version():
 
 
 async def main():
-    headers = {
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36'
-    }
     _timeout = aiohttp.client.ClientTimeout(sock_connect=10, sock_read=10)
     async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=True)) as session:
         async with session.get(url='https://v.anime1.me/watch?v=MvAdi&autoplay=1', headers=headers,
@@ -61,6 +60,32 @@ async def main():
                     if not chunk:
                         break
                     fd.write(chunk)
+
+
+class Anime1:
+    @staticmethod
+    def get_home_animate_data() -> list:
+        data = []
+        res = requests.get(url=Anime1AnimateUrl, headers=headers)
+        if res.ok:
+            html = BeautifulSoup(res.text, 'lxml')
+            title_array = []
+            for title_element in html.find_all('tr', class_='row-1 odd'):
+                for title in title_element.find_all('th'):
+                    title_array.append(title.text)
+            title_array_len = len(title_array)
+            for elements in html.find_all('tbody', class_='row-hover'):
+                _ = {}
+                for index, element in enumerate(elements.find_all('td')):
+                    title_index = index % title_array_len
+                    text = element.text
+                    if title_index == 0:
+                        text = badname(text)
+                    _.update({title_array[title_index]: text})
+                    if title_index == 4:
+                        data.append(_)
+                        _ = {}
+        return data
 
 
 if __name__ == '__main__':
