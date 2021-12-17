@@ -1,5 +1,7 @@
 # 現在還在開發中，隨時都可能放棄。
-本來應該要開其他分支進行開發，但因為在其他分支 push 程式 github 不會顯示我今天有 commit，因我不想斷 commit 連續天數，所以我就 push master。
+我從 Traffic 上看到有人在 clone 此專案，所以我在此說明一下。
+
+本來要開其他分支進行開發，但因為在其他分支 push 程式 github 不會顯示我今天有 commit，因我不想斷 commit 連續天數，所以我就 push master。
 
 正因為我都 push master，所以 clone 下來運行可能會發生程式錯誤的關係導致無法運行是正常的。
 
