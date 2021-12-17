@@ -79,9 +79,12 @@ class Anime1:
                 for index, element in enumerate(elements.find_all('td')):
                     title_index = index % title_array_len
                     text = element.text
-                    if title_index == 0:
-                        text = badname(text)
                     _.update({title_array[title_index]: text})
+                    if title_index == 0:
+                        _ = {
+                            title_array[title_index]: badname(text),
+                            'url': f'{Anime1AnimateUrl}{element.find("a")["href"]}'
+                        }
                     if title_index == 4:
                         data.append(_)
                         _ = {}
@@ -91,4 +94,5 @@ class Anime1:
 if __name__ == '__main__':
     # asyncio.run(main())
     # request_version()
+    Anime1.get_home_animate_data()
     pass
