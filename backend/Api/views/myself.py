@@ -1,4 +1,6 @@
 from django.db.models import Prefetch
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -14,6 +16,7 @@ from Tools.urls import MyselfUrl
 
 
 class WeekAnimateView(APIView):
+    @method_decorator(cache_page(300))
     def get(self, request):
         data = Myself.week_animate()
         if data:
@@ -22,6 +25,7 @@ class WeekAnimateView(APIView):
 
 
 class AnimateInfoView(APIView):
+    @method_decorator(cache_page(300))
     def get(self, request):
         url = request.query_params.get('url')
         if not url:
@@ -37,6 +41,7 @@ class AnimateInfoView(APIView):
 
 
 class FinishListView(APIView):
+    @method_decorator(cache_page(300))
     def get(self, request):
         data = Myself.finish_list()
         if data:

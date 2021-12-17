@@ -1,5 +1,6 @@
 import io
 import asyncio
+import json
 from typing import Union, List
 
 from django.core.files.images import ImageFile
@@ -14,7 +15,7 @@ from channels.db import database_sync_to_async
 from Database.models import myself, my
 from django.core.files.base import ContentFile
 from Tools.tools import aiohttp_bytes, use_io_get_image_format
-from project.settings import MEDIA_PATH, BASE_DIR
+from django.core.cache import caches
 
 
 class MyPageNumberPagination(PageNumberPagination):
@@ -162,7 +163,8 @@ class MyselfBase:
     def get_download_animate_episode_data_list(download_models: Union[QuerySet, List[myself.DownloadModel]]) -> list:
         data = []
         for download_model in download_models:
-            ts_models = myself.AnimateEpisodeTsModel.objects.select_related('owner').filter(owner_id=download_model.owner_id)
+            ts_models = myself.AnimateEpisodeTsModel.objects.select_related('owner').filter(
+                owner_id=download_model.owner_id)
             ts_count = ts_models.count()
             ts_undone_models = ts_models.filter(done=False)
             ts_undone_count = ts_undone_models.count()
@@ -192,7 +194,8 @@ class MyselfBase:
         取得多個動漫集數資料與更新成下載中。
         :return:
         """
-        return myself.DownloadModel.objects.select_related('owner').select_related('owner__owner').filter(owner__done=False)
+        return myself.DownloadModel.objects.select_related('owner').select_related('owner__owner').filter(
+            owner__done=False)
 
     @staticmethod
     @database_sync_to_async
@@ -227,7 +230,8 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def filter_animate_episode_info_downloading_models(**kwargs) -> Union[QuerySet, List[myself.AnimateEpisodeInfoModel]]:
+    def filter_animate_episode_info_downloading_models(**kwargs) -> Union[
+        QuerySet, List[myself.AnimateEpisodeInfoModel]]:
         """
         取得指定動漫有哪些集數正在下載的 model。
         :return:
@@ -388,6 +392,22 @@ class MyBase:
         return MyPageNumberPagination.get_paginated(page_obj=page_obj, paginator=paginator, data=serializer.data)
 
 
+class CacheBase:
+    @staticmethod
+    def get_cache_data(key: str):
+        cache_db = caches['default']
+        result = cache_db.get(key)
+        if result:
+            return json.loads(result)
+        return result
+
+    @staticmethod
+    def set_cache_data(key: str, data: str, timeout: int):
+        cache_db = caches['default']
+        cache_db.set(key, data, timeout=timeout)
+
+
 class DB:
     Myself = MyselfBase
     My = MyBase
+    Cache = CacheBase
