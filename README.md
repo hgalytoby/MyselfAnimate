@@ -1,4 +1,8 @@
 # 現在還在開發中，隨時都可能放棄。
+本來應該要開其他分支進行開發，但因為在其他分支 push 程式 github 不會顯示我今天有 commit，因我不想斷 commit 連續天數，所以我就 push master。
+
+正因為我都 push master，所以 clone 下來運行可能會發生程式錯誤的關係導致無法運行是正常的。
+
 
 ## 目標是想做一個整合下載的網頁
 - 我現在只有 [Myself](https://myself-bbs.com/portal.php) 與 [Anime1.me](https://anime1.me/) 不需登入會員就能下載 `720p` 影片。
