@@ -31,7 +31,7 @@ class AnimateInfoModel(models.Model):
     url = models.URLField(unique=True)
 
     class Meta:
-        db_table = 'AnimateInfo'
+        db_table = 'MyselfAnimateInfo'
 
 
 class FinishAnimateModel(models.Model):
@@ -68,7 +68,7 @@ class AnimateEpisodeInfoModel(models.Model):
     owner = models.ForeignKey(AnimateInfoModel, on_delete=models.CASCADE, related_name='episode_info_model')
 
     class Meta:
-        db_table = 'AnimateEpisodeInfo'
+        db_table = 'MyselfAnimateEpisodeInfo'
 
     @database_sync_to_async
     def get_animate_name(self):
@@ -99,7 +99,7 @@ class AnimateEpisodeTsModel(models.Model):
     owner = models.ForeignKey(AnimateEpisodeInfoModel, on_delete=models.CASCADE, related_name='ts_model')
 
     class Meta:
-        db_table = 'AnimateEpisodeTs'
+        db_table = 'MyselfAnimateEpisodeTs'
 
 
 class DownloadModel(models.Model):

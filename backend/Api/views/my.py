@@ -2,8 +2,8 @@ from rest_framework.generics import ListAPIView, ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from Api.serializers import SystemSerializer, HistorySerializer
-from Database.models import SystemModel, HistoryModel
+from Api.serializers.my import SystemSerializer, HistorySerializer
+from Database.models.my import SystemModel, HistoryModel
 from Tools.db import DB, MyPageNumberPagination
 
 

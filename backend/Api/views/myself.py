@@ -3,13 +3,14 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, DestroyAPIView
-from Api.serializers import FinishAnimateSerializer, AnimateEpisodeInfoSerializer, AnimateInfoSerializer, \
+from Api.serializers.myself import FinishAnimateSerializer, AnimateEpisodeInfoSerializer, AnimateInfoSerializer, \
     DownloadSerializer
-from Database.models import FinishAnimateModel, AnimateEpisodeInfoModel, AnimateEpisodeTsModel, DownloadModel, \
+from Database.models.myself import FinishAnimateModel, AnimateEpisodeInfoModel, AnimateEpisodeTsModel, DownloadModel, \
     AnimateInfoModel
 from Tools.db import DB, MyPageNumberPagination
 from Tools.myself import Myself
 from Tools.tools import req_bytes
+from Tools.urls import MyselfUrl
 
 
 class WeekAnimateView(APIView):
@@ -23,7 +24,9 @@ class WeekAnimateView(APIView):
 class AnimateInfoView(APIView):
     def get(self, request):
         url = request.query_params.get('url')
-        animate_url = f'https://myself-bbs.com/{url}'
+        if not url:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        animate_url = f'{MyselfUrl}{url}'
         data = Myself.animate_info(url=animate_url)
         image = req_bytes(url=data['image'])
         video = data.pop('video')

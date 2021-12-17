@@ -83,11 +83,31 @@ class Anime1:
                     if title_index == 0:
                         _ = {
                             title_array[title_index]: badname(text),
-                            'url': f'{Anime1AnimateUrl}{element.find("a")["href"]}'
+                            'url': element.find("a")["href"]
                         }
                     if title_index == 4:
                         data.append(_)
                         _ = {}
+        return data
+
+    @staticmethod
+    def get_animate_info(url: str) -> list:
+        data = []
+        res = requests.get(url=url, headers=headers)
+        if res.ok:
+            html = BeautifulSoup(res.text, 'lxml')
+            for elements in html.find_all('article'):
+                _ = {}
+                for index, element in enumerate(elements.find_all('time')):
+                    if index == 0:
+                        _.update({'published_updated_date': element.text})
+                    else:
+                        _.update({'updated': element.text})
+                _.update({
+                    'name': elements.find('h2', class_='entry-title').text.strip(),
+                    'video_url': elements.find('button', class_='loadvideo')['data-src']
+                })
+                data.append(_)
         return data
 
 

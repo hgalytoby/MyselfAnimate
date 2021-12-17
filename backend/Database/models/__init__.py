@@ -1,2 +1,1 @@
-from .myself import AnimateEpisodeInfoModel, AnimateEpisodeTsModel, AnimateInfoModel, FinishAnimateModel, DownloadModel
-from .my import HistoryModel, SystemModel
+from . import my, myself

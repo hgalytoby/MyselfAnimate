@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from Database.models import HistoryModel, SystemModel
+from Database.models.my import HistoryModel, SystemModel
 
 
 class HistorySerializer(serializers.ModelSerializer):
