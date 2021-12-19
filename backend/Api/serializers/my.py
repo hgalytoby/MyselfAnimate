@@ -1,18 +1,18 @@
 from rest_framework import serializers
-from Database.models.my import HistoryModel, SystemModel
+from Database.models.my import MyHistoryModel, MySystemModel
 
 
-class HistorySerializer(serializers.ModelSerializer):
+class MyHistorySerializer(serializers.ModelSerializer):
     download_date = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", required=False, read_only=True)
 
     class Meta:
-        model = HistoryModel
+        model = MyHistoryModel
         fields = '__all__'
 
 
-class SystemSerializer(serializers.ModelSerializer):
+class MySystemSerializer(serializers.ModelSerializer):
     datetime = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", required=False, read_only=True)
 
     class Meta:
-        model = SystemModel
+        model = MySystemModel
         fields = '__all__'

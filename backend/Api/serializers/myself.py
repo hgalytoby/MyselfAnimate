@@ -1,19 +1,19 @@
 from rest_framework import serializers
-from Database.models.myself import FinishAnimateModel, AnimateEpisodeInfoModel, AnimateInfoModel, DownloadModel
+from Database.models.myself import MyselfFinishAnimateModel, MyselfAnimateEpisodeInfoModel, MyselfAnimateInfoModel, MyselfDownloadModel
 
 
-class FinishAnimateSerializer(serializers.ModelSerializer):
+class MyselfFinishAnimateSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
 
     def get_image(self, instance):
         return f'/static/uploads{instance.image.url}'
 
     class Meta:
-        model = FinishAnimateModel
+        model = MyselfFinishAnimateModel
         fields = ('id', 'name', 'url', 'image', 'info')
 
 
-class AnimateEpisodeInfoSerializer(serializers.ModelSerializer):
+class MyselfAnimateEpisodeInfoSerializer(serializers.ModelSerializer):
     name = serializers.CharField(read_only=True)
     url = serializers.URLField(read_only=True)
     video = serializers.SerializerMethodField()
@@ -24,23 +24,23 @@ class AnimateEpisodeInfoSerializer(serializers.ModelSerializer):
         return None
 
     class Meta:
-        model = AnimateEpisodeInfoModel
+        model = MyselfAnimateEpisodeInfoModel
         fields = ('id', 'name', 'url', 'done', 'video')
 
 
-class AnimateInfoSerializer(serializers.ModelSerializer):
+class MyselfAnimateInfoSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
-    episode_info_model = AnimateEpisodeInfoSerializer(many=True, read_only=True)
+    episode_info_model = MyselfAnimateEpisodeInfoSerializer(many=True, read_only=True)
 
     def get_image(self, instance):
         return f'/static/uploads{instance.image.url}'
 
     class Meta:
-        model = AnimateInfoModel
+        model = MyselfAnimateInfoModel
         fields = '__all__'
 
 
-class DownloadSerializer(serializers.ModelSerializer):
+class MyselfDownloadSerializer(serializers.ModelSerializer):
     class Meta:
-        model = DownloadModel
+        model = MyselfDownloadModel
         fields = ('id',)

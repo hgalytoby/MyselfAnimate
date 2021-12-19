@@ -1,0 +1,53 @@
+from channels.db import database_sync_to_async
+from django.db import models
+
+
+def upload_image_path(instance, filename):
+    """
+    """
+    return f'{instance.from_website}/{instance.name}/image/{instance.size}_{filename}'
+
+
+def upload_ts_path(instance, filename):
+    """
+    """
+    return f'{instance.owner.owner.from_website}/{instance.owner.owner.name}/video/ts/{instance.owner.name}/{filename}'
+
+
+def upload_video_path(instance, filename):
+    """
+    """
+    return f'{instance.owner.from_website}/{instance.owner.name}/video/{filename}'
+
+
+class BaseAnimateEpisodeInfoModel(models.Model):
+    """
+    name: 動漫名字
+    url: 影片連結
+    done: 是否下載完成
+    video: 影片位置
+    """
+    name = models.CharField(max_length=64)
+    url = models.URLField()
+    done = models.BooleanField(default=False)
+    video = models.FileField(upload_to=upload_video_path, null=True, blank=True)
+
+    class Meta:
+        abstract = True
+
+    @database_sync_to_async
+    def get_animate_name(self):
+        """
+        在異步情況下取得動漫名字。
+        :return:
+        """
+        return self.owner.name
+
+    @database_sync_to_async
+    def get_from_website(self):
+        """
+        在異步情況下取得哪個網站的動漫。
+        :return:
+        """
+        return self.owner.from_website
+

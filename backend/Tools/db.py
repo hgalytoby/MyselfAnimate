@@ -9,13 +9,17 @@ from django.db.models import QuerySet
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
-from Api.serializers import myself, my
+from Api.serializers import MyselfFinishAnimateSerializer
 from channels.db import database_sync_to_async
 
-from Database.models import myself, my
 from django.core.files.base import ContentFile
+
+from Database.models import MyselfFinishAnimateModel, MyselfAnimateEpisodeInfoModel, MyselfAnimateEpisodeTsModel, \
+    MyselfDownloadModel, MyselfAnimateInfoModel, MyHistoryModel, MySystemModel
 from Tools.tools import aiohttp_bytes, use_io_get_image_format
 from django.core.cache import caches
+
+from project.settings import MEDIA_PATH, BASE_DIR
 
 
 class MyPageNumberPagination(PageNumberPagination):
@@ -63,7 +67,7 @@ class MyselfBase:
         :return:
         """
         image_type = use_io_get_image_format(animate['image'])
-        model = myself.FinishAnimateModel()
+        model = MyselfFinishAnimateModel()
         model.name = animate['name']
         model.url = animate['url']
         model.info = animate['info']
@@ -102,7 +106,7 @@ class MyselfBase:
         :return:
         """
         for episode in video:
-            myself.AnimateEpisodeInfoModel.objects.get_or_create(name=episode['name'], **kwargs, defaults={
+            MyselfAnimateEpisodeInfoModel.objects.get_or_create(name=episode['name'], **kwargs, defaults={
                 'name': episode['name'],
                 'url': episode['url'],
                 'owner': kwargs.get('owner'),
@@ -118,8 +122,8 @@ class MyselfBase:
         """
         models = []
         for ts_uri in ts_list:
-            models.append(myself.AnimateEpisodeTsModel(uri=ts_uri, **kwargs))
-        myself.AnimateEpisodeTsModel.objects.bulk_create(models)
+            models.append(MyselfAnimateEpisodeTsModel(uri=ts_uri, **kwargs))
+        MyselfAnimateEpisodeTsModel.objects.bulk_create(models)
 
     @staticmethod
     @database_sync_to_async
@@ -130,7 +134,7 @@ class MyselfBase:
         """
         data = []
         for owner_id in owner_id_list:
-            data.append(myself.DownloadModel.objects.create(owner_id=owner_id))
+            data.append(MyselfDownloadModel.objects.create(owner_id=owner_id))
         return data
 
     @staticmethod
@@ -143,12 +147,12 @@ class MyselfBase:
         """
         image_type = use_io_get_image_format(image)
         data['image'] = ImageFile(io.BytesIO(image), name=f'{data["name"]}.{image_type}')
-        model, created = myself.AnimateInfoModel.objects.update_or_create(url=data['url'], defaults=data)
+        model, created = MyselfAnimateInfoModel.objects.update_or_create(url=data['url'], defaults=data)
         return model
 
     @classmethod
     @database_sync_to_async
-    def update_animate_episode_url(cls, new_url: str, model: Union[QuerySet, myself.AnimateEpisodeInfoModel]):
+    def update_animate_episode_url(cls, new_url: str, model: Union[QuerySet, MyselfAnimateEpisodeInfoModel]):
         """
         更新 AnimateEpisodeInfoModel 的 URL。
         :param new_url:
@@ -160,10 +164,10 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def get_download_animate_episode_data_list(download_models: Union[QuerySet, List[myself.DownloadModel]]) -> list:
+    def get_download_animate_episode_data_list(download_models: Union[QuerySet, List[MyselfDownloadModel]]) -> list:
         data = []
         for download_model in download_models:
-            ts_models = myself.AnimateEpisodeTsModel.objects.select_related('owner').filter(
+            ts_models = MyselfAnimateEpisodeTsModel.objects.select_related('owner').filter(
                 owner_id=download_model.owner_id)
             ts_count = ts_models.count()
             ts_undone_models = ts_models.filter(done=False)
@@ -189,12 +193,12 @@ class MyselfBase:
 
     @staticmethod
     @database_sync_to_async
-    def get_total_download_animate_episode_models() -> Union[QuerySet, List[myself.DownloadModel]]:
+    def get_total_download_animate_episode_models() -> Union[QuerySet, List[MyselfDownloadModel]]:
         """
         取得多個動漫集數資料與更新成下載中。
         :return:
         """
-        return myself.DownloadModel.objects.select_related('owner').select_related('owner__owner').filter(
+        return MyselfDownloadModel.objects.select_related('owner').select_related('owner__owner').filter(
             owner__done=False)
 
     @staticmethod
@@ -204,7 +208,7 @@ class MyselfBase:
         取得動漫某一集 ts 總數量。
         :return:
         """
-        return myself.AnimateEpisodeTsModel.objects.filter(**kwargs).count()
+        return MyselfAnimateEpisodeTsModel.objects.filter(**kwargs).count()
 
     @staticmethod
     @database_sync_to_async
@@ -214,29 +218,29 @@ class MyselfBase:
         :return:
         """
         data = []
-        for model in myself.DownloadModel.objects.all():
+        for model in MyselfDownloadModel.objects.all():
             data.append(model.id)
         return data
 
     @staticmethod
     @database_sync_to_async
-    def get_animate_episode_info_model(**kwargs) -> Union[QuerySet, myself.AnimateEpisodeInfoModel]:
+    def get_animate_episode_info_model(**kwargs) -> Union[QuerySet, MyselfAnimateEpisodeInfoModel]:
         """
         取得動漫單影集資料。
         取得動漫資料 model。
         :return:
         """
-        return myself.AnimateEpisodeInfoModel.objects.get(**kwargs)
+        return MyselfAnimateEpisodeInfoModel.objects.get(**kwargs)
 
     @staticmethod
     @database_sync_to_async
     def filter_animate_episode_info_downloading_models(**kwargs) -> Union[
-        QuerySet, List[myself.AnimateEpisodeInfoModel]]:
+        QuerySet, List[MyselfAnimateEpisodeInfoModel]]:
         """
         取得指定動漫有哪些集數正在下載的 model。
         :return:
         """
-        return list(myself.AnimateEpisodeInfoModel.objects.filter(download=True, done=False, **kwargs))
+        return list(MyselfAnimateEpisodeInfoModel.objects.filter(download=True, done=False, **kwargs))
 
     @staticmethod
     @database_sync_to_async
@@ -246,7 +250,7 @@ class MyselfBase:
         :return:
         """
         data = []
-        for model in myself.AnimateEpisodeTsModel.objects.filter(done=False, **kwargs):
+        for model in MyselfAnimateEpisodeTsModel.objects.filter(done=False, **kwargs):
             data.append(model.uri)
         return data
 
@@ -259,18 +263,18 @@ class MyselfBase:
         :return:
         """
         data = []
-        for model in myself.AnimateEpisodeTsModel.objects.filter(**kwargs):
+        for model in MyselfAnimateEpisodeTsModel.objects.filter(**kwargs):
             data.append(f"file '{BASE_DIR}{MEDIA_PATH}/{model.ts}'")
         return data
 
     @staticmethod
     @database_sync_to_async
-    def filter_finish_animate(**kwargs) -> Union[QuerySet, List[myself.FinishAnimateModel]]:
+    def filter_finish_animate(**kwargs) -> Union[QuerySet, List[MyselfFinishAnimateModel]]:
         """
         :param kwargs:
         :return:
         """
-        return list(myself.FinishAnimateModel.objects.filter(**kwargs))
+        return list(MyselfFinishAnimateModel.objects.filter(**kwargs))
 
     @staticmethod
     @database_sync_to_async
@@ -280,22 +284,22 @@ class MyselfBase:
         :param kwargs:
         :return:
         """
-        models = myself.AnimateEpisodeInfoModel.objects.filter(**kwargs)
+        models = MyselfAnimateEpisodeInfoModel.objects.filter(**kwargs)
         for model in models:
-            myself.DownloadModel.objects.filter(owner_id=model.pk).delete()
-            myself.AnimateEpisodeTsModel.objects.filter(owner_id=model.pk).delete()
+            MyselfDownloadModel.objects.filter(owner_id=model.pk).delete()
+            MyselfAnimateEpisodeTsModel.objects.filter(owner_id=model.pk).delete()
             model.done = False
             model.video = None
             model.save()
 
     @staticmethod
     @database_sync_to_async
-    def All_finish_animate() -> Union[QuerySet, List[myself.FinishAnimateModel]]:
+    def All_finish_animate() -> Union[QuerySet, List[MyselfFinishAnimateModel]]:
         """
         不加 list 有時候會出現 You cannot call this from an async context - use a thread or sync_to_async.
         :return:
         """
-        return list(myself.FinishAnimateModel.objects.all())
+        return list(MyselfFinishAnimateModel.objects.all())
 
     @classmethod
     @database_sync_to_async
@@ -304,7 +308,7 @@ class MyselfBase:
         刪除動滿某一集所有 ts 資料。
         :return:
         """
-        myself.AnimateEpisodeTsModel.objects.filter(**kwargs).delete()
+        MyselfAnimateEpisodeTsModel.objects.filter(**kwargs).delete()
 
     @classmethod
     @database_sync_to_async
@@ -313,7 +317,7 @@ class MyselfBase:
         刪除下載已完成動漫。
         :return:
         """
-        myself.DownloadModel.objects.filter(owner__done=True).delete()
+        MyselfDownloadModel.objects.filter(owner__done=True).delete()
 
     @classmethod
     @database_sync_to_async
@@ -322,7 +326,7 @@ class MyselfBase:
         刪除下載資料庫的資料。
         :return:
         """
-        myself.DownloadModel.objects.filter(**kwargs).delete()
+        MyselfDownloadModel.objects.filter(**kwargs).delete()
 
     @staticmethod
     @database_sync_to_async
@@ -332,7 +336,7 @@ class MyselfBase:
         :param ts_content:
         :return:
         """
-        model = myself.AnimateEpisodeTsModel.objects.get(**kwargs)
+        model = MyselfAnimateEpisodeTsModel.objects.get(**kwargs)
         model.done = True
         model.ts.save(model.uri, ContentFile(ts_content))
 
@@ -344,7 +348,7 @@ class MyselfBase:
         :param video_path:
         :return:
         """
-        model = myself.AnimateEpisodeInfoModel.objects.get(**kwargs)
+        model = MyselfAnimateEpisodeInfoModel.objects.get(**kwargs)
         model.done = True
         model.video = video_path
         model.save()
@@ -361,28 +365,28 @@ class MyselfBase:
         """
         paginator = Paginator(model, 15)
         page_obj = paginator.page(page if page else 1)
-        serializer = myself.FinishAnimateSerializer(page_obj, many=True)
+        serializer = MyselfFinishAnimateSerializer(page_obj, many=True)
         return MyPageNumberPagination.get_paginated(page_obj=page_obj, paginator=paginator, data=serializer.data)
 
     @staticmethod
     @database_sync_to_async
     def switch_download(switch_data1: dict, switch_data2: dict):
-        myself.DownloadModel.objects.filter(pk__in=[switch_data1['id'], switch_data2['id']]).delete()
+        MyselfDownloadModel.objects.filter(pk__in=[switch_data1['id'], switch_data2['id']]).delete()
         switch_data1['id'], switch_data2['id'] = switch_data2['id'], switch_data1['id']
-        myself.DownloadModel.objects.create(pk=switch_data1['id'], owner_id=switch_data1['episode_id'])
-        myself.DownloadModel.objects.create(pk=switch_data2['id'], owner_id=switch_data2['episode_id'])
+        MyselfDownloadModel.objects.create(pk=switch_data1['id'], owner_id=switch_data1['episode_id'])
+        MyselfDownloadModel.objects.create(pk=switch_data2['id'], owner_id=switch_data2['episode_id'])
 
 
 class MyBase:
     @staticmethod
     @database_sync_to_async
     def create_history(**kwargs):
-        my.HistoryModel.objects.create(**kwargs)
+        MyHistoryModel.objects.create(**kwargs)
 
     @staticmethod
     @database_sync_to_async
     def create_log(msg: str, action: str):
-        my.SystemModel.objects.create(msg=msg, action=action)
+        MySystemModel.objects.create(msg=msg, action=action)
 
     @staticmethod
     def get_custom_log_data(model, serializer):

@@ -5,17 +5,17 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, DestroyAPIView
-from Api.serializers.myself import FinishAnimateSerializer, AnimateEpisodeInfoSerializer, AnimateInfoSerializer, \
-    DownloadSerializer
-from Database.models.myself import FinishAnimateModel, AnimateEpisodeInfoModel, AnimateEpisodeTsModel, DownloadModel, \
-    AnimateInfoModel
+from Api.serializers import MyselfFinishAnimateSerializer, MyselfAnimateEpisodeInfoSerializer, \
+    MyselfAnimateInfoSerializer, MyselfDownloadSerializer
+from Database.models.myself import MyselfFinishAnimateModel, MyselfAnimateEpisodeInfoModel, MyselfAnimateEpisodeTsModel, \
+    MyselfDownloadModel, MyselfAnimateInfoModel
 from Tools.db import DB, MyPageNumberPagination
 from Tools.myself import Myself
 from Tools.tools import req_bytes
 from Tools.urls import MyselfUrl
 
 
-class WeekAnimateView(APIView):
+class MyselfWeekAnimateView(APIView):
     @method_decorator(cache_page(300))
     def get(self, request):
         data = Myself.week_animate()
@@ -24,7 +24,7 @@ class WeekAnimateView(APIView):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-class AnimateInfoView(APIView):
+class MyselfAnimateInfoView(APIView):
     @method_decorator(cache_page(300))
     def get(self, request):
         url = request.query_params.get('url')
@@ -36,11 +36,11 @@ class AnimateInfoView(APIView):
         video = data.pop('video')
         model = DB.Myself.update_or_create_animate_info_model(data=data, image=image)
         DB.Myself.create_many_animate_episode(video, owner=model)
-        serializer = AnimateInfoSerializer(model)
+        serializer = MyselfAnimateInfoSerializer(model)
         return Response(serializer.data)
 
 
-class FinishListView(APIView):
+class MyselfFinishListView(APIView):
     @method_decorator(cache_page(300))
     def get(self, request):
         data = Myself.finish_list()
@@ -49,48 +49,49 @@ class FinishListView(APIView):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-class FinishAnimateView(ListAPIView):
-    serializer_class = FinishAnimateSerializer
-    queryset = FinishAnimateModel.objects.all()
+class MyselfFinishAnimateView(ListAPIView):
+    serializer_class = MyselfFinishAnimateSerializer
+    queryset = MyselfFinishAnimateModel.objects.all()
     pagination_class = MyPageNumberPagination
 
 
-class AnimateEpisodeInfoView(RetrieveUpdateAPIView):
-    serializer_class = AnimateEpisodeInfoSerializer
-    queryset = AnimateEpisodeInfoModel.objects.select_related('owner').all()
+class MyselfAnimateEpisodeInfoView(RetrieveUpdateAPIView):
+    serializer_class = MyselfAnimateEpisodeInfoSerializer
+    queryset = MyselfAnimateEpisodeInfoModel.objects.select_related('owner').all()
 
     def put(self, request, *args, **kwargs):
         if request.data.get('download'):
-            model = AnimateEpisodeInfoModel.objects.get(pk=kwargs.get('pk'))
-            AnimateEpisodeTsModel.objects.filter(owner=model).delete()
+            model = MyselfAnimateEpisodeInfoModel.objects.get(pk=kwargs.get('pk'))
+            MyselfAnimateEpisodeTsModel.objects.filter(owner=model).delete()
         return self.update(request, *args, **kwargs)
 
 
-class AnimateInfoEpisodeView(ListAPIView):
-    serializer_class = AnimateEpisodeInfoSerializer
-    queryset = AnimateEpisodeInfoModel.objects.select_related('owner').all()
+class MyselfAnimateInfoEpisodeView(ListAPIView):
+    serializer_class = MyselfAnimateEpisodeInfoSerializer
+    queryset = MyselfAnimateEpisodeInfoModel.objects.select_related('owner').all()
 
     def list(self, request, *args, **kwargs):
-        model = AnimateEpisodeInfoModel.objects.filter(owner_id=kwargs.get('animate_id'))
+        model = MyselfAnimateEpisodeInfoModel.objects.filter(owner_id=kwargs.get('animate_id'))
         if not model:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = AnimateEpisodeInfoSerializer(model, many=True)
+        serializer = MyselfAnimateEpisodeInfoSerializer(model, many=True)
         return Response(serializer.data)
 
 
-class AnimateEpisodeDoneView(ListAPIView):
-    serializer_class = AnimateInfoSerializer
-    queryset = AnimateInfoModel.objects.all()
+class MyselfAnimateEpisodeDoneView(ListAPIView):
+    serializer_class = MyselfAnimateInfoSerializer
+    queryset = MyselfAnimateInfoModel.objects.all()
     pagination_class = MyPageNumberPagination
 
     def list(self, request, *args, **kwargs):
-        prefetch = Prefetch('episode_info_model', queryset=AnimateEpisodeInfoModel.objects.filter(done=True))
-        queryset = AnimateInfoModel.objects.prefetch_related(prefetch).filter(episode_info_model__done=True).distinct()
+        prefetch = Prefetch('episode_info_model', queryset=MyselfAnimateEpisodeInfoModel.objects.filter(done=True))
+        queryset = MyselfAnimateInfoModel.objects.prefetch_related(prefetch).filter(
+            episode_info_model__done=True).distinct()
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
 
-class DownloadView(DestroyAPIView):
-    serializer_class = DownloadSerializer
-    queryset = DownloadModel.objects.all()
+class MyselfDownloadView(DestroyAPIView):
+    serializer_class = MyselfDownloadSerializer
+    queryset = MyselfDownloadModel.objects.all()

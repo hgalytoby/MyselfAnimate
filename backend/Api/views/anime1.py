@@ -8,7 +8,7 @@ from Tools.anime1 import Anime1
 from Tools.urls import Anime1AnimateUrl
 
 
-class HomeAnimateView(APIView):
+class Anime1HomeAnimateView(APIView):
     @method_decorator(cache_page(300))
     def get(self, request):
         data = Anime1.get_home_animate_data()
@@ -17,7 +17,7 @@ class HomeAnimateView(APIView):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-class AnimateInfoView(APIView):
+class Anime1AnimateInfoView(APIView):
     @method_decorator(cache_page(300))
     def get(self, request):
         url = request.query_params.get('url')
