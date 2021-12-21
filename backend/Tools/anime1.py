@@ -5,8 +5,8 @@ import asyncio
 import aiohttp
 from bs4 import BeautifulSoup
 
-from Tools.tools import aiohttp_text, badname
-from Tools.urls import Anime1AnimateUrl
+from Tools.tools import aiohttp_text, badname, aiohttp_json, aiohttp_post_json
+from Tools.urls import Anime1AnimateUrl, Anime1Api
 
 headers = {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36'
@@ -110,9 +110,24 @@ class Anime1:
                 data.append(_)
         return data
 
+    @staticmethod
+    async def get_api_key_and_value(url: str) -> tuple:
+        res = await aiohttp_text(url=url)
+        api_data = re.findall(r"send\S{2}(.*?)[']", res)[0]
+        api_key, api_value = api_data.split('=')
+        return api_key, api_value
+
+    @staticmethod
+    async def get_cookies_and_animate_url(api_key: str, api_value: str) -> tuple:
+        data = {api_key: unquote(api_value)}
+        res_json, cookies = await aiohttp_post_json(url=Anime1Api, data=data, cookie=True)
+        animate_url = f'https:{"".join(res_json.values())}'
+        return animate_url, cookies
+
+
 
 if __name__ == '__main__':
     # asyncio.run(main())
     # request_version()
-    Anime1.get_home_animate_data()
+    # Anime1.get_home_animate_data()
     pass

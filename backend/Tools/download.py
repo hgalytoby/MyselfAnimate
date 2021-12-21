@@ -1,12 +1,16 @@
 import asyncio
 import threading
 import subprocess
+
+import aiohttp
+
+from Tools.anime1 import Anime1
 from Tools.db import DB
 from Tools.myself import Myself
 from project.settings import MEDIA_PATH, ROOT_MEDIA_PATH
 
 
-class DownloadManage:
+class BaseDownloadManage:
     def __init__(self):
         self.download_list = []
         self.wait_download_list = []
@@ -15,8 +19,6 @@ class DownloadManage:
         self.now = 0
         self.max = 2
         self.ws = None
-        self.from_website = 'Myself'
-        threading.Thread(target=self.main, args=()).start()
 
     async def clear_finish_animate_list(self):
         """
@@ -45,6 +47,13 @@ class DownloadManage:
         #         if not item['done']:
         #             self.tasks_dict[item['id']].cancel()
         #         self.download_list.remove(item)
+
+
+class MyselfDownloadManage(BaseDownloadManage):
+    def __init__(self):
+        super(MyselfDownloadManage, self).__init__()
+        self.from_website = 'Myself'
+        threading.Thread(target=self.main, args=()).start()
 
     async def switch_download_order(self, data: dict):
         """
@@ -255,6 +264,63 @@ class DownloadManage:
                 self.now += 1
                 task_data = self.wait_download_list.pop(0)
                 print('開始下載', task_data['animate_name'], task_data['episode_name'], task_data['id'])
+                self.download_list.append(task_data)
+                self.tasks_dict.update({task_data['id']: asyncio.create_task(self.download_animate_script(task_data))})
+            await asyncio.sleep(0.1)
+
+    def main(self):
+        """
+        開始異步執行。
+        :return:
+        """
+        asyncio.run(self.main_task())
+
+
+class Anime1DownloadManage(BaseDownloadManage):
+    def __init__(self):
+        super(Anime1DownloadManage, self).__init__()
+        self.from_website = 'Anime1'
+        threading.Thread(target=self.main, args=()).start()
+
+    @staticmethod
+    async def download_animate(task_data, animate_url, cookies):
+        _headers = {
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36',
+            'cookie': cookies
+        }
+        _timeout = aiohttp.client.ClientTimeout(sock_connect=10, sock_read=10)
+        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=True)) as session:
+            async with session.get(url=animate_url, headers=_headers, timeout=_timeout) as res:
+                with open(f'{task_data["name"]}.mp4', 'wb') as fd:
+                    download_content_length = 0
+                    while True:
+                        chunk = await res.content.read(1024 * 10)
+                        download_content_length += len(chunk)
+                        if not chunk:
+                            break
+                        fd.write(chunk)
+                        task_data['progress_value'] = download_content_length // res.content_length * 100
+
+    async def download_animate_script(self, task_data):
+        try:
+            if task_data['done']:
+                task_data['progress_value'] = 100
+            else:
+                api_key, api_value = await Anime1.get_api_key_and_value(url=task_data['url'])
+                animate_url, cookies = await Anime1.get_cookies_and_animate_url(api_key=api_key, api_value=api_value)
+                await self.download_animate(task_data, animate_url, cookies)
+        except asyncio.CancelledError:
+            print(f'取消下載: {task_data["name"]}')
+        else:
+            task_data.update({'status': '下載完成'})
+        self.now -= 1
+
+    async def main_task(self):
+        while True:
+            if self.wait_download_list and self.max > self.now:
+                self.now += 1
+                task_data = self.wait_download_list.pop(0)
+                print('開始下載', task_data['name'], task_data['id'])
                 self.download_list.append(task_data)
                 self.tasks_dict.update({task_data['id']: asyncio.create_task(self.download_animate_script(task_data))})
             await asyncio.sleep(0.1)

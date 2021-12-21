@@ -2,11 +2,11 @@ import json
 import asyncio
 from Tools.db import DB
 from Tools.myself import Myself
-from Tools.download import DownloadManage
+from Tools.download import MyselfDownloadManage
 from Tools.urls import MyselfFinishAnimateUrl, MyselfFinishAnimateBaseUrl
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-download_manage = DownloadManage()
+myself_download_manage = MyselfDownloadManage()
 
 
 class Manage:
@@ -43,7 +43,7 @@ class Manage:
                     download_models = await DB.Myself.create_many_download_models(owner_id_list=data['episodes'])
                     download_data_list = await DB.Myself.get_download_animate_episode_data_list(
                         download_models=download_models)
-                    download_manage.wait_download_list.extend(download_data_list)
+                    myself_download_manage.wait_download_list.extend(download_data_list)
                 except Exception as error:
                     print(error)
                 # print(animate_episode_list, '123')
@@ -61,7 +61,7 @@ class Manage:
             await self.send(
                 text_data=json.dumps({
                     'msg': '目前下載列表',
-                    'data': download_manage.download_list + download_manage.wait_download_list,
+                    'data': myself_download_manage.download_list + myself_download_manage.wait_download_list,
                     'action': 'download_myself_animate_array'}))
             await asyncio.sleep(0.5)
 
@@ -88,7 +88,7 @@ class Manage:
         """
         await DB.Myself.delete_download_finish_animate()
         await DB.My.create_log(msg='Myself 清除下載已完成', action='delete')
-        await download_manage.clear_finish_animate_list()
+        await myself_download_manage.clear_finish_animate_list()
         await self.send(text_data=json.dumps({'msg': '已清除已完成動漫', 'action': data['action']}))
 
     async def delete_download_animate(self, data: dict):
@@ -99,7 +99,7 @@ class Manage:
         """
         await DB.Myself.delete_download_and_ts(download_model__id__in=data['deletes'])
         await DB.My.create_log(msg='Myself 刪除已選取動漫', action='delete')
-        await download_manage.delete_download_animate_list(data['deletes'])
+        await myself_download_manage.delete_download_animate_list(data['deletes'])
         await self.send(text_data=json.dumps({'msg': '已取消勾選的下載動漫', 'action': data['action']}))
 
     async def download_order(self, data):
@@ -108,7 +108,7 @@ class Manage:
         :param data: data: dict -> 前端傳來要更改動漫下載順序。
         :return:
         """
-        await download_manage.switch_download_order(data=data)
+        await myself_download_manage.switch_download_order(data=data)
         await DB.My.create_log(msg='Myself 已更新下載順序', action='switch')
         await self.send(text_data=json.dumps({'msg': '已更新下載順序', 'action': data['action']}))
 
@@ -123,7 +123,7 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
         await self.accept()
         await DB.My.create_log(msg='已連線', action='connect')
         await self.send(text_data=json.dumps({'type': 'connect', 'msg': f'連線成功!!'}))
-        download_manage.ws = self
+        myself_download_manage.ws = self
         asyncio.create_task(self.download_tasks())
 
     async def disconnect(self, close_code):
@@ -132,7 +132,7 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
         :param close_code:
         :return:
         """
-        download_manage.ws = None
+        myself_download_manage.ws = None
         pass
 
     async def receive(self, text_data: str = None, bytes_data: bytes = None):

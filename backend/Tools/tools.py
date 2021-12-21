@@ -36,6 +36,26 @@ async def base_aiohttp_req(url: str, method: str, timeout: tuple, **kwargs):
             return await getattr(res, method)(**kwargs)
 
 
+async def base_aiohttp_post_req(url: str, method: str, timeout: tuple, data: dict, cookie: bool = False, **kwargs):
+    """
+    異步請求的 base，依照 method 使用 .text or .json or .bytes。
+    :param url: str -> 要爬的 url。
+    :param method: str -> .text or .json or .bytes。
+    :param timeout: tuple -> 設定請求與讀取時間。
+    :param data: dict -> post 的資料。
+    :param cookie: bool -> 要不要拿 cookie。
+    :param kwargs: .text or .json or .bytes 要用的參數。
+    :return: str or dict or bytes -> .text or .json or .bytes。
+    """
+    _timeout = aiohttp.client.ClientTimeout(sock_connect=timeout[0], sock_read=timeout[1])
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
+        async with session.post(url=url, headers=headers, timeout=_timeout, data=data) as res:
+            if cookie:
+                cookies = '; '.join(f'{v.key}={v.value}' for v in res.cookies.values())
+                return await getattr(res, method)(**kwargs), cookies
+            return await getattr(res, method)(**kwargs)
+
+
 async def aiohttp_text(url: str, timeout: tuple = (10, 10)) -> str:
     """
     用異步請求取得 text。
@@ -64,6 +84,18 @@ async def aiohttp_json(url: str, timeout=(10, 10)) -> dict:
     :return:
     """
     return await base_aiohttp_req(url, method='json', timeout=timeout)
+
+
+async def aiohttp_post_json(url: str, data: dict, timeout: tuple = (10, 10), cookie: bool = False) -> dict:
+    """
+    用異步請求取得 json。
+    :param url: str -> 要爬的 url。
+    :param data: dict -> post 的資料。
+    :param timeout: tuple -> 設定請求與讀取時間。
+    :param cookie: bool -> 要不要拿 cookie。
+    :return:
+    """
+    return await base_aiohttp_post_req(url, method='json', timeout=timeout, data=data, cookie=cookie)
 
 
 def req_bytes(url: str) -> bytes:
