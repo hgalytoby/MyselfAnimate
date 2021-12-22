@@ -1,14 +1,19 @@
 export const myselfApi = {
   weekAnimate: '/api/myself/week-animate/',
-  animateInfo: '/api/myself/animate-info/',
+  animateInfo: (url) => `/api/myself/animate-info/?url=${url}`,
   finishList: '/api/myself/finish-list/',
   finishAnimate: '/api/myself/finish-animate/',
   animateEpisodeDone: '/api/myself/animate-episode-done/',
-  animateInfoEpisodeInfo: '/api/myself/animate-info/{animateID}/episode-info/'
+  animateInfoEpisodeInfo: (animateID) => `/api/myself/animate-info/${animateID}/episode-info/`
 }
 
 export const myApi = {
   log: '/api/my/log/',
   system: (page, size) => `/api/my/log/system/?page=${page}&size=${size}`,
   history: (page, size) => `/api/my/log/history/?page=${page}&size=${size}`
+}
+
+export const anima1Api = {
+  animateList: '/api/anime1/animate-list/',
+  animateInfo: (url) => `/api/anime1/animate-info/?url=${url}`
 }

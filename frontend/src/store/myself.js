@@ -51,7 +51,8 @@ export const actions = {
     axiosGet(myselfApi.weekAnimate, context, addWeekAnimateMutation)
   },
   [animateInfoAction] (context, value) {
-    axiosGet(`${myselfApi.animateInfo}?url=${value}`, context, addAnimateInfoMutation)
+    // axiosGet(`${myselfApi.animateInfo}?url=${value}`, context, addAnimateInfoMutation)
+    axiosGet(myselfApi.animateInfo(value), context, addAnimateInfoMutation)
   },
   [finishListAction] (context, value) {
     axiosGet(myselfApi.finishList, context, addFinishListMutation)
@@ -64,7 +65,7 @@ export const actions = {
   },
   [animateInfoEpisodeInfoAction] (context, value) {
     if (value.value.id) {
-      axiosGet(myselfApi.animateInfoEpisodeInfo.replace('{animateID}', value.value.id), context, animateInfoEpisodeInfoMutation)
+      axiosGet(myselfApi.animateInfoEpisodeInfo(value.value.id), context, animateInfoEpisodeInfoMutation)
     }
   }
 }

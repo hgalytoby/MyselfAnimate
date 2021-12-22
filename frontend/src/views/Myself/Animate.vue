@@ -83,7 +83,6 @@ export default {
     store.dispatch(`myself/${animateInfoAction}`, props.url)
     useWindowsFocus(store.dispatch, `myself/${animateInfoEpisodeInfoAction}`, animateInfo)
     const downloadAnimate = () => {
-      console.log(1)
       sendSocketMessage({
         action: 'download_myself_animate',
         episodes: checkboxAnimateEpisode.value,

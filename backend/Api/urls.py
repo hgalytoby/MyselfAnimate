@@ -2,7 +2,7 @@ from django.urls import path
 
 from Api.views import MyselfWeekAnimateView, MyselfAnimateInfoView, MyselfAnimateInfoEpisodeView, MyselfFinishListView, \
     MyselfFinishAnimateView, MyselfAnimateEpisodeInfoView, MyselfDownloadView, MyselfAnimateEpisodeDoneView, \
-    MySystemView, MyHistoryView, MyLogView, Anime1HomeAnimateView, Anime1AnimateInfoView, TestView
+    MySystemView, MyHistoryView, MyLogView, Anime1AnimateListView, Anime1AnimateInfoView, TestView
 from project.settings import DEBUG
 
 app_name = 'api'
@@ -27,7 +27,7 @@ my_api = [
 ]
 
 anime1_api = [
-    path('anime1/home-animate/', Anime1HomeAnimateView.as_view(), name='anime1_home_animate'),
+    path('anime1/animate-list/', Anime1AnimateListView.as_view(), name='anime1_animate_list'),
     path('anime1/animate-info/', Anime1AnimateInfoView.as_view(), name='anime1_animate_info'),
 ]
 

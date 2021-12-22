@@ -1,7 +1,6 @@
 from urllib.parse import unquote
 import re
 import requests
-import asyncio
 import aiohttp
 from bs4 import BeautifulSoup
 
@@ -10,6 +9,14 @@ from Tools.urls import Anime1AnimateUrl, Anime1Api
 
 headers = {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36'
+}
+
+animate_table = {
+    '動畫名稱': 'name',
+    '集數': 'episode',
+    '年份': 'years',
+    '季節': 'season',
+    '字幕組': 'subtitle_group',
 }
 
 
@@ -72,7 +79,7 @@ class Anime1:
             title_array = []
             for title_element in html.find_all('tr', class_='row-1 odd'):
                 for title in title_element.find_all('th'):
-                    title_array.append(title.text)
+                    title_array.append(animate_table[title.text])
             title_array_len = len(title_array)
             for elements in html.find_all('tbody', class_='row-hover'):
                 _ = {}
@@ -123,7 +130,6 @@ class Anime1:
         res_json, cookies = await aiohttp_post_json(url=Anime1Api, data=data, cookie=True)
         animate_url = f'https:{"".join(res_json.values())}'
         return animate_url, cookies
-
 
 
 if __name__ == '__main__':
