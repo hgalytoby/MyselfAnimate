@@ -15,7 +15,7 @@ from channels.db import database_sync_to_async
 from django.core.files.base import ContentFile
 
 from Database.models import MyselfFinishAnimateModel, MyselfAnimateEpisodeInfoModel, MyselfAnimateEpisodeTsModel, \
-    MyselfDownloadModel, MyselfAnimateInfoModel, MyHistoryModel, MySystemModel
+    MyselfDownloadModel, MyselfAnimateInfoModel, MyHistoryModel, MySystemModel, Anime1AnimateInfoModel
 from Tools.tools import aiohttp_bytes, use_io_get_image_format
 from django.core.cache import caches
 
@@ -411,7 +411,15 @@ class CacheBase:
         cache_db.set(key, data, timeout=timeout)
 
 
+class Anime1Base:
+    @classmethod
+    def create_animate_info(cls, **kwargs):
+        return Anime1AnimateInfoModel.objects.create(**kwargs)
+
+    pass
+
 class DB:
     Myself = MyselfBase
     My = MyBase
     Cache = CacheBase
+    Anime1 = Anime1Base

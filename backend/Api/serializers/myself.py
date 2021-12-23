@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from Database.models.myself import MyselfFinishAnimateModel, MyselfAnimateEpisodeInfoModel, MyselfAnimateInfoModel, MyselfDownloadModel
+from Database.models.myself import MyselfFinishAnimateModel, MyselfAnimateEpisodeInfoModel, MyselfAnimateInfoModel, \
+    MyselfDownloadModel
 
 
 class MyselfFinishAnimateSerializer(serializers.ModelSerializer):

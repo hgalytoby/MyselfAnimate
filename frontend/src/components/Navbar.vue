@@ -23,7 +23,7 @@
           <div class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="anime1" role="button" data-bs-toggle="dropdown"
                aria-expanded="false">
-              anime1
+              Anime1
             </a>
             <ul class="dropdown-menu" aria-labelledby="anime1">
               <li>

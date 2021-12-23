@@ -21,7 +21,6 @@ class Anime1AnimateInfoView(APIView):
     @method_decorator(cache_page(300))
     def get(self, request):
         url = request.query_params.get('url')
-        print(url)
         if not url:
             return Response(status=status.HTTP_404_NOT_FOUND)
         animate_url = f'{Anime1AnimateUrl}{url}'
