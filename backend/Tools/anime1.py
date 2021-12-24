@@ -112,7 +112,7 @@ class Anime1:
                         _.update({'updated': element.text})
                 _.update({
                     'name': elements.find('h2', class_='entry-title').text.strip(),
-                    'video_url': elements.find('button', class_='loadvideo')['data-src']
+                    'url': elements.find('button', class_='loadvideo')['data-src']
                 })
                 data.append(_)
         return data

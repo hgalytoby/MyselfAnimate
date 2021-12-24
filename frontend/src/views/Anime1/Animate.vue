@@ -11,13 +11,16 @@ import { animateInfoAction, animateInfoState } from '../../variables/anime1'
 export default {
   name: 'Animate',
   props: {
-    url: String
+    url: String,
+    animateData: String
   },
   setup (props) {
     const store = useStore()
     const animateInfo = computed(() => store.state.anime1[animateInfoState])
-    console.log('props', props)
-    store.dispatch(`anime1/${animateInfoAction}`, props.url)
+    store.dispatch(`anime1/${animateInfoAction}`, {
+      animateData: props.animateData !== undefined ? JSON.parse(props.animateData) : null,
+      url: props.url
+    })
     return {
       animateInfo
     }

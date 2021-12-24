@@ -14,6 +14,17 @@ export const axiosGet = (url, context, mutation) => {
   })
 }
 
+export const axiosPost = (url, data, context, mutation) => {
+  app.config.globalProperties.$Progress.start()
+  axios.post(url, data).then(function (response) {
+    app.config.globalProperties.$Progress.finish()
+    context.commit(mutation, response.data)
+  }).catch(function (error) {
+    console.log(error.response)
+    app.config.globalProperties.$Progress.fail()
+  })
+}
+
 export const startFancy = (video) => {
   Fancybox.show([
     {

@@ -29,6 +29,8 @@ class Anime1AnimateEpisodeInfoModel(BaseAnimateEpisodeInfoModel):
     owner: 關聯
     """
     owner = models.ForeignKey(Anime1AnimateInfoModel, on_delete=models.CASCADE, related_name='episode_info_model')
+    published_updated_date = models.DateField()
+    updated = models.DateField(null=True, blank=True)
 
     class Meta:
         db_table = 'Anime1AnimateEpisodeInfo'

@@ -6,7 +6,7 @@ import {
   animateListMutation,
   animateListState
 } from '../variables/anime1'
-import { axiosGet } from '../tools'
+import { axiosGet, axiosPost } from '../tools'
 import { anima1Api } from '../api'
 
 export const state = {
@@ -19,7 +19,7 @@ export const actions = {
     axiosGet(anima1Api.animateList, context, animateListMutation)
   },
   [animateInfoAction] (context, value) {
-    axiosGet(anima1Api.animateInfo(value), context, animateInfoMutation)
+    axiosPost(anima1Api.animateInfo(value.url), value.animateData, context, animateInfoMutation)
   }
 }
 

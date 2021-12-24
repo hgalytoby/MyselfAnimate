@@ -12,7 +12,7 @@ export const anime1Route = [
     component: Animate,
     name: 'Anime1Animate',
     props ($route) {
-      return { url: $route.query.url }
+      return { url: $route.query.url, animateData: $route.params.animateData }
     }
   }
 ]
