@@ -3,7 +3,7 @@ beautifulsoup4
 channels
 channels-redis
 daphne
-django
+django==3.2.10
 django-debug-toolbar
 djangorestframework
 django_cleanup

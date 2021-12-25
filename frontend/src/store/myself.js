@@ -13,9 +13,6 @@ import {
   finishAnimateUpdateState,
   finishAnimateUpdateButtonState,
   finishAnimateUpdateButtonMutation,
-  checkboxAnimateEpisodeState,
-  addCheckboxAnimateEpisodeMutation,
-  removeCheckboxAnimateEpisodeMutation,
   downloadMyselfAnimateMutation,
   downloadMyselfAnimateState,
   downloadMyselfAnimateGetters,
@@ -39,7 +36,6 @@ export const state = {
   [finishListState]: {},
   [finishAnimateUpdateState]: false,
   [finishAnimateUpdateButtonState]: '更新資料',
-  [checkboxAnimateEpisodeState]: [],
   [finishAnimateState]: [],
   [animateCollectState]: [],
   [downloadMyselfAnimateState]: [],
@@ -90,12 +86,6 @@ export const mutations = {
   [finishAnimateUpdateButtonMutation] (state, value) {
     state[finishAnimateUpdateButtonState] = value.msg
     state[finishAnimateUpdateState] = value.updating
-  },
-  [addCheckboxAnimateEpisodeMutation] (state, value) {
-    state[checkboxAnimateEpisodeState].push(value)
-  },
-  [removeCheckboxAnimateEpisodeMutation] (state, value) {
-    state[checkboxAnimateEpisodeState].splice(value, 1)
   },
   [downloadMyselfAnimateMutation] (state, value) {
     state[downloadMyselfAnimateState] = value

@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from Api.serializers.anime1 import Anime1InfoSerializer
 from Database.models import Anime1AnimateInfoModel
 from Tools.anime1 import Anime1
 from Tools.db import DB
@@ -28,13 +29,14 @@ class Anime1AnimateInfoView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
         animate_url = f'{Anime1AnimateUrl}{url}'
         data = DB.Cache.get_cache_data(key=animate_url)
+        if data:
+            return Response(data, status=status.HTTP_200_OK)
         if request.data:
             model = DB.Anime1.create_animate_info(**request.data)
         else:
             model = DB.Anime1.get_animate_info(url=url)
-        if not data:
-            data = Anime1.get_animate_info(url=animate_url)
-            DB.Cache.set_cache_data(key=animate_url, data=json.dumps(data), timeout=300)
-        if data:
-            return Response(data, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        episode_data = Anime1.get_animate_info(url=animate_url, data=[])
+        DB.Anime1.update_or_create_many_episode(episodes=episode_data, owner=model)
+        serializer = Anime1InfoSerializer(model)
+        DB.Cache.set_cache_data(key=animate_url, data=json.dumps(serializer.data), timeout=1800)
+        return Response(serializer.data)

@@ -30,31 +30,38 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-sm-2" v-for="data in animateInfo.episode_info_model" :key="data.id">
-        <BootstrapIcon icon="check2-square" v-show="checkCheckboxArray(data.id, data.download)"
+      <h5>尚未下載</h5>
+      <div class="col-sm-2" v-for="data in animateUndone" :key="data.id">
+        <BootstrapIcon icon="check2-square" v-show="checkCheckboxArray(data.id)"
                        @click="clickCheckbox(data.id)"/>
-        <BootstrapIcon icon="square" v-show="!checkCheckboxArray(data.id, data.download)"
+        <BootstrapIcon icon="square" v-show="!checkCheckboxArray(data.id)"
                        @click="clickCheckbox(data.id)"/>
-        <!--      <input type="checkbox" :id="data.id" :value="data" v-model="checkboxAnimateEpisode">-->
-        <BootstrapIcon class="video-play" icon="play-btn" v-if="data.done" @click="startFancy(data.video)"/>
-        <BootstrapIcon class="video-play" icon="pause-circle" v-else/>
         <span>{{ data.name }}</span>
       </div>
-      {{checkboxAnimateEpisode}}
+      <h5>正在下載</h5>
+       <div class="col-sm-2" v-for="data in animateDownloading" :key="data.id">
+        <span>{{ data.name }}</span>
+      </div>
+      <h5>下載完成</h5>
+       <div class="col-sm-2" v-for="data in animateDone" :key="data.id">
+        <BootstrapIcon class="video-play" icon="play-btn" @click="startFancy(data.video)"/>
+        <span>{{ data.name }}</span>
+      </div>
     </div>
   </div>
   <button type="button" class="btn btn-primary" @click="downloadAnimate">下載所選的集數</button>
 </template>
 
 <script>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
 import {
   animateInfoAction,
-  animateInfoState, addCheckboxAnimateEpisodeMutation,
-  checkboxAnimateEpisodeState,
+  animateInfoState,
   loadingMutation,
-  loadingState, removeCheckboxAnimateEpisodeMutation, animateInfoEpisodeInfoAction
+  loadingState,
+  downloadMyselfAnimateState
+  animateInfoEpisodeInfoAction
 } from '../../variables/myself'
 import { sendSocketMessage } from '../../hooks/useWS'
 import Loading from '../../components/Loading'
@@ -71,47 +78,66 @@ export default {
     const store = useStore()
     const loading = computed(() => store.state.myself[loadingState])
     const animateInfo = computed(() => store.state.myself[animateInfoState])
-    const checkboxAnimateEpisode = computed({
-      get () {
-        return store.state.myself[checkboxAnimateEpisodeState]
-      },
-      set (value) {
-        store.commit(`myself/${addCheckboxAnimateEpisodeMutation}`, value)
-      }
+    const downloadMyselfAnimate = computed(() => {
+      return store.state.myself[downloadMyselfAnimateState].filter((item) => {
+        return item.animate_id === animateInfo.value.id
+      })
     })
+    const animateDownloading = computed(() => {
+      const downloadingID = downloadMyselfAnimate.value.filter((item) => !item.done).map((item) => item.id)
+      return animateInfo.value.episode_info_model.filter((item) => {
+        return downloadingID.indexOf(item.id) !== -1
+      })
+    })
+    const animateUndone = computed(() => {
+      const downloadingID = downloadMyselfAnimate.value.map((item) => item.id)
+      return animateInfo.value.episode_info_model.filter((item) => {
+        return !item.done && downloadingID.indexOf(item.id) === -1
+      })
+    })
+    const animateDone = computed(() => {
+      const wsDone = downloadMyselfAnimate.value.filter((item) => item.done).map((item) => item.id)
+      return animateInfo.value.episode_info_model.filter((item) => item.done || wsDone.indexOf(item.id) !== -1)
+    })
+    const clickCheckboxData = ref([])
     store.commit(`myself/${loadingMutation}`)
     store.dispatch(`myself/${animateInfoAction}`, props.url)
-    useWindowsFocus(store.dispatch, `myself/${animateInfoEpisodeInfoAction}`, animateInfo)
+    // useWindowsFocus(store.dispatch, `myself/${animateInfoEpisodeInfoAction}`, animateInfo)
     const downloadAnimate = () => {
       sendSocketMessage({
         action: 'download_myself_animate',
-        episodes: checkboxAnimateEpisode.value,
+        episodes: clickCheckboxData.value,
         id: animateInfo.value.id,
         animateName: animateInfo.value.name
       })
     }
 
     function clickCheckbox (id) {
-      const index = checkboxAnimateEpisode.value.indexOf(id)
+      console.log(clickCheckboxData.value.indexOf(id))
+      const index = clickCheckboxData.value.indexOf(id)
       if (index === -1) {
-        store.commit(`myself/${addCheckboxAnimateEpisodeMutation}`, id)
+        clickCheckboxData.value.push(id)
       } else {
-        store.commit(`myself/${removeCheckboxAnimateEpisodeMutation}`, index)
+        clickCheckboxData.value.splice(index, 1)
       }
     }
 
-    function checkCheckboxArray (id, download) {
-      // console.log(checkboxAnimateEpisode.value[0])
-      return checkboxAnimateEpisode.value.indexOf(id) !== -1 || download
+    function checkCheckboxArray (id) {
+      return clickCheckboxData.value.indexOf(id) !== -1
     }
+
     return {
       loading,
       animateInfo,
-      checkboxAnimateEpisode,
       downloadAnimate,
       clickCheckbox,
       checkCheckboxArray,
-      startFancy
+      clickCheckboxData,
+      startFancy,
+      animateDownloading,
+      animateUndone,
+      animateDone,
+      downloadMyselfAnimate
     }
   }
 }

@@ -39,3 +39,4 @@ urlpatterns = myself_api + my_api + anime1_api
 
 if DEBUG:
     urlpatterns += test_api
+

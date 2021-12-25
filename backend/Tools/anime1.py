@@ -1,3 +1,4 @@
+import time
 from urllib.parse import unquote
 import re
 import requests
@@ -97,9 +98,8 @@ class Anime1:
                         _ = {}
         return data
 
-    @staticmethod
-    def get_animate_info(url: str) -> list:
-        data = []
+    @classmethod
+    def get_animate_info(cls, url: str, data: list) -> list:
         res = requests.get(url=url, headers=headers)
         if res.ok:
             html = BeautifulSoup(res.text, 'lxml')
@@ -115,6 +115,10 @@ class Anime1:
                     'url': elements.find('button', class_='loadvideo')['data-src']
                 })
                 data.append(_)
+            previous = html.find('div', class_='nav-previous')
+            if previous:
+                time.sleep(1)
+                return cls.get_animate_info(url=previous.find('a')['href'], data=data)
         return data
 
     @staticmethod
@@ -135,5 +139,7 @@ class Anime1:
 if __name__ == '__main__':
     # asyncio.run(main())
     # request_version()
-    # Anime1.get_home_animate_data()
+    print(Anime1.get_animate_info(data=[],
+                                  url='https://anime1.me/category/2021%e5%b9%b4%e5%86%ac%e5%ad%a3/tropical-rouge-%e5%85%89%e4%b9%8b%e7%be%8e%e5%b0%91%e5%a5%b3'))
+    # Anime1.get_animate_info(data=[], url='https://anime1.me/category/2021%e5%b9%b4%e7%a7%8b%e5%ad%a3/%e5%8f%a4%e8%a6%8b%e5%90%8c%e5%ad%b8%e6%9c%89%e4%ba%a4%e6%b5%81%e9%9a%9c%e7%a4%99%e7%97%87')
     pass

@@ -7,7 +7,7 @@ from Database.models import Anime1AnimateInfoModel, Anime1AnimateEpisodeInfoMode
 class Anime1EpisodeInfoSerializer(BaseEpisodeInfoSerializer):
     class Meta:
         model = Anime1AnimateEpisodeInfoModel
-        fields = ('id', 'name', 'url', 'done', 'video')
+        fields = ('id', 'name', 'url', 'done', 'video', 'published_updated_date', 'updated', )
 
 
 class Anime1InfoSerializer(serializers.ModelSerializer):

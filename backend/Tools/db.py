@@ -199,17 +199,7 @@ class MyselfBase:
         取得多個動漫集數資料與更新成下載中。
         :return:
         """
-        return MyselfDownloadModel.objects.select_related('owner').select_related('owner__owner').filter(
-            owner__done=False)
-
-    @staticmethod
-    @database_sync_to_async
-    def get_animate_episode_ts_count(**kwargs) -> int:
-        """
-        取得動漫某一集 ts 總數量。
-        :return:
-        """
-        return MyselfAnimateEpisodeTsModel.objects.filter(**kwargs).count()
+        return MyselfDownloadModel.objects.select_related('owner').select_related('owner__owner').all()
 
     @staticmethod
     @database_sync_to_async
@@ -231,7 +221,7 @@ class MyselfBase:
         取得動漫資料 model。
         :return:
         """
-        return MyselfAnimateEpisodeInfoModel.objects.get(**kwargs)
+        return MyselfAnimateEpisodeInfoModel.objects.select_related('owner').get(**kwargs)
 
     @staticmethod
     @database_sync_to_async
@@ -241,7 +231,8 @@ class MyselfBase:
         取得指定動漫有哪些集數正在下載的 model。
         :return:
         """
-        return list(MyselfAnimateEpisodeInfoModel.objects.filter(download=True, done=False, **kwargs))
+        return list(
+            MyselfAnimateEpisodeInfoModel.objects.select_related('owner').filter(done=False, **kwargs))
 
     @staticmethod
     @database_sync_to_async
@@ -251,7 +242,7 @@ class MyselfBase:
         :return:
         """
         data = []
-        for model in MyselfAnimateEpisodeTsModel.objects.filter(done=False, **kwargs):
+        for model in MyselfAnimateEpisodeTsModel.objects.select_related('owner').filter(done=False, **kwargs):
             data.append(model.uri)
         return data
 
@@ -285,7 +276,7 @@ class MyselfBase:
         :param kwargs:
         :return:
         """
-        models = MyselfAnimateEpisodeInfoModel.objects.filter(**kwargs)
+        models = MyselfAnimateEpisodeInfoModel.objects.select_related('owner').filter(**kwargs)
         for model in models:
             MyselfDownloadModel.objects.filter(owner_id=model.pk).delete()
             MyselfAnimateEpisodeTsModel.objects.filter(owner_id=model.pk).delete()
@@ -419,13 +410,16 @@ class Anime1Base:
         return model
 
     @classmethod
-    def get_animate_info(cls, url):
+    def get_animate_info(cls, url: str):
         return Anime1AnimateInfoModel.objects.get(url=url)
 
     @classmethod
-    def update_or_create_many_episode(cls, **kwargs):
-        model, created = Anime1AnimateEpisodeInfoModel.objects.update_or_create(name=kwargs['name'], defaults=kwargs)
-        return model, created
+    def update_or_create_many_episode(cls, episodes: list, owner):
+        for episode in episodes:
+            Anime1AnimateEpisodeInfoModel.objects.update_or_create(name=episode['name'], defaults={
+                **episode,
+                'owner': owner
+            })
 
 
 class DB:
