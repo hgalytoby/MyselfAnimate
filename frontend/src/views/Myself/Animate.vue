@@ -60,7 +60,7 @@ import {
   animateInfoState,
   loadingMutation,
   loadingState,
-  downloadMyselfAnimateState
+  downloadMyselfAnimateState,
   animateInfoEpisodeInfoAction
 } from '../../variables/myself'
 import { sendSocketMessage } from '../../hooks/useWS'
@@ -79,30 +79,24 @@ export default {
     const loading = computed(() => store.state.myself[loadingState])
     const animateInfo = computed(() => store.state.myself[animateInfoState])
     const downloadMyselfAnimate = computed(() => {
-      return store.state.myself[downloadMyselfAnimateState].filter((item) => {
-        return item.animate_id === animateInfo.value.id
-      })
+      return store.state.myself[downloadMyselfAnimateState].filter((item) => item.animate_id === animateInfo.value.id)
     })
     const animateDownloading = computed(() => {
       const downloadingID = downloadMyselfAnimate.value.filter((item) => !item.done).map((item) => item.id)
-      return animateInfo.value.episode_info_model.filter((item) => {
-        return downloadingID.indexOf(item.id) !== -1
-      })
+      return animateInfo.value.episode_info_model.filter((item) => downloadingID.indexOf(item.id) !== -1)
     })
     const animateUndone = computed(() => {
       const downloadingID = downloadMyselfAnimate.value.map((item) => item.id)
-      return animateInfo.value.episode_info_model.filter((item) => {
-        return !item.done && downloadingID.indexOf(item.id) === -1
-      })
+      return animateInfo.value.episode_info_model.filter((item) => !item.done && downloadingID.indexOf(item.id) === -1)
     })
     const animateDone = computed(() => {
-      const wsDone = downloadMyselfAnimate.value.filter((item) => item.done).map((item) => item.id)
-      return animateInfo.value.episode_info_model.filter((item) => item.done || wsDone.indexOf(item.id) !== -1)
+      const downloadingID = downloadMyselfAnimate.value.filter((item) => item.done).map((item) => item.id)
+      return animateInfo.value.episode_info_model.filter((item) => item.done || downloadingID.indexOf(item.id) !== -1)
     })
     const clickCheckboxData = ref([])
     store.commit(`myself/${loadingMutation}`)
     store.dispatch(`myself/${animateInfoAction}`, props.url)
-    // useWindowsFocus(store.dispatch, `myself/${animateInfoEpisodeInfoAction}`, animateInfo)
+    useWindowsFocus(store.dispatch, `myself/${animateInfoEpisodeInfoAction}`, animateInfo)
     const downloadAnimate = () => {
       sendSocketMessage({
         action: 'download_myself_animate',
