@@ -21,8 +21,8 @@ class MyHistoryView(ListAPIView):
 
 class MyLogView(APIView):
     def get(self, request):
-        system_data = DB.My.get_custom_log_data(model=MySystemModel.objects.all(), serializer=SystemSerializer)
-        history_data = DB.My.get_custom_log_data(model=MyHistoryModel.objects.all(), serializer=HistorySerializer)
+        system_data = DB.My.get_custom_log_data(model=MySystemModel.objects.all(), serializer=MySystemSerializer)
+        history_data = DB.My.get_custom_log_data(model=MyHistoryModel.objects.all(), serializer=MyHistorySerializer)
         return Response({
             'system': system_data,
             'history': history_data,

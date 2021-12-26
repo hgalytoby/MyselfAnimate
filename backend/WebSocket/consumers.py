@@ -2,14 +2,37 @@ import json
 import asyncio
 from Tools.db import DB
 from Tools.myself import Myself
-from Tools.download import MyselfDownloadManage
+from Tools.download import MyselfDownloadManage, Anime1DownloadManage
 from Tools.urls import MyselfFinishAnimateUrl, MyselfFinishAnimateBaseUrl
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 myself_download_manage = MyselfDownloadManage()
+anime1_download_manage = Anime1DownloadManage()
 
 
-class Manage:
+class Base:
+    async def download_tasks(self):
+        """
+        將現在正要下載的動漫資料傳給前端。
+        :return:
+        """
+        while True:
+            await self.parent.send(
+                text_data=json.dumps({
+                    'msg': 'now download array',
+                    'data': self.download + self.wait,
+                    'action': self.task_action}))
+            await asyncio.sleep(0.5)
+
+
+class MyselfManage(Base):
+    download = myself_download_manage.download_list
+    wait = myself_download_manage.wait_download_list
+    task_action = 'download_myself_animate_array'
+
+    def __init__(self, parent):
+        self.parent = parent
+
     async def myself_finish_animate_update(self):
         """
         更新完結動漫。
@@ -27,7 +50,7 @@ class Manage:
 
         await DB.My.create_log(msg='Myself 完結動漫更新完成', action='updated')
         await asyncio.sleep(5)
-        await self.send(
+        await self.parent.send(
             text_data=json.dumps({'msg': '更新完成', 'action': 'myself_finish_animate_update', 'updating': False}))
 
     async def myself_animate_download(self, data: dict):
@@ -47,23 +70,10 @@ class Manage:
                 except Exception as error:
                     print(error)
                 # print(animate_episode_list, '123')
-                await self.send(
+                await self.parent.send(
                     text_data=json.dumps({'msg': '下載完成', 'action': data['action'], 'updating': False}))
         except Exception as e:
             print(e)
-
-    async def download_tasks(self):
-        """
-        將現在正要下載的動漫資料傳給前端。
-        :return:
-        """
-        while True:
-            await self.send(
-                text_data=json.dumps({
-                    'msg': '目前下載列表',
-                    'data': myself_download_manage.download_list + myself_download_manage.wait_download_list,
-                    'action': 'download_myself_animate_array'}))
-            await asyncio.sleep(0.5)
 
     async def search_animate(self, data: dict):
         """
@@ -78,7 +88,7 @@ class Manage:
             await DB.My.create_log(msg=f'Myself 搜尋動漫', action='search')
             model = await DB.Myself.All_finish_animate()
         serializer_data = await DB.Myself.search_finish_animate_paginator(model=model, page=data.get('page'))
-        await self.send(text_data=json.dumps({'data': serializer_data, 'action': data['action']}))
+        await self.parent.send(text_data=json.dumps({'data': serializer_data, 'action': data['action']}))
 
     async def clear_finish_animate(self, data: dict):
         """
@@ -89,7 +99,7 @@ class Manage:
         await DB.Myself.delete_download_finish_animate()
         await DB.My.create_log(msg='Myself 清除下載已完成', action='delete')
         await myself_download_manage.clear_finish_animate_list()
-        await self.send(text_data=json.dumps({'msg': '已清除已完成動漫', 'action': data['action']}))
+        await self.parent.send(text_data=json.dumps({'msg': '已清除已完成動漫', 'action': data['action']}))
 
     async def delete_download_animate(self, data: dict):
         """
@@ -97,10 +107,11 @@ class Manage:
         :param data: dict -> 前端傳來要刪除正在下載動漫資料。
         :return:
         """
+        DB.Cache.clear_cache()
         await DB.Myself.delete_download_and_ts(download_model__id__in=data['deletes'])
         await DB.My.create_log(msg='Myself 刪除已選取動漫', action='delete')
         await myself_download_manage.delete_download_animate_list(data['deletes'])
-        await self.send(text_data=json.dumps({'msg': '已取消勾選的下載動漫', 'action': data['action']}))
+        await self.parent.send(text_data=json.dumps({'msg': '已取消勾選的下載動漫', 'action': data['action']}))
 
     async def download_order(self, data):
         """
@@ -110,10 +121,23 @@ class Manage:
         """
         await myself_download_manage.switch_download_order(data=data)
         await DB.My.create_log(msg='Myself 已更新下載順序', action='switch')
-        await self.send(text_data=json.dumps({'msg': '已更新下載順序', 'action': data['action']}))
+        await self.parent.send(text_data=json.dumps({'msg': '已更新下載順序', 'action': data['action']}))
 
 
-class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
+class Anime1Manage(Base):
+    download = anime1_download_manage.download_list
+    wait = anime1_download_manage.wait_download_list
+    task_action = 'download_anime1_animate_array'
+
+    def __init__(self, parent):
+        self.parent = parent
+
+
+class AsyncChatConsumer(AsyncWebsocketConsumer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.Myself = MyselfManage(self)
+        self.Anime1 = Anime1Manage(self)
 
     async def connect(self):
         """
@@ -123,8 +147,8 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
         await self.accept()
         await DB.My.create_log(msg='已連線', action='connect')
         await self.send(text_data=json.dumps({'type': 'connect', 'msg': f'連線成功!!'}))
-        myself_download_manage.ws = self
-        asyncio.create_task(self.download_tasks())
+        asyncio.create_task(self.Myself.download_tasks())
+        asyncio.create_task(self.Anime1.download_tasks())
 
     async def disconnect(self, close_code):
         """
@@ -143,24 +167,24 @@ class AsyncChatConsumer(AsyncWebsocketConsumer, Manage):
         :return:
         """
         data = json.loads(text_data)
-        print(data)
+        # print(data)
         try:
             if data.get('action'):
                 if data['action'] == 'myself_finish_animate_update':
-                    asyncio.create_task(self.myself_finish_animate_update())
+                    asyncio.create_task(self.Myself.myself_finish_animate_update())
                     await self.send(text_data=json.dumps({'msg': f'正在更新中', 'action': data['action'], 'updating': True}))
                 elif data['action'] == 'download_myself_animate':
-                    asyncio.create_task(self.myself_animate_download(data=data))
+                    asyncio.create_task(self.Myself.myself_animate_download(data=data))
                     await self.send(
                         text_data=json.dumps({'msg': f'我收到要下載的清單了', 'action': data['action'], 'updating': True}))
                 elif data['action'] == 'search_myself_animate':
-                    asyncio.create_task(self.search_animate(data=data))
+                    asyncio.create_task(self.Myself.search_animate(data=data))
                 elif data['action'] == 'clear_finish_myself_animate':
-                    asyncio.create_task(self.clear_finish_animate(data=data))
+                    asyncio.create_task(self.Myself.clear_finish_animate(data=data))
                 elif data['action'] == 'delete_myself_download_animate':
-                    asyncio.create_task(self.delete_download_animate(data=data))
+                    asyncio.create_task(self.Myself.delete_download_animate(data=data))
                 elif data['action'] == 'download_order_myself_animate':
-                    asyncio.create_task(self.download_order(data=data))
+                    asyncio.create_task(self.Myself.download_order(data=data))
             # if data.get('msg') and data['msg'] == 'some message to websocket server':
             #     await self.send(text_data=json.dumps({'msg': f'前端在按 Login'}))
         except Exception as error:

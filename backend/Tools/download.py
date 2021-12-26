@@ -18,7 +18,7 @@ class BaseDownloadManage:
         self.tasks_dict = {}
         self.now = 0
         self.max = 2
-        self.ws = None
+        self.switch_db_function = NotImplemented
 
     async def clear_finish_animate_list(self):
         """
@@ -48,13 +48,6 @@ class BaseDownloadManage:
         #             self.tasks_dict[item['id']].cancel()
         #         self.download_list.remove(item)
 
-
-class MyselfDownloadManage(BaseDownloadManage):
-    def __init__(self):
-        super(MyselfDownloadManage, self).__init__()
-        self.from_website = 'Myself'
-        threading.Thread(target=self.main, args=()).start()
-
     async def switch_download_order(self, data: dict):
         """
         交換下載順序。
@@ -64,38 +57,46 @@ class MyselfDownloadManage(BaseDownloadManage):
         download_len = len(self.download_list)
         if data['method'] == 'up' and data['index'] != 0:
             if download_len > data['index']:
-                await DB.Myself.switch_download(switch_data1=self.download_list[data['index'] - 1],
-                                                switch_data2=self.download_list[data['index']])
+                await self.switch_db_function(switch_data1=self.download_list[data['index'] - 1],
+                                              switch_data2=self.download_list[data['index']])
                 self.download_list[data['index'] - 1], self.download_list[data['index']] = \
                     self.download_list[data['index']], self.download_list[data['index'] - 1]
             else:
                 if data['index'] - download_len == 0:
-                    await DB.Myself.switch_download(switch_data1=self.wait_download_list[0],
-                                                    switch_data2=self.download_list[-1])
+                    await self.switch_db_function(switch_data1=self.wait_download_list[0],
+                                                  switch_data2=self.download_list[-1])
                     self.download_list.insert(-1, self.wait_download_list.pop(0))
                 else:
                     _ = data['index'] - download_len
-                    await DB.Myself.switch_download(switch_data1=self.wait_download_list[_],
-                                                    switch_data2=self.wait_download_list[_ - 1])
+                    await self.switch_db_function(switch_data1=self.wait_download_list[_],
+                                                  switch_data2=self.wait_download_list[_ - 1])
                     self.wait_download_list[_], self.wait_download_list[_ - 1] = \
                         self.wait_download_list[_ - 1], self.wait_download_list[_]
         elif data['method'] == 'down' and data['index'] != download_len + len(self.wait_download_list) - 1:
             if download_len > data['index'] + 1:
-                await DB.Myself.switch_download(switch_data1=self.download_list[data['index']],
-                                                switch_data2=self.download_list[data['index'] + 1])
+                await self.switch_db_function(switch_data1=self.download_list[data['index']],
+                                              switch_data2=self.download_list[data['index'] + 1])
                 self.download_list[data['index']], self.download_list[data['index'] + 1] = \
                     self.download_list[data['index'] + 1], self.download_list[data['index']]
             else:
                 _ = data['index'] + 1 - download_len
                 if data['index'] + 1 - download_len == 0:
-                    await DB.Myself.switch_download(switch_data1=self.wait_download_list[0],
-                                                    switch_data2=self.download_list[-1])
+                    await self.switch_db_function(switch_data1=self.wait_download_list[0],
+                                                  switch_data2=self.download_list[-1])
                     self.download_list.insert(-1, self.wait_download_list.pop(0))
                 else:
-                    await DB.Myself.switch_download(switch_data1=self.wait_download_list[_ - 1],
-                                                    switch_data2=self.wait_download_list[_])
+                    await self.switch_db_function(switch_data1=self.wait_download_list[_ - 1],
+                                                  switch_data2=self.wait_download_list[_])
                     self.wait_download_list[_ - 1], self.wait_download_list[_] = \
                         self.wait_download_list[_], self.wait_download_list[_ - 1]
+
+
+class MyselfDownloadManage(BaseDownloadManage):
+    def __init__(self):
+        super(MyselfDownloadManage, self).__init__()
+        self.from_website = 'Myself'
+        self.switch_db_function = DB.Myself.switch_download
+        threading.Thread(target=self.main, args=()).start()
 
     @staticmethod
     async def download_ts(ts_semaphore: asyncio.Semaphore, ts_uri: str, task_data: dict):
@@ -246,8 +247,8 @@ class MyselfDownloadManage(BaseDownloadManage):
             print('else try')
             if not task_data['video']:
                 await self._process_merge_video(task_data=task_data)
-            await DB.My.create_history(animate_website_name=self.from_website, animate_name=task_data["animate_name"],
-                                       episode_name=task_data["episode_name"])
+                await DB.My.create_history(animate_website_name=self.from_website, animate_name=task_data["animate_name"],
+                                           episode_name=task_data["episode_name"])
             task_data.update({'status': '下載完成'})
         self.now -= 1
 
@@ -316,13 +317,15 @@ class Anime1DownloadManage(BaseDownloadManage):
         self.now -= 1
 
     async def main_task(self):
+
         while True:
             if self.wait_download_list and self.max > self.now:
-                self.now += 1
-                task_data = self.wait_download_list.pop(0)
-                print('開始下載', task_data['name'], task_data['id'])
-                self.download_list.append(task_data)
-                self.tasks_dict.update({task_data['id']: asyncio.create_task(self.download_animate_script(task_data))})
+                pass
+                # self.now += 1
+                # task_data = self.wait_download_list.pop(0)
+                # print('開始下載', task_data['name'], task_data['id'])
+                # self.download_list.append(task_data)
+                # self.tasks_dict.update({task_data['id']: asyncio.create_task(self.download_animate_script(task_data))})
             await asyncio.sleep(0.1)
 
     def main(self):

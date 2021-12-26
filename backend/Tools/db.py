@@ -389,18 +389,26 @@ class MyBase:
 
 
 class CacheBase:
-    @staticmethod
-    def get_cache_data(key: str):
-        cache_db = caches['default']
-        result = cache_db.get(key)
+    cache_db = caches['default']
+
+    @classmethod
+    def get_cache_data(cls, key: str):
+        result = cls.cache_db.get(key)
         if result:
             return json.loads(result)
         return result
 
-    @staticmethod
-    def set_cache_data(key: str, data: str, timeout: int):
-        cache_db = caches['default']
-        cache_db.set(key, data, timeout=timeout)
+    @classmethod
+    def set_cache_data(cls, key: str, data: str, timeout: int):
+        cls.cache_db.set(key, data, timeout=timeout)
+
+    @classmethod
+    def clear_cache(cls):
+        cls.cache_db.clear()
+
+    @classmethod
+    def delete_cache_data(cls, key: str):
+        cls.cache_db.delete(key)
 
 
 class Anime1Base:

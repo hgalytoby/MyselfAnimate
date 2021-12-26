@@ -4,14 +4,16 @@ import {
   animateInfoState,
   animateListAction,
   animateListMutation,
-  animateListState
+  animateListState, downloadAnime1AnimateGetters, downloadAnime1AnimateState, loadingMutation, loadingState
 } from '../variables/anime1'
 import { axiosGet, axiosPost } from '../tools'
 import { anima1Api } from '../api'
 
 export const state = {
   [animateListState]: [],
-  [animateInfoState]: []
+  [animateInfoState]: [],
+  [downloadAnime1AnimateState]: [],
+  [loadingState]: true
 }
 
 export const actions = {
@@ -29,10 +31,18 @@ export const mutations = {
   },
   [animateInfoMutation] (state, value) {
     state[animateInfoState] = value
+    state[loadingState] = false
+  },
+  [loadingMutation] (state, value) {
+    state[loadingState] = true
   }
 }
 
-export const getters = {}
+export const getters = {
+  [downloadAnime1AnimateGetters] (state) {
+    return state[downloadAnime1AnimateState]
+  }
+}
 export default {
   state,
   actions,

@@ -6,7 +6,7 @@ export const actions = {}
 
 export const mutations = {
   setWsRes (state, value) {
-    console.log(value)
+    // console.log(value)
     // if (value.type === 'connect') {
     state.wsClick = value
     // } else if (value.type === 'click') {

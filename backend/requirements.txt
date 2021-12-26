@@ -5,6 +5,7 @@ channels-redis
 daphne
 django==3.2.10
 django-debug-toolbar
+django-redis
 djangorestframework
 django_cleanup
 drf_yasg

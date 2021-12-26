@@ -29,108 +29,43 @@
         </div>
       </div>
     </div>
-    <div class="row">
-      <h5>尚未下載</h5>
-      <div class="col-sm-2" v-for="data in animateUndone" :key="data.id">
-        <BootstrapIcon icon="check2-square" v-show="checkCheckboxArray(data.id)"
-                       @click="clickCheckbox(data.id)"/>
-        <BootstrapIcon icon="square" v-show="!checkCheckboxArray(data.id)"
-                       @click="clickCheckbox(data.id)"/>
-        <span>{{ data.name }}</span>
-      </div>
-      <h5>正在下載</h5>
-       <div class="col-sm-2" v-for="data in animateDownloading" :key="data.id">
-        <span>{{ data.name }}</span>
-      </div>
-      <h5>下載完成</h5>
-       <div class="col-sm-2" v-for="data in animateDone" :key="data.id">
-        <BootstrapIcon class="video-play" icon="play-btn" @click="startFancy(data.video)"/>
-        <span>{{ data.name }}</span>
-      </div>
-    </div>
+    <DownloadStatus :animateInfoObj="animateInfo" :downloadStateArray="downloadMyselfAnimate"/>
   </div>
-  <button type="button" class="btn btn-primary" @click="downloadAnimate">下載所選的集數</button>
 </template>
 
 <script>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useStore } from 'vuex'
 import {
   animateInfoAction,
   animateInfoState,
   loadingMutation,
   loadingState,
-  downloadMyselfAnimateState,
-  animateInfoEpisodeInfoAction
+  animateInfoEpisodeInfoAction, downloadMyselfAnimateState
 } from '../../variables/myself'
-import { sendSocketMessage } from '../../hooks/useWS'
 import Loading from '../../components/Loading'
-import { startFancy } from '../../tools'
 import useWindowsFocus from '../../hooks/useWindowsFocus'
+import DownloadStatus from '../../components/DownloadStatus'
 
 export default {
   name: 'Animate',
   props: {
     url: String
   },
-  components: { Loading },
+  components: { Loading, DownloadStatus },
   setup (props) {
     const store = useStore()
     const loading = computed(() => store.state.myself[loadingState])
     const animateInfo = computed(() => store.state.myself[animateInfoState])
-    const downloadMyselfAnimate = computed(() => {
-      return store.state.myself[downloadMyselfAnimateState].filter((item) => item.animate_id === animateInfo.value.id)
-    })
-    const animateDownloading = computed(() => {
-      const downloadingID = downloadMyselfAnimate.value.filter((item) => !item.done).map((item) => item.id)
-      return animateInfo.value.episode_info_model.filter((item) => downloadingID.indexOf(item.id) !== -1)
-    })
-    const animateUndone = computed(() => {
-      const downloadingID = downloadMyselfAnimate.value.map((item) => item.id)
-      return animateInfo.value.episode_info_model.filter((item) => !item.done && downloadingID.indexOf(item.id) === -1)
-    })
-    const animateDone = computed(() => {
-      const downloadingID = downloadMyselfAnimate.value.filter((item) => item.done).map((item) => item.id)
-      return animateInfo.value.episode_info_model.filter((item) => item.done || downloadingID.indexOf(item.id) !== -1)
-    })
-    const clickCheckboxData = ref([])
     store.commit(`myself/${loadingMutation}`)
     store.dispatch(`myself/${animateInfoAction}`, props.url)
     useWindowsFocus(store.dispatch, `myself/${animateInfoEpisodeInfoAction}`, animateInfo)
-    const downloadAnimate = () => {
-      sendSocketMessage({
-        action: 'download_myself_animate',
-        episodes: clickCheckboxData.value,
-        id: animateInfo.value.id,
-        animateName: animateInfo.value.name
-      })
-    }
-
-    function clickCheckbox (id) {
-      console.log(clickCheckboxData.value.indexOf(id))
-      const index = clickCheckboxData.value.indexOf(id)
-      if (index === -1) {
-        clickCheckboxData.value.push(id)
-      } else {
-        clickCheckboxData.value.splice(index, 1)
-      }
-    }
-
-    function checkCheckboxArray (id) {
-      return clickCheckboxData.value.indexOf(id) !== -1
-    }
-
+    const downloadMyselfAnimate = computed(() => {
+      return store.state.myself[downloadMyselfAnimateState].filter((item) => item.animate_id === animateInfo.value.id)
+    })
     return {
       loading,
       animateInfo,
-      downloadAnimate,
-      clickCheckbox,
-      checkCheckboxArray,
-      clickCheckboxData,
-      startFancy,
-      animateDownloading,
-      animateUndone,
-      animateDone,
       downloadMyselfAnimate
     }
   }

@@ -4,10 +4,8 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <div class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="myself-animate" role="button" data-bs-toggle="dropdown"
-               aria-expanded="false">
-              MyselfAnimate
-            </a>
+            <router-link class="nav-link dropdown-toggle" to="/Myself" id="myself-animate" role="button" data-bs-toggle="dropdown"
+             aria-expanded="false">MyselfAnimate</router-link>
             <ul class="dropdown-menu" aria-labelledby="myself-animate">
               <li>
                 <router-link class="dropdown-item" to="/Myself">本季新番</router-link>
@@ -21,10 +19,8 @@
             </ul>
           </div>
           <div class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="anime1" role="button" data-bs-toggle="dropdown"
-               aria-expanded="false">
-              Anime1
-            </a>
+            <router-link class="nav-link dropdown-toggle" to="/AnimateList" id="anime1" role="button" data-bs-toggle="dropdown"
+               aria-expanded="false">Anime1</router-link>
             <ul class="dropdown-menu" aria-labelledby="anime1">
               <li>
                 <router-link class="dropdown-item" to="/AnimateList">動畫列表</router-link>
