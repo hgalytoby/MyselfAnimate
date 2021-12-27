@@ -16,7 +16,7 @@ from django.core.files.base import ContentFile
 
 from Database.models import MyselfFinishAnimateModel, MyselfAnimateEpisodeInfoModel, MyselfAnimateEpisodeTsModel, \
     MyselfDownloadModel, MyselfAnimateInfoModel, MyHistoryModel, MySystemModel, Anime1AnimateInfoModel, \
-    Anime1AnimateEpisodeInfoModel
+    Anime1AnimateEpisodeInfoModel, Anime1DownloadModel
 from Tools.tools import aiohttp_bytes, use_io_get_image_format
 from django.core.cache import caches
 
@@ -166,17 +166,9 @@ class MyselfBase:
     @staticmethod
     @database_sync_to_async
     def get_download_animate_episode_data_list(download_models: Union[QuerySet, List[MyselfDownloadModel]]) -> list:
-        data = []
+        result = []
         for download_model in download_models:
-            ts_models = MyselfAnimateEpisodeTsModel.objects.select_related('owner').filter(
-                owner_id=download_model.owner_id)
-            ts_count = ts_models.count()
-            ts_undone_models = ts_models.filter(done=False)
-            ts_undone_count = ts_undone_models.count()
-            ts_list = []
-            for ts_undone_model in ts_undone_models:
-                ts_list.append(ts_undone_model.uri)
-            data.append({
+            data = {
                 'id': download_model.id,
                 'episode_id': download_model.owner.id,
                 'animate_id': download_model.owner.owner.id,
@@ -184,13 +176,27 @@ class MyselfBase:
                 'episode_name': download_model.owner.name,
                 'done': download_model.owner.done,
                 'vpx_url': download_model.owner.url,
-                'ts_list': ts_list,
-                'ts_count': ts_count,
-                'count': ts_count - ts_undone_count,
+                'ts_count': 100,
+                'count': 100,
                 'status': '準備下載',
                 'video': f'{MEDIA_PATH}{download_model.owner.video.url}' if download_model.owner.video else None
-            })
-        return data
+            }
+            if not download_model.owner.done:
+                ts_models = MyselfAnimateEpisodeTsModel.objects.select_related('owner').filter(
+                    owner_id=download_model.owner_id)
+                ts_count = ts_models.count()
+                ts_undone_models = ts_models.filter(done=False)
+                ts_undone_count = ts_undone_models.count()
+                ts_list = []
+                for ts_undone_model in ts_undone_models:
+                    ts_list.append(ts_undone_model.uri)
+                data.update({
+                    'ts_list': ts_list,
+                    'ts_count': ts_count,
+                    'count': ts_count - ts_undone_count
+                })
+            result.append(data)
+        return result
 
     @staticmethod
     @database_sync_to_async
@@ -428,6 +434,23 @@ class Anime1Base:
                 **episode,
                 'owner': owner
             })
+
+    @staticmethod
+    @database_sync_to_async
+    def create_many_download_models(owner_id_list: list) -> list:
+        """
+        :param owner_id_list:
+        :return:
+        """
+        data = []
+        for owner_id in owner_id_list:
+            data.append(Anime1DownloadModel.objects.create(owner_id=owner_id))
+        return data
+
+    @staticmethod
+    @database_sync_to_async
+    def get_download_animate_episode_data_list(download_models: Union[QuerySet, List[Anime1DownloadModel]]) -> list:
+        pass
 
 
 class DB:

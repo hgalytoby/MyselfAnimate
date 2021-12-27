@@ -12,7 +12,7 @@ export const connectSocket = () => {
   const store = useStore()
   socket.onopen = function () {
     console.log('websocket connected!!')
-    sendSocketMessage({ msg1: '我要跟後端連線了!' })
+    sendSocketMessage({ action: 'connect' })
   }
   socket.onmessage = function (msg) {
     console.log('onmessage', JSON.parse(msg.data))
@@ -27,6 +27,8 @@ export const connectSocket = () => {
       store.commit('myself/searchMyselfAnimateMutation', receive.data)
     } else if (receive.action === 'clear_finish_myself_animate') {
     } else if (receive.action === 'download_order_myself_animate') {
+    } else if (receive.action === 'download_anime1_animate_array') {
+      store.commit('anime1/downloadAnime1AnimateMutation', receive.data)
     } else {
       store.commit('ws/setWsRes', JSON.parse(msg.data))
     }

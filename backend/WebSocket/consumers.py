@@ -33,7 +33,7 @@ class MyselfManage(Base):
     def __init__(self, parent):
         self.parent = parent
 
-    async def myself_finish_animate_update(self):
+    async def finish_animate_update(self):
         """
         更新完結動漫。
         :return:
@@ -53,7 +53,7 @@ class MyselfManage(Base):
         await self.parent.send(
             text_data=json.dumps({'msg': '更新完成', 'action': 'myself_finish_animate_update', 'updating': False}))
 
-    async def myself_animate_download(self, data: dict):
+    async def animate_download(self, data: dict):
         """
         下載動漫集數。
         :param data: dict -> 前端傳來要下載動漫的資料。
@@ -132,6 +132,25 @@ class Anime1Manage(Base):
     def __init__(self, parent):
         self.parent = parent
 
+    async def animate_download(self, data: dict):
+        """
+        下載動漫集數。
+        :param data: dict -> 前端傳來要下載動漫的資料。
+        :return:
+        """
+        try:
+            if data['episodes']:
+                await DB.My.create_log(msg='Anime1 下載動漫', action='download')
+                try:
+                    ...
+                # download_models = await DB.Anime1.create_many_download_models(owner_id_list=data['episodes'])
+
+                except Exception as e:
+                    print(e)
+                print(data['episodes'])
+        except Exception as e:
+            print(e)
+
 
 class AsyncChatConsumer(AsyncWebsocketConsumer):
     def __init__(self, *args, **kwargs):
@@ -146,7 +165,6 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
         """
         await self.accept()
         await DB.My.create_log(msg='已連線', action='connect')
-        await self.send(text_data=json.dumps({'type': 'connect', 'msg': f'連線成功!!'}))
         asyncio.create_task(self.Myself.download_tasks())
         asyncio.create_task(self.Anime1.download_tasks())
 
@@ -166,15 +184,16 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
         :param bytes_data: bytes -> 前端傳來的值。
         :return:
         """
+
         data = json.loads(text_data)
-        # print(data)
+        print(data)
         try:
             if data.get('action'):
                 if data['action'] == 'myself_finish_animate_update':
-                    asyncio.create_task(self.Myself.myself_finish_animate_update())
+                    asyncio.create_task(self.Myself.finish_animate_update())
                     await self.send(text_data=json.dumps({'msg': f'正在更新中', 'action': data['action'], 'updating': True}))
                 elif data['action'] == 'download_myself_animate':
-                    asyncio.create_task(self.Myself.myself_animate_download(data=data))
+                    asyncio.create_task(self.Myself.animate_download(data=data))
                     await self.send(
                         text_data=json.dumps({'msg': f'我收到要下載的清單了', 'action': data['action'], 'updating': True}))
                 elif data['action'] == 'search_myself_animate':
@@ -185,8 +204,14 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
                     asyncio.create_task(self.Myself.delete_download_animate(data=data))
                 elif data['action'] == 'download_order_myself_animate':
                     asyncio.create_task(self.Myself.download_order(data=data))
+                elif data['action'] == 'download_anime1_animate':
+                    asyncio.create_task(self.Anime1.animate_download(data=data))
+                elif data['action'] == 'connect':
+                    await self.send(text_data=json.dumps({'action': 'connect', 'msg': f'連線成功!!'}))
             # if data.get('msg') and data['msg'] == 'some message to websocket server':
             #     await self.send(text_data=json.dumps({'msg': f'前端在按 Login'}))
+            else:
+                await self.send(text_data=json.dumps({'msg': f'錯誤的格式', 'action': 'error'}))
         except Exception as error:
             print(error)
             await self.send(text_data=json.dumps({'msg': f'後端出錯了: {error}'}))

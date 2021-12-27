@@ -28,16 +28,15 @@ class Anime1AnimateInfoView(APIView):
         if not url:
             return Response(status=status.HTTP_404_NOT_FOUND)
         animate_url = f'{Anime1AnimateUrl}{url}'
-        # data = DB.Cache.get_cache_data(key=animate_url)
-        # if data:
-        #     return Response(data, status=status.HTTP_200_OK)
+        data = DB.Cache.get_cache_data(key=animate_url)
+        if data:
+            return Response(data, status=status.HTTP_200_OK)
         if request.data:
             model = DB.Anime1.create_animate_info(**request.data)
         else:
             model = DB.Anime1.get_animate_info(url=url)
-        print(model)
         episode_data = Anime1.get_animate_info(url=animate_url, data=[])
         DB.Anime1.update_or_create_many_episode(episodes=episode_data, owner=model)
         serializer = Anime1InfoSerializer(model)
-        # DB.Cache.set_cache_data(key=animate_url, data=json.dumps(serializer.data), timeout=1800)
+        DB.Cache.set_cache_data(key=animate_url, data=json.dumps(serializer.data), timeout=1800)
         return Response(serializer.data)

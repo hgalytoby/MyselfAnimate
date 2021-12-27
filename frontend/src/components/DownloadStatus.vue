@@ -38,7 +38,8 @@ export default {
   name: 'DownloadStatus',
   props: {
     animateInfoObj: Object,
-    downloadStateArray: Array
+    downloadStateArray: Array,
+    action: String
   },
   setup (props) {
     const clickCheckboxData = ref([])
@@ -58,7 +59,7 @@ export default {
     })
     const downloadAnimate = () => {
       sendSocketMessage({
-        action: 'download_myself_animate',
+        action: props.action,
         episodes: clickCheckboxData.value,
         id: animateInfo.value.id,
         animateName: animateInfo.value.name

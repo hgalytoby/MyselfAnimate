@@ -237,9 +237,7 @@ class MyselfDownloadManage(BaseDownloadManage):
         :return:
         """
         try:
-            if task_data['done']:
-                task_data['count'], task_data['ts_count'] = 100, 100
-            else:
+            if not task_data['done']:
                 await self.download_animate(task_data=task_data)
         except asyncio.CancelledError:
             print(f'取消下載: {task_data["animate_name"]} {task_data["episode_name"]}')
@@ -320,12 +318,12 @@ class Anime1DownloadManage(BaseDownloadManage):
 
         while True:
             if self.wait_download_list and self.max > self.now:
-                pass
-                # self.now += 1
-                # task_data = self.wait_download_list.pop(0)
-                # print('開始下載', task_data['name'], task_data['id'])
+                self.now += 1
+                task_data = self.wait_download_list.pop(0)
+                print('開始下載', task_data['name'], task_data['id'])
                 # self.download_list.append(task_data)
                 # self.tasks_dict.update({task_data['id']: asyncio.create_task(self.download_animate_script(task_data))})
+                pass
             await asyncio.sleep(0.1)
 
     def main(self):
