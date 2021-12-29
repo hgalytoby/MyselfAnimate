@@ -145,7 +145,7 @@ class Anime1Manage(Base):
                 await DB.My.create_log(msg='Anime1 下載動漫', action='download')
                 try:
                     ...
-                # download_models = await DB.Anime1.create_many_download_models(owner_id_list=data['episodes'])
+                    # download_models = await DB.Anime1.create_many_download_models(owner_id_list=kwargs['episodes'])
 
                 except Exception as e:
                     print(e)

@@ -1,5 +1,5 @@
 from django.db import models
-from Database.models.base import upload_image_path, upload_ts_path, BaseAnimateEpisodeInfoModel
+from Database.models.base import upload_image_path, upload_ts_path, BaseAnimateEpisodeInfoModel, BaseDownloadModel
 
 
 class MyselfAnimateInfoModel(models.Model):
@@ -77,7 +77,7 @@ class MyselfAnimateEpisodeTsModel(models.Model):
         db_table = 'MyselfAnimateEpisodeTs'
 
 
-class MyselfDownloadModel(models.Model):
+class MyselfDownloadModel(BaseDownloadModel):
     """
     owner: 關聯
     """

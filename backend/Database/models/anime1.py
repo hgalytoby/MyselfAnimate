@@ -1,5 +1,5 @@
 from django.db import models
-from Database.models.base import BaseAnimateEpisodeInfoModel
+from Database.models.base import BaseAnimateEpisodeInfoModel, BaseDownloadModel
 
 
 class Anime1AnimateInfoModel(models.Model):
@@ -37,7 +37,7 @@ class Anime1AnimateEpisodeInfoModel(BaseAnimateEpisodeInfoModel):
         ordering = ('-published_updated_date', )
 
 
-class Anime1DownloadModel(models.Model):
+class Anime1DownloadModel(BaseDownloadModel):
     """
     owner: 關聯
     """

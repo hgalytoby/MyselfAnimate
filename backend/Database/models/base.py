@@ -1,6 +1,8 @@
 from channels.db import database_sync_to_async
 from django.db import models
 
+from project.settings import MEDIA_PATH
+
 
 def upload_image_path(instance, filename):
     """
@@ -51,3 +53,20 @@ class BaseAnimateEpisodeInfoModel(models.Model):
         """
         return self.owner.from_website
 
+
+class BaseDownloadModel(models.Model):
+    def get_and_add_download_data(self, add_data):
+        return {
+            'episode_id': self.owner.id,
+            'animate_id': self.owner.owner.id,
+            'animate_name': self.owner.owner.name,
+            'episode_name': self.owner.name,
+            'done': self.owner.done,
+            'id': self.id,
+            'status': '準備下載',
+            'video': f'{MEDIA_PATH}{self.owner.video.url}' if self.owner.video else None,
+            **add_data,
+        }
+
+    class Meta:
+        abstract = True

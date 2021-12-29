@@ -168,20 +168,12 @@ class MyselfBase:
     def get_download_animate_episode_data_list(download_models: Union[QuerySet, List[MyselfDownloadModel]]) -> list:
         result = []
         for download_model in download_models:
-            data = {
-                'id': download_model.id,
-                'episode_id': download_model.owner.id,
-                'animate_id': download_model.owner.owner.id,
-                'animate_name': download_model.owner.owner.name,
-                'episode_name': download_model.owner.name,
-                'done': download_model.owner.done,
+            data = download_model.get_and_add_download_data(add_data={
                 'vpx_url': download_model.owner.url,
                 'ts_count': 100,
                 'count': 100,
-                'status': '準備下載',
-                'video': f'{MEDIA_PATH}{download_model.owner.video.url}' if download_model.owner.video else None
-            }
-            if not download_model.owner.done:
+            })
+            if not data['done']:
                 ts_models = MyselfAnimateEpisodeTsModel.objects.select_related('owner').filter(
                     owner_id=download_model.owner_id)
                 ts_count = ts_models.count()
@@ -450,7 +442,14 @@ class Anime1Base:
     @staticmethod
     @database_sync_to_async
     def get_download_animate_episode_data_list(download_models: Union[QuerySet, List[Anime1DownloadModel]]) -> list:
-        pass
+        result = []
+        for download_model in download_models:
+            data = download_model.get_and_add_download_data(add_data={
+                'url': download_model.owner.url,
+            })
+            if not data['done']:
+                ...
+        ...
 
 
 class DB:
