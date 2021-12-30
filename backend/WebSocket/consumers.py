@@ -82,7 +82,7 @@ class MyselfManage(Base):
         :param data: dict -> 前端傳來要搜尋動漫的資料。
         :return:
         """
-        if data['msg']:
+        if kwargs['msg']:
             await DB.My.create_log(msg=f'Myself 搜尋{kwargs["msg"]}動漫', action='search')
             model = await DB.Myself.filter_finish_animate(name__contains=kwargs['msg'])
         else:
@@ -144,9 +144,9 @@ class Anime1Manage(Base):
             if kwargs['episodes']:
                 await DB.My.create_log(msg='Anime1 下載動漫', action='download')
                 try:
-                    ...
-                    # download_models = await DB.Anime1.create_many_download_models(owner_id_list=kwargs['episodes'])
-
+                    download_models = await DB.Anime1.create_many_download_models(owner_id_list=kwargs['episodes'])
+                    download_data_list = await DB.Anime1.get_download_animate_episode_data_list(download_models=download_models)
+                    anime1_download_manage.wait_download_list.extend(download_data_list)
                 except Exception as e:
                     print(e)
                 print(kwargs['episodes'])

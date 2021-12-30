@@ -446,10 +446,10 @@ class Anime1Base:
         for download_model in download_models:
             data = download_model.get_and_add_download_data(add_data={
                 'url': download_model.owner.url,
+                'progress_value': 0
             })
-            if not data['done']:
-                ...
-        ...
+            result.append(data)
+        return result
 
 
 class DB:
