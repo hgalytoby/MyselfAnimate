@@ -7,7 +7,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from Api.serializers.anime1 import Anime1InfoSerializer
-from Database.models import Anime1AnimateInfoModel
 from Tools.anime1 import Anime1
 from Tools.db import DB
 from Tools.urls import Anime1AnimateUrl
@@ -28,9 +27,9 @@ class Anime1AnimateInfoView(APIView):
         if not url:
             return Response(status=status.HTTP_404_NOT_FOUND)
         animate_url = f'{Anime1AnimateUrl}{url}'
-        data = DB.Cache.get_cache_data(key=animate_url)
-        if data:
-            return Response(data, status=status.HTTP_200_OK)
+        # data = DB.Cache.get_cache_data(key=animate_url)
+        # if data:
+        #     return Response(data, status=status.HTTP_200_OK)
         if request.data:
             model = DB.Anime1.create_animate_info(**request.data)
         else:

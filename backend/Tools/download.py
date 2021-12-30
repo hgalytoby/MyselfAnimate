@@ -1,4 +1,7 @@
 import asyncio
+import json
+import os
+import shutil
 import threading
 import subprocess
 
@@ -89,6 +92,17 @@ class BaseDownloadManage:
                                                   switch_data2=self.wait_download_list[_])
                     self.wait_download_list[_ - 1], self.wait_download_list[_] = \
                         self.wait_download_list[_], self.wait_download_list[_ - 1]
+
+    async def main_task(self):
+        while True:
+            if self.wait_download_list and self.max > self.now:
+                self.now += 1
+                task_data = self.wait_download_list.pop(0)
+                print('開始下載', task_data['animate_name'], task_data['episode_name'], task_data['id'])
+                self.download_list.append(task_data)
+                self.tasks_dict.update({task_data['id']: asyncio.create_task(self.download_animate_script(task_data))})
+                pass
+            await asyncio.sleep(0.1)
 
 
 class MyselfDownloadManage(BaseDownloadManage):
@@ -192,9 +206,8 @@ class MyselfDownloadManage(BaseDownloadManage):
         try:
             model = await DB.Myself.get_animate_episode_info_model(owner__name=task_data['animate_name'],
                                                                    name=task_data['episode_name'])
-            from_website = await model.get_from_website()
-            ts_list_path = f"{from_website}/{task_data['animate_name']}/video/ts/{task_data['episode_name']}/ts_list.txt"
-            video_path = f"{from_website}/{task_data['animate_name']}/video/{task_data['episode_name']}.mp4"
+            ts_list_path = f"{self.from_website}/{task_data['animate_name']}/video/ts/{task_data['episode_name']}/ts_list.txt"
+            video_path = f"{self.from_website}/{task_data['animate_name']}/video/{task_data['episode_name']}.mp4"
             ts_path_list = await DB.Myself.filter_animate_episode_ts_list(owner=model)
             with open(f"{ROOT_MEDIA_PATH}{ts_list_path}", 'w', encoding='utf-8') as f:
                 f.write('\n'.join(ts_path_list))
@@ -245,7 +258,8 @@ class MyselfDownloadManage(BaseDownloadManage):
             print('else try')
             if not task_data['video']:
                 await self._process_merge_video(task_data=task_data)
-                await DB.My.create_history(animate_website_name=self.from_website, animate_name=task_data["animate_name"],
+                await DB.My.create_history(animate_website_name=self.from_website,
+                                           animate_name=task_data["animate_name"],
                                            episode_name=task_data["episode_name"])
             task_data.update({'status': '下載完成'})
         self.now -= 1
@@ -258,14 +272,7 @@ class MyselfDownloadManage(BaseDownloadManage):
         download_models = await DB.Myself.get_total_download_animate_episode_models()
         self.wait_download_list += await DB.Myself.get_download_animate_episode_data_list(
             download_models=download_models)
-        while True:
-            if self.wait_download_list and self.max > self.now:
-                self.now += 1
-                task_data = self.wait_download_list.pop(0)
-                print('開始下載', task_data['animate_name'], task_data['episode_name'], task_data['id'])
-                self.download_list.append(task_data)
-                self.tasks_dict.update({task_data['id']: asyncio.create_task(self.download_animate_script(task_data))})
-            await asyncio.sleep(0.1)
+        await super(MyselfDownloadManage, self).main_task()
 
     def main(self):
         """
@@ -281,24 +288,35 @@ class Anime1DownloadManage(BaseDownloadManage):
         self.from_website = 'Anime1'
         threading.Thread(target=self.main, args=()).start()
 
-    @staticmethod
-    async def download_animate(task_data, animate_url, cookies):
+    async def download_animate(self, task_data, animate_url, cookies):
         _headers = {
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36',
             'cookie': cookies
         }
         _timeout = aiohttp.client.ClientTimeout(sock_connect=10, sock_read=10)
-        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=True)) as session:
-            async with session.get(url=animate_url, headers=_headers, timeout=_timeout) as res:
-                with open(f'{task_data["name"]}.mp4', 'wb') as fd:
-                    download_content_length = 0
-                    while True:
-                        chunk = await res.content.read(1024 * 10)
-                        download_content_length += len(chunk)
-                        if not chunk:
-                            break
-                        fd.write(chunk)
-                        task_data['progress_value'] = download_content_length // res.content_length * 100
+        try:
+            async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=True)) as session:
+                async with session.get(url=animate_url, headers=_headers, timeout=_timeout) as res:
+                    path = f'{MEDIA_PATH}/{self.from_website}/{task_data["animate_name"]}/video/'
+                    if os.path.isdir(path):
+                        shutil.rmtree(f'{MEDIA_PATH}/{self.from_website}/{task_data["animate_name"]}')
+                    os.makedirs(path)
+                    video_path = f'{path}{task_data["episode_name"]}.mp4'
+                    with open(video_path, 'wb') as fd:
+                        download_content_length = 0
+                        while True:
+                            chunk = await res.content.read(1024 * 10)
+                            download_content_length += len(chunk)
+                            if not chunk:
+                                break
+                            fd.write(chunk)
+                            task_data['progress_value'] = download_content_length // res.content_length * 100
+                        await DB.Anime1.save_animate_episode_video_file(pk=task_data['episode_id'],
+                                                                        video_path=video_path)
+                        task_data['video'] = video_path
+                        task_data['done'] = True
+        except Exception as e:
+            print(e)
 
     async def download_animate_script(self, task_data):
         try:
@@ -315,16 +333,7 @@ class Anime1DownloadManage(BaseDownloadManage):
         self.now -= 1
 
     async def main_task(self):
-
-        while True:
-            if self.wait_download_list and self.max > self.now:
-                self.now += 1
-                task_data = self.wait_download_list.pop(0)
-                print('開始下載', task_data['name'], task_data['id'])
-                # self.download_list.append(task_data)
-                # self.tasks_dict.update({task_data['id']: asyncio.create_task(self.download_animate_script(task_data))})
-                pass
-            await asyncio.sleep(0.1)
+        await super(Anime1DownloadManage, self).main_task()
 
     def main(self):
         """

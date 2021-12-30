@@ -11,6 +11,7 @@
     <DownloadStatus :animateInfoObj="animateInfo" :downloadStateArray="downloadAnime1Animate"
                     action="download_anime1_animate"/>
   </div>
+  {{downloadAnime1Animate}}
 </template>
 
 <script>

@@ -42,10 +42,11 @@ import {
   animateInfoState,
   loadingMutation,
   loadingState,
-  animateInfoEpisodeInfoAction, downloadMyselfAnimateState
+  // animateInfoEpisodeInfoAction, downloadMyselfAnimateState
+  downloadMyselfAnimateState
 } from '../../variables/myself'
 import Loading from '../../components/Loading'
-import useWindowsFocus from '../../hooks/useWindowsFocus'
+// import useWindowsFocus from '../../hooks/useWindowsFocus'
 import DownloadStatus from '../../components/DownloadStatus'
 
 export default {
@@ -60,7 +61,7 @@ export default {
     const animateInfo = computed(() => store.state.myself[animateInfoState])
     store.commit(`myself/${loadingMutation}`)
     store.dispatch(`myself/${animateInfoAction}`, props.url)
-    useWindowsFocus(store.dispatch, `myself/${animateInfoEpisodeInfoAction}`, animateInfo)
+    // useWindowsFocus(store.dispatch, `myself/${animateInfoEpisodeInfoAction}`, animateInfo)
     const downloadMyselfAnimate = computed(() => {
       return store.state.myself[downloadMyselfAnimateState].filter((item) => item.animate_id === animateInfo.value.id)
     })

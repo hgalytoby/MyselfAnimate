@@ -55,7 +55,7 @@ class BaseAnimateEpisodeInfoModel(models.Model):
 
 
 class BaseDownloadModel(models.Model):
-    def get_and_add_download_data(self, add_data):
+    def get_download_data(self):
         return {
             'episode_id': self.owner.id,
             'animate_id': self.owner.owner.id,
@@ -63,9 +63,8 @@ class BaseDownloadModel(models.Model):
             'episode_name': self.owner.name,
             'done': self.owner.done,
             'id': self.id,
-            'status': '準備下載',
+            'status': '下載完成' if self.owner.done else '準備下載',
             'video': f'{MEDIA_PATH}{self.owner.video.url}' if self.owner.video else None,
-            **add_data,
         }
 
     class Meta:

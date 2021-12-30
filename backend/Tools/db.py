@@ -168,11 +168,12 @@ class MyselfBase:
     def get_download_animate_episode_data_list(download_models: Union[QuerySet, List[MyselfDownloadModel]]) -> list:
         result = []
         for download_model in download_models:
-            data = download_model.get_and_add_download_data(add_data={
+            data = {
+                **download_model.get_download_data(),
                 'vpx_url': download_model.owner.url,
                 'ts_count': 100,
                 'count': 100,
-            })
+            }
             if not data['done']:
                 ts_models = MyselfAnimateEpisodeTsModel.objects.select_related('owner').filter(
                     owner_id=download_model.owner_id)
@@ -444,12 +445,26 @@ class Anime1Base:
     def get_download_animate_episode_data_list(download_models: Union[QuerySet, List[Anime1DownloadModel]]) -> list:
         result = []
         for download_model in download_models:
-            data = download_model.get_and_add_download_data(add_data={
+            data = {
+                **download_model.get_download_data(),
                 'url': download_model.owner.url,
-                'progress_value': 0
-            })
+                'progress_value': 0,
+            }
             result.append(data)
         return result
+
+    @staticmethod
+    @database_sync_to_async
+    def save_animate_episode_video_file(video_path: str, **kwargs):
+        """
+        儲存動漫某一集的檔案。
+        :param video_path:
+        :return:
+        """
+        model = Anime1AnimateEpisodeInfoModel.objects.get(**kwargs)
+        model.done = True
+        model.video = video_path
+        model.save()
 
 
 class DB:

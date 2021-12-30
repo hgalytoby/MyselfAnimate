@@ -20,14 +20,13 @@ class Base:
             await self.parent.send(
                 text_data=json.dumps({
                     'msg': 'now download array',
-                    'data': self.download + self.wait,
+                    'data': getattr(self.manage, 'download_list') + getattr(self.manage, 'wait_download_list'),
                     'action': self.task_action}))
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(1)
 
 
 class MyselfManage(Base):
-    download = myself_download_manage.download_list
-    wait = myself_download_manage.wait_download_list
+    manage = myself_download_manage
     task_action = 'download_myself_animate_array'
 
     def __init__(self, parent):
@@ -38,7 +37,7 @@ class MyselfManage(Base):
         更新完結動漫。
         :return:
         """
-        await self.send(text_data=json.dumps({'msg': f'正在更新中', 'action': kwargs['action'], 'updating': True}))
+        await self.parent.send(text_data=json.dumps({'msg': f'正在更新中', 'action': kwargs['action'], 'updating': True}))
         await DB.My.create_log(msg='Myself 更新完結動漫', action='update')
         total_page_data = await Myself.finish_animate_total_page(url=MyselfFinishAnimateUrl, get_res_text=True)
         for page in range(1, total_page_data['total_page'] + 1):
@@ -59,7 +58,7 @@ class MyselfManage(Base):
         :param data: dict -> 前端傳來要下載動漫的資料。
         :return:
         """
-        await self.send(text_data=json.dumps({'msg': f'我收到要下載的清單了', 'action': kwargs['action'], 'updating': True}))
+        await self.parent.send(text_data=json.dumps({'msg': f'我收到要下載的清單了', 'action': kwargs['action'], 'updating': True}))
         try:
             if kwargs['episodes']:
                 await DB.My.create_log(msg='Myself 下載動漫', action='download')
@@ -67,6 +66,7 @@ class MyselfManage(Base):
                     download_models = await DB.Myself.create_many_download_models(owner_id_list=kwargs['episodes'])
                     download_data_list = await DB.Myself.get_download_animate_episode_data_list(
                         download_models=download_models)
+
                     myself_download_manage.wait_download_list.extend(download_data_list)
                 except Exception as error:
                     print(error)
@@ -110,6 +110,7 @@ class MyselfManage(Base):
         :return:
         """
         DB.Cache.clear_cache()
+        print(kwargs)
         await DB.Myself.delete_download_and_ts(download_model__id__in=kwargs['deletes'])
         await DB.My.create_log(msg='Myself 刪除已選取動漫', action='delete')
         await myself_download_manage.delete_download_animate_list(kwargs['deletes'])
@@ -127,8 +128,7 @@ class MyselfManage(Base):
 
 
 class Anime1Manage(Base):
-    download = anime1_download_manage.download_list
-    wait = anime1_download_manage.wait_download_list
+    manage = anime1_download_manage
     task_action = 'download_anime1_animate_array'
 
     def __init__(self, parent):
@@ -140,12 +140,15 @@ class Anime1Manage(Base):
         :param data: dict -> 前端傳來要下載動漫的資料。
         :return:
         """
+        await self.parent.send(text_data=json.dumps({'msg': f'我收到要下載的清單了', 'action': kwargs['action'], 'updating': True}))
         try:
             if kwargs['episodes']:
                 await DB.My.create_log(msg='Anime1 下載動漫', action='download')
                 try:
                     download_models = await DB.Anime1.create_many_download_models(owner_id_list=kwargs['episodes'])
-                    download_data_list = await DB.Anime1.get_download_animate_episode_data_list(download_models=download_models)
+                    download_data_list = await DB.Anime1.get_download_animate_episode_data_list(
+                        download_models=download_models)
+                    print('download_data_list', download_data_list)
                     anime1_download_manage.wait_download_list.extend(download_data_list)
                 except Exception as e:
                     print(e)

@@ -72,6 +72,7 @@
       </table>
     </div>
   </transition>
+  {{downloadAnime1AnimateArray}}
 </template>
 
 <script>
@@ -80,6 +81,7 @@ import { downloadMyselfAnimateGetters } from '../variables/myself'
 import { computed } from 'vue'
 import { sendSocketMessage } from '../hooks/useWS'
 import { startFancy } from '../tools'
+import { downloadAnime1AnimateGetters } from '../variables/anime1'
 
 export default {
   name: 'MyDownload',
@@ -87,6 +89,7 @@ export default {
     const store = useStore()
     const downloadCheckBox = []
     const downloadMyselfAnimateArray = computed(() => store.getters[`myself/${downloadMyselfAnimateGetters}`])
+    const downloadAnime1AnimateArray = computed(() => store.getters[`anime1/${downloadAnime1AnimateGetters}`])
 
     const clearFinishDownload = () => {
       sendSocketMessage({
@@ -155,7 +158,8 @@ export default {
       clickDownloadCheckBox,
       checkBoxAll,
       clickCheckBoxAll,
-      orderUpOrDown
+      orderUpOrDown,
+      downloadAnime1AnimateArray
     }
   }
 }
