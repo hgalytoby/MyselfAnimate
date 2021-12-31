@@ -475,6 +475,29 @@ class Anime1Base:
         model.video = video_path
         model.save()
 
+    @classmethod
+    @database_sync_to_async
+    def delete_download_finish_animate(cls):
+        """
+        刪除下載已完成動漫。
+        :return:
+        """
+        Anime1DownloadModel.objects.filter(owner__done=True).delete()
+
+    @staticmethod
+    @database_sync_to_async
+    def delete_download(**kwargs):
+        """
+        刪除 Download 的資料庫資料。
+        :param kwargs:
+        :return:
+        """
+        models = Anime1AnimateEpisodeInfoModel.objects.select_related('owner').filter(**kwargs)
+        for model in models:
+            Anime1DownloadModel.objects.filter(owner_id=model.pk).delete()
+            model.done = False
+            model.video = None
+            model.save()
 
 class DB:
     Myself = MyselfBase

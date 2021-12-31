@@ -30,8 +30,9 @@
       </div>
     </div>
     <DownloadStatus :animateInfoObj="animateInfo" :downloadStateArray="downloadMyselfAnimate"
-                    action="download_myself_animate"/>
+              action="download_myself_animate"/>
   </div>
+
 </template>
 
 <script>

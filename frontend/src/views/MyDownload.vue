@@ -7,15 +7,17 @@
     </li>
     <li class="nav-item" role="presentation">
       <button class="nav-link" id="pills-anime1-tab" data-bs-toggle="pill" data-bs-target="#pills-anime1"
-              type="button" role="tab" aria-controls="pills-anime1" aria-selected="false">Anime1
+              type="button" role="tab" aria-controls="pills-anime1" aria-selected="true">Anime1
       </button>
     </li>
   </ul>
   <div class="tab-content" id="pills-tabContent">
     <div class="tab-pane fade show active" id="pills-myself" role="tabpanel" aria-labelledby="pills-myself-tab">
+      <TabModel target="myself-target" clearAction="clear_finish_myself_animate"/>
       <AnimateDownload :downloadAnimateData="downloadMyselfAnimateArray"/>
     </div>
     <div class="tab-pane fade" id="pills-anime1" role="tabpanel" aria-labelledby="pills-anime1-tab">
+      <TabModel target="anime1-target" clearAction="clear_finish_anime1_animate"/>
       <AnimateDownload :downloadAnimateData="downloadAnime1AnimateArray"/>
     </div>
   </div>
@@ -27,11 +29,13 @@ import { downloadMyselfAnimateGetters } from '../variables/myself'
 import { computed } from 'vue'
 import { downloadAnime1AnimateGetters } from '../variables/anime1'
 import AnimateDownload from '../components/AnimateDownload'
+import TabModel from './MyDownload/TabModel'
 
 export default {
   name: 'MyDownload',
   components: {
-    AnimateDownload
+    AnimateDownload,
+    TabModel
   },
   setup: function () {
     const store = useStore()

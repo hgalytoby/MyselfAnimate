@@ -297,9 +297,10 @@ class Anime1DownloadManage(BaseDownloadManage):
         try:
             async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=True)) as session:
                 async with session.get(url=animate_url, headers=_headers, timeout=_timeout) as res:
+                    task_data.update({'status': '下載中'})
                     path = f'{MEDIA_PATH}/{self.from_website}/{task_data["animate_name"]}/'
-                    if not os.path.isdir(path):
-                        os.makedirs(path)
+                    if not os.path.isdir(f'.{path}'):
+                        os.makedirs(f'.{path}')
                     video_path = f'{path}{task_data["episode_name"]}.mp4'
                     with open(f'.{video_path}', 'wb') as fd:
                         download_content_length = 0
@@ -309,7 +310,7 @@ class Anime1DownloadManage(BaseDownloadManage):
                             if not chunk:
                                 break
                             fd.write(chunk)
-                            task_data['progress_value'] = download_content_length // res.content_length * 100
+                            task_data['progress_value'] = int(download_content_length / res.content_length * 100)
                         await DB.Anime1.save_animate_episode_video_file(pk=task_data['episode_id'],
                                                                         video_path=video_path)
                         task_data['video'] = video_path
