@@ -48,7 +48,11 @@ export const mutations = {
 
 export const getters = {
   [downloadAnime1AnimateGetters] (state) {
-    return state[downloadAnime1AnimateState]
+    return state[downloadAnime1AnimateState].map((item) => {
+      item.progressValue = item.progress_value
+      item.progressColor = item.progress_value > 50 ? 'white' : 'black'
+      return item
+    })
   }
 }
 export default {

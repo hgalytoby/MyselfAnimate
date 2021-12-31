@@ -455,6 +455,15 @@ class Anime1Base:
 
     @staticmethod
     @database_sync_to_async
+    def get_total_download_animate_episode_models() -> Union[QuerySet, List[MyselfDownloadModel]]:
+        """
+        取得多個動漫集數資料與更新成下載中。
+        :return:
+        """
+        return Anime1DownloadModel.objects.select_related('owner').select_related('owner__owner').all()
+
+    @staticmethod
+    @database_sync_to_async
     def save_animate_episode_video_file(video_path: str, **kwargs):
         """
         儲存動漫某一集的檔案。

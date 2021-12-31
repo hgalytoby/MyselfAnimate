@@ -34,7 +34,7 @@ class Anime1AnimateEpisodeInfoModel(BaseAnimateEpisodeInfoModel):
 
     class Meta:
         db_table = 'Anime1AnimateEpisodeInfo'
-        ordering = ('-published_updated_date', )
+        ordering = ('published_updated_date', )
 
 
 class Anime1DownloadModel(BaseDownloadModel):

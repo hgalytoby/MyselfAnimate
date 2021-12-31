@@ -1,35 +1,36 @@
 <template>
-    <ul class="nav nav-tabs" id="pills-tab" role="tablist">
-      <li class="nav-item" role="presentation" v-for="(_, week, index) of weekAnimate" :key="week">
-        <button class="nav-link" :class="index===0 ? 'active' : ''" :id="`pills-${week}-tab`" data-bs-toggle="pill"
-                :data-bs-target="`#pills-${week}`"
-                type="button" role="tab" :aria-controls="`pills-${week}`" :aria-selected="index===0"> {{ weekDict[week] }}
-        </button>
-      </li>
-    </ul>
-    <div class="tab-content" id="pills-tabContent">
-      <template v-for="(animateArray, week, index) of weekAnimate" :key="week">
-        <ul class="tab-pane fade list-unstyled" :class="index===0 ? 'show active' : ''"
-            :id="`pills-${week}`" role="tabpanel" :aria-labelledby="`pills-${week}-tab`">
-          <li v-for="animate in animateArray" :key="animate.url">
-            <div class="row justify-content-start">
-              <div class="col animateLink">
-                <router-link :to="{
+  <ul class="nav nav-tabs" id="pills-tab" role="tablist">
+    <li class="nav-item" role="presentation" v-for="(_, week, index) of weekAnimate" :key="week">
+      <button class="nav-link" :class="index === 0 ? 'active' : ''" :id="`pills-${week}-tab`" data-bs-toggle="pill"
+              :data-bs-target="`#pills-${week}`"
+              type="button" role="tab" :aria-controls="`pills-${week}`" :aria-selected="index === 0"> {{ weekDict[week]
+        }}
+      </button>
+    </li>
+  </ul>
+  <div class="tab-content" id="pills-tabContent">
+    <template v-for="(animateArray, week, index) of weekAnimate" :key="week">
+      <ul class="tab-pane fade list-unstyled" :class="index===0 ? 'show active' : ''"
+          :id="`pills-${week}`" role="tabpanel" :aria-labelledby="`pills-${week}-tab`">
+        <li v-for="animate in animateArray" :key="animate.url">
+          <div class="row justify-content-start">
+            <div class="col animateLink">
+              <router-link :to="{
               name: 'MyselfAnimate',
               query: {
                 url: animate.url.split('/').at(-1)
               }
             }">{{ animate.name }}
-                </router-link>
-              </div>
-              <div class="col text-end" :style="animate.update_color">
-                {{ animate.update }}
-              </div>
+              </router-link>
             </div>
-          </li>
-        </ul>
-      </template>
-    </div>
+            <div class="col text-end" :style="animate.update_color">
+              {{ animate.update }}
+            </div>
+          </div>
+        </li>
+      </ul>
+    </template>
+  </div>
 </template>
 
 <script>

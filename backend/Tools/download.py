@@ -297,12 +297,11 @@ class Anime1DownloadManage(BaseDownloadManage):
         try:
             async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=True)) as session:
                 async with session.get(url=animate_url, headers=_headers, timeout=_timeout) as res:
-                    path = f'{MEDIA_PATH}/{self.from_website}/{task_data["animate_name"]}/video/'
-                    if os.path.isdir(path):
-                        shutil.rmtree(f'{MEDIA_PATH}/{self.from_website}/{task_data["animate_name"]}')
-                    os.makedirs(path)
+                    path = f'{MEDIA_PATH}/{self.from_website}/{task_data["animate_name"]}/'
+                    if not os.path.isdir(path):
+                        os.makedirs(path)
                     video_path = f'{path}{task_data["episode_name"]}.mp4'
-                    with open(video_path, 'wb') as fd:
+                    with open(f'.{video_path}', 'wb') as fd:
                         download_content_length = 0
                         while True:
                             chunk = await res.content.read(1024 * 10)
@@ -326,6 +325,9 @@ class Anime1DownloadManage(BaseDownloadManage):
                 api_key, api_value = await Anime1.get_api_key_and_value(url=task_data['url'])
                 animate_url, cookies = await Anime1.get_cookies_and_animate_url(api_key=api_key, api_value=api_value)
                 await self.download_animate(task_data, animate_url, cookies)
+                await DB.My.create_history(animate_website_name=self.from_website,
+                                           animate_name=task_data["animate_name"],
+                                           episode_name=task_data["episode_name"])
         except asyncio.CancelledError:
             print(f'取消下載: {task_data["name"]}')
         else:
@@ -333,6 +335,9 @@ class Anime1DownloadManage(BaseDownloadManage):
         self.now -= 1
 
     async def main_task(self):
+        download_models = await DB.Anime1.get_total_download_animate_episode_models()
+        self.wait_download_list += await DB.Anime1.get_download_animate_episode_data_list(
+            download_models=download_models)
         await super(Anime1DownloadManage, self).main_task()
 
     def main(self):

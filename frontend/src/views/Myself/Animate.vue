@@ -47,7 +47,7 @@ import {
 } from '../../variables/myself'
 import Loading from '../../components/Loading'
 // import useWindowsFocus from '../../hooks/useWindowsFocus'
-import DownloadStatus from '../../components/DownloadStatus'
+import DownloadStatus from '../../components/AnimateEpisode'
 
 export default {
   name: 'Animate',

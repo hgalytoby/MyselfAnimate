@@ -24,7 +24,7 @@ import {
   loadingMutation,
   loadingState
 } from '../../variables/anime1'
-import DownloadStatus from '../../components/DownloadStatus'
+import DownloadStatus from '../../components/AnimateEpisode'
 import Loading from '../../components/Loading'
 
 export default {

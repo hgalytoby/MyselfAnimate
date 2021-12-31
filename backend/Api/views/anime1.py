@@ -13,7 +13,7 @@ from Tools.urls import Anime1AnimateUrl
 
 
 class Anime1AnimateListView(APIView):
-    @method_decorator(cache_page(300))
+    # @method_decorator(cache_page(300))
     def get(self, request):
         data = Anime1.get_home_animate_data()
         if data:
