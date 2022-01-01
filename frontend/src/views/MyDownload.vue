@@ -13,12 +13,18 @@
   </ul>
   <div class="tab-content" id="pills-tabContent">
     <div class="tab-pane fade show active" id="pills-myself" role="tabpanel" aria-labelledby="pills-myself-tab">
-      <TabModel target="myself-target" clearAction="clear_finish_myself_animate"/>
-      <AnimateDownload :downloadAnimateData="downloadMyselfAnimateArray"/>
+      <TabModel animate="myself" target="myself-target" clear-action="clear_finish_myself_animate"
+                delete-action="delete_myself_download_animate" :download-check-box="myselfDownloadCheckBoxArray"/>
+      <AnimateDownload animate="myself" order-action="download_order_myself_animate"
+                       :download-animate-data="downloadMyselfAnimateArray"
+                       :downloadCheckBox="myselfDownloadCheckBoxArray"/>
     </div>
     <div class="tab-pane fade" id="pills-anime1" role="tabpanel" aria-labelledby="pills-anime1-tab">
-      <TabModel target="anime1-target" clearAction="clear_finish_anime1_animate"/>
-      <AnimateDownload :downloadAnimateData="downloadAnime1AnimateArray"/>
+      <TabModel animate="anime1" target="anime1-target" clear-action="clear_finish_anime1_animate"
+                delete-action="delete_anime1_download_animate" :download-check-box="anime1DownloadCheckBoxArray"/>
+      <AnimateDownload animate="anime1" order-action="download_order_anime1_animate"
+                       :download-animate-data="downloadAnime1AnimateArray"
+                       :download-check-box="anime1DownloadCheckBoxArray"/>
     </div>
   </div>
 </template>
@@ -30,6 +36,7 @@ import { computed } from 'vue'
 import { downloadAnime1AnimateGetters } from '../variables/anime1'
 import AnimateDownload from '../components/AnimateDownload'
 import TabModel from './MyDownload/TabModel'
+import { downloadCheckBoxState } from '../variables/my'
 
 export default {
   name: 'MyDownload',
@@ -41,10 +48,14 @@ export default {
     const store = useStore()
     const downloadMyselfAnimateArray = computed(() => store.getters[`myself/${downloadMyselfAnimateGetters}`])
     const downloadAnime1AnimateArray = computed(() => store.getters[`anime1/${downloadAnime1AnimateGetters}`])
+    const myselfDownloadCheckBoxArray = computed(() => store.state.myself[downloadCheckBoxState])
+    const anime1DownloadCheckBoxArray = computed(() => store.state.anime1[downloadCheckBoxState])
 
     return {
       downloadMyselfAnimateArray,
-      downloadAnime1AnimateArray
+      downloadAnime1AnimateArray,
+      myselfDownloadCheckBoxArray,
+      anime1DownloadCheckBoxArray
     }
   }
 }

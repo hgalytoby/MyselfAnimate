@@ -1,6 +1,5 @@
 <template>
   <h3>webSocket: {{ $store.state.ws.wsClick }}</h3>
-
 </template>
 
 <script>

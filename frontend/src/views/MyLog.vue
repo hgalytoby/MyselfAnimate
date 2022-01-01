@@ -14,8 +14,8 @@
   <transition appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"
               leave-active-class="animate__fadeOut">
     <div class="tab-content" id="pills-tabContent">
-      <Log :state="systemState" :action="`my/${systemAction}`" type="system" :itemTable="systemTable"/>
-      <Log :state="historyState" :action="`my/${historyAction}`" type="history" :itemTable="historyTable"/>
+      <Log :state="systemState" :action="`my/${systemAction}`" type="system" :item-table="systemTable"/>
+      <Log :state="historyState" :action="`my/${historyAction}`" type="history" :item-table="historyTable"/>
     </div>
   </transition>
 </template>

@@ -31,7 +31,7 @@
   </div>
   <transition appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"
               leave-active-class="animate__fadeOut">
-    <Pagination :pageDataObj="finishAnimate" :changePageFunction="changePage" :pageShowMsg="pageMsg"/>
+    <Pagination :page-data-obj="finishAnimate" :change-page-function="changePage" :page-show-msg="pageMsg"/>
   </transition>
 </template>
 

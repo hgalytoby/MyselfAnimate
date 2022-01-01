@@ -1,32 +1,11 @@
 <template>
-<!--  <button type="button" class="btn btn-success" @click="clearFinishDownload">清除已完成</button>-->
-<!--  <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">-->
-<!--    刪除動漫-->
-<!--  </button>-->
-<!--  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">-->
-<!--    <div class="modal-dialog">-->
-<!--      <div class="modal-content">-->
-<!--        <div class="modal-header">-->
-<!--          <h5 class="modal-title" id="exampleModalLabel">刪除動漫</h5>-->
-<!--          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>-->
-<!--        </div>-->
-<!--        <div class="modal-body">-->
-<!--          確定要刪除勾選的動漫?-->
-<!--        </div>-->
-<!--        <div class="modal-footer">-->
-<!--          <button type="button" class="btn btn-danger" @click="deleteAnimate" data-bs-dismiss="modal">確認</button>-->
-<!--          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
   <transition appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"
               leave-active-class="animate__fadeOut">
     <div class="table-responsive">
       <table class="table table-hover" style="word-wrap:break-word;word-break:break-all;white-space:normal;">
         <thead>
         <tr class="table">
-          <th scope="col" @click="clickCheckBoxAll">
+          <th scope="col" @click="clickAllDownloadCheckBox">
             <BootstrapIcon v-show="!checkBoxAll" icon="square"/>
             <BootstrapIcon class="download-checked" v-show="checkBoxAll" icon="check2-square"/>
           </th>
@@ -78,58 +57,55 @@
 import { sendSocketMessage } from '../hooks/useWS'
 import { computed } from 'vue'
 import { startFancy } from '../tools'
+import {
+  clickAllDownloadCheckBoxMutation,
+  clickDownloadCheckBoxMutation,
+  downloadCheckBoxMutation
+} from '../variables/my'
+import { useStore } from 'vuex'
 
 export default {
   name: 'AnimateDownload',
   props: {
-    downloadAnimateData: Array
+    animate: String,
+    orderAction: String,
+    downloadAnimateData: Array,
+    downloadCheckBox: Array
   },
   setup (props) {
+    const store = useStore()
     const downloadAnimateArray = computed(() => props.downloadAnimateData)
-    const clearFinishDownload = () => {
-      sendSocketMessage({
-        action: 'clear_finish_myself_animate'
-      })
-    }
-    const downloadCheckBox = []
+    const downloadCheckBoxArray = computed(() => props.downloadCheckBox)
     const checkBoxAll = computed(() => {
-      if (downloadAnimateArray.value && downloadCheckBox) {
+      if (downloadAnimateArray.value && downloadCheckBoxArray.value) {
         if (downloadAnimateArray.value.length > 0) {
-          return downloadAnimateArray.value.length === downloadCheckBox.length
+          return downloadAnimateArray.value.length === downloadCheckBoxArray.value.length
         }
       }
       return false
     })
 
-    function deleteAnimate () {
-      sendSocketMessage({
-        action: 'delete_myself_download_animate',
-        deletes: downloadCheckBox
-      })
-      downloadCheckBox.length = 0
-    }
-
     function filterDownloadCheckBox (downloadID) {
-      return this.downloadCheckBox.indexOf(downloadID) !== -1
+      return downloadCheckBoxArray.value.indexOf(downloadID) !== -1
     }
 
     function clickDownloadCheckBox (downloadID) {
-      const index = this.downloadCheckBox.indexOf(downloadID)
-      if (index !== -1) {
-        this.downloadCheckBox.splice(index, 1)
-      } else {
-        this.downloadCheckBox.push(downloadID)
-      }
+      store.commit(`${props.animate}/${clickDownloadCheckBoxMutation}`, downloadID)
+      // const index = downloadCheckBoxArray.value.indexOf(downloadID)
+      // if (index !== -1) {
+      //   this.downloadCheckBox.splice(index, 1)
+      // } else {
+      //   this.downloadCheckBox.push(downloadID)
+      // }
     }
 
-    function clickCheckBoxAll () {
-      console.log(checkBoxAll.value)
+    function clickAllDownloadCheckBox () {
       if (checkBoxAll.value) {
-        downloadCheckBox.length = 0
+        store.commit(`${props.animate}/${downloadCheckBoxMutation}`)
       } else {
         downloadAnimateArray.value.forEach((animate) => {
-          if (downloadCheckBox.indexOf(animate.id) === -1) {
-            downloadCheckBox.push(animate.id)
+          if (downloadCheckBoxArray.value.indexOf(animate.id) === -1) {
+            store.commit(`${props.animate}/${clickAllDownloadCheckBoxMutation}`, animate.id)
           }
         })
       }
@@ -137,7 +113,7 @@ export default {
 
     function orderUpOrDown (method, index) {
       sendSocketMessage({
-        action: 'download_order_myself_animate',
+        action: props.orderAction,
         method,
         index
       })
@@ -145,13 +121,10 @@ export default {
 
     return {
       startFancy,
-      clearFinishDownload,
-      deleteAnimate,
-      downloadCheckBox,
       filterDownloadCheckBox,
       clickDownloadCheckBox,
       checkBoxAll,
-      clickCheckBoxAll,
+      clickAllDownloadCheckBox,
       orderUpOrDown,
       downloadAnimateArray
     }

@@ -8,7 +8,7 @@
     <span>年份: {{ animateInfo.years }}</span>
     <span>季節: {{ animateInfo.season }}</span>
     <span>字幕組: {{ animateInfo.subtitle_group }}</span>
-    <DownloadStatus :animateInfoObj="animateInfo" :downloadStateArray="downloadAnime1Animate"
+    <DownloadStatus :animate-info-obj="animateInfo" :download-state-array="downloadAnime1Animate"
                     action="download_anime1_animate"/>
   </div>
   {{downloadAnime1Animate}}

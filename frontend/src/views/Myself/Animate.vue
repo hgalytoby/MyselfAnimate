@@ -29,8 +29,8 @@
         </div>
       </div>
     </div>
-    <DownloadStatus :animateInfoObj="animateInfo" :downloadStateArray="downloadMyselfAnimate"
-              action="download_myself_animate"/>
+    <DownloadStatus :animate-info-obj="animateInfo" :download-state-array="downloadMyselfAnimate"
+                    action="download_myself_animate"/>
   </div>
 
 </template>

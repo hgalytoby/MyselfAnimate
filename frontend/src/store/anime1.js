@@ -13,12 +13,19 @@ import {
 } from '../variables/anime1'
 import { axiosGet, axiosPost } from '../tools'
 import { anima1Api } from '../api'
+import {
+  clickAllDownloadCheckBoxMutation,
+  clickDownloadCheckBoxMutation,
+  downloadCheckBoxMutation,
+  downloadCheckBoxState
+} from '../variables/my'
 
 export const state = {
   [animateListState]: [],
   [animateInfoState]: [],
   [downloadAnime1AnimateState]: [],
-  [loadingState]: true
+  [loadingState]: true,
+  [downloadCheckBoxState]: []
 }
 
 export const actions = {
@@ -43,6 +50,20 @@ export const mutations = {
   },
   [loadingMutation] (state, value) {
     state[loadingState] = true
+  },
+  [downloadCheckBoxMutation] (state, value) {
+    state[downloadCheckBoxState].length = 0
+  },
+  [clickDownloadCheckBoxMutation] (state, value) {
+    const index = state[downloadCheckBoxState].indexOf(value)
+    if (index !== -1) {
+      state[downloadCheckBoxState].splice(index, 1)
+    } else {
+      state[downloadCheckBoxState].push(value)
+    }
+  },
+  [clickAllDownloadCheckBoxMutation] (state, value) {
+    state[downloadCheckBoxState].push(value)
   }
 }
 

@@ -24,26 +24,39 @@
 
 <script>
 import { sendSocketMessage } from '../../hooks/useWS'
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+import { downloadCheckBoxMutation } from '../../variables/my'
 
 export default {
   name: 'TabModel',
   props: {
+    animate: String,
     target: String,
-    clearAction: String
+    clearAction: String,
+    deleteAction: String,
+    downloadCheckBox: Array
   },
   setup (props) {
+    const store = useStore()
+    const downloadCheckBoxArray = computed(() => props.downloadCheckBox)
     const clearFinishDownload = () => {
       sendSocketMessage({
         action: props.clearAction
       })
     }
     function deleteAnimate () {
-
+      sendSocketMessage({
+        action: props.deleteAction,
+        deletes: downloadCheckBoxArray.value
+      })
+      store.commit(`${props.animate}/${downloadCheckBoxMutation}`)
     }
     return {
       clearFinishDownload,
       deleteAnimate,
-      props
+      props,
+      downloadCheckBoxArray
     }
   }
 }

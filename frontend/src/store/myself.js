@@ -28,6 +28,12 @@ import {
 } from '../variables/myself'
 import { myselfApi } from '../api'
 import { axiosGet } from '../tools'
+import {
+  clickAllDownloadCheckBoxMutation,
+  clickDownloadCheckBoxMutation,
+  downloadCheckBoxMutation,
+  downloadCheckBoxState
+} from '../variables/my'
 
 export const state = {
   [weekAnimateState]: {},
@@ -39,6 +45,7 @@ export const state = {
   [finishAnimateState]: [],
   [animateCollectState]: [],
   [downloadMyselfAnimateState]: [],
+  [downloadCheckBoxState]: [],
   searchTimer: null
 }
 
@@ -109,6 +116,20 @@ export const mutations = {
   },
   [animateInfoEpisodeInfoMutation] (state, value) {
     state[animateInfoState].episode_info_model = value
+  },
+  [downloadCheckBoxMutation] (state, value) {
+    state[downloadCheckBoxState].length = 0
+  },
+  [clickDownloadCheckBoxMutation] (state, value) {
+    const index = state[downloadCheckBoxState].indexOf(value)
+    if (index !== -1) {
+      state[downloadCheckBoxState].splice(index, 1)
+    } else {
+      state[downloadCheckBoxState].push(value)
+    }
+  },
+  [clickAllDownloadCheckBoxMutation] (state, value) {
+    state[downloadCheckBoxState].push(value)
   }
 }
 export const getters = {

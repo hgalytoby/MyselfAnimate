@@ -13,7 +13,7 @@
       </tr>
       </tbody>
     </table>
-    <Pagination :pageDataObj="logData" :changePageFunction="changePage" :pageShowMsg="pageMsg"/>
+    <Pagination :page-data-obj="logData" :change-page-function="changePage" :page-show-msg="pageMsg"/>
   </div>
 </template>
 
