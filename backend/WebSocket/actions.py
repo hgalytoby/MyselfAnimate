@@ -174,7 +174,7 @@ class Anime1Manage(Base):
         :return:
         """
         DB.Cache.clear_cache()
-        await DB.Anime1.delete_download_and_ts(download_model__id__in=kwargs['deletes'])
+        await DB.Anime1.delete_download(download_model__id__in=kwargs['deletes'])
         await DB.My.create_log(msg='Anime1 刪除已選取動漫', action='delete')
         await self.manage.delete_download_animate_list(kwargs['deletes'])
         await self.parent.send(text_data=json.dumps({'msg': '已取消勾選的下載動漫', 'action': kwargs['action']}))

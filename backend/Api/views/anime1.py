@@ -13,7 +13,7 @@ from Tools.urls import Anime1AnimateUrl
 
 
 class Anime1AnimateListView(APIView):
-    # @method_decorator(cache_page(300))
+    @method_decorator(cache_page(300))
     def get(self, request):
         data = Anime1.get_home_animate_data()
         if data:
@@ -27,9 +27,9 @@ class Anime1AnimateInfoView(APIView):
         if not url:
             return Response(status=status.HTTP_404_NOT_FOUND)
         animate_url = f'{Anime1AnimateUrl}{url}'
-        # data = DB.Cache.get_cache_data(key=animate_url)
-        # if data:
-        #     return Response(data, status=status.HTTP_200_OK)
+        data = DB.Cache.get_cache_data(key=animate_url)
+        if data:
+            return Response(data, status=status.HTTP_200_OK)
         if request.data:
             model = DB.Anime1.create_animate_info(**request.data)
         else:

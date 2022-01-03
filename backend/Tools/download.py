@@ -286,6 +286,7 @@ class Anime1DownloadManage(BaseDownloadManage):
     def __init__(self):
         super(Anime1DownloadManage, self).__init__()
         self.from_website = 'Anime1'
+        self.switch_db_function = DB.Anime1.switch_download
         threading.Thread(target=self.main, args=()).start()
 
     async def download_animate(self, task_data, animate_url, cookies):

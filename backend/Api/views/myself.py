@@ -25,7 +25,7 @@ class MyselfWeekAnimateView(APIView):
 
 
 class MyselfAnimateInfoView(APIView):
-    # @method_decorator(cache_page(1800))
+    @method_decorator(cache_page(1800))
     def get(self, request):
         url = request.query_params.get('url')
         if not url:

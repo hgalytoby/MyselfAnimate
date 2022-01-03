@@ -387,6 +387,7 @@ class MyBase:
         return MyPageNumberPagination.get_paginated(page_obj=page_obj, paginator=paginator, data=serializer.data)
 
 
+
 class CacheBase:
     cache_db = caches['default']
 
@@ -498,6 +499,15 @@ class Anime1Base:
             model.done = False
             model.video = None
             model.save()
+
+    @staticmethod
+    @database_sync_to_async
+    def switch_download(switch_data1: dict, switch_data2: dict):
+        Anime1DownloadModel.objects.filter(pk__in=[switch_data1['id'], switch_data2['id']]).delete()
+        switch_data1['id'], switch_data2['id'] = switch_data2['id'], switch_data1['id']
+        Anime1DownloadModel.objects.create(pk=switch_data1['id'], owner_id=switch_data1['episode_id'])
+        Anime1DownloadModel.objects.create(pk=switch_data2['id'], owner_id=switch_data2['episode_id'])
+
 
 class DB:
     Myself = MyselfBase
