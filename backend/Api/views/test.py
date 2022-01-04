@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 # from Database.models import AnimateEpisodeInfoModel, AnimateEpisodeTsModel
 from django.views import View
 
-from Api.serializers.anime1 import Anime1InfoSerializer
+from Api.serializers.anime1 import Anime1AnimateInfoSerializer
 from Tools.anime1 import Anime1
 from Tools.db import DB
 from Tools.urls import Anime1AnimateUrl

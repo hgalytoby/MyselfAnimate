@@ -58,7 +58,51 @@ class MyPageNumberPagination(PageNumberPagination):
             return start + list(range(remainder_x_page_item + remainder + 1, remainder_x_page_item + page_item + 1))
 
 
-class MyselfBase:
+class Base:
+    @classmethod
+    @database_sync_to_async
+    def switch_download(cls, switch_data1: dict, switch_data2: dict):
+        cls.download_model.objects.filter(pk__in=[switch_data1['id'], switch_data2['id']]).delete()
+        switch_data1['id'], switch_data2['id'] = switch_data2['id'], switch_data1['id']
+        cls.download_model.objects.create(pk=switch_data1['id'], owner_id=switch_data1['episode_id'])
+        cls.download_model.objects.create(pk=switch_data2['id'], owner_id=switch_data2['episode_id'])
+
+    @classmethod
+    @database_sync_to_async
+    def create_many_download_models(cls, owner_id_list: list) -> list:
+        """
+        :param owner_id_list:
+        :return:
+        """
+        data = []
+        for owner_id in owner_id_list:
+            data.append(cls.download_model.objects.create(owner_id=owner_id))
+        return data
+
+    @classmethod
+    @database_sync_to_async
+    def get_total_download_animate_episode_models(cls) -> Union[QuerySet, List[MyselfDownloadModel]]:
+        """
+        取得多個動漫集數資料與更新成下載中。
+        :return:
+        """
+        return cls.download_model.objects.select_related('owner').select_related('owner__owner').all()
+
+    @classmethod
+    @database_sync_to_async
+    def delete_download_finish_animate(cls):
+        """
+        刪除下載已完成動漫。
+        :return:
+        """
+        cls.download_model.objects.filter(owner__done=True).delete()
+
+
+class MyselfBase(Base):
+    animate_info_model = MyselfAnimateInfoModel
+    animate_episode_info_model = MyselfAnimateEpisodeInfoModel
+    download_model = MyselfDownloadModel
+
     @classmethod
     @database_sync_to_async
     def create_finish_animate(cls, animate: dict):
@@ -127,18 +171,6 @@ class MyselfBase:
         MyselfAnimateEpisodeTsModel.objects.bulk_create(models)
 
     @staticmethod
-    @database_sync_to_async
-    def create_many_download_models(owner_id_list: list) -> list:
-        """
-        :param owner_id_list:
-        :return:
-        """
-        data = []
-        for owner_id in owner_id_list:
-            data.append(MyselfDownloadModel.objects.create(owner_id=owner_id))
-        return data
-
-    @staticmethod
     def update_or_create_animate_info_model(data: dict, image: bytes):
         """
         更新或新增動漫資料。
@@ -190,15 +222,6 @@ class MyselfBase:
                 })
             result.append(data)
         return result
-
-    @staticmethod
-    @database_sync_to_async
-    def get_total_download_animate_episode_models() -> Union[QuerySet, List[MyselfDownloadModel]]:
-        """
-        取得多個動漫集數資料與更新成下載中。
-        :return:
-        """
-        return MyselfDownloadModel.objects.select_related('owner').select_related('owner__owner').all()
 
     @staticmethod
     @database_sync_to_async
@@ -287,10 +310,9 @@ class MyselfBase:
     @database_sync_to_async
     def All_finish_animate() -> Union[QuerySet, List[MyselfFinishAnimateModel]]:
         """
-        不加 list 有時候會出現 You cannot call this from an async context - use a thread or sync_to_async.
         :return:
         """
-        return list(MyselfFinishAnimateModel.objects.all())
+        return MyselfFinishAnimateModel.objects.all()
 
     @classmethod
     @database_sync_to_async
@@ -300,15 +322,6 @@ class MyselfBase:
         :return:
         """
         MyselfAnimateEpisodeTsModel.objects.filter(**kwargs).delete()
-
-    @classmethod
-    @database_sync_to_async
-    def delete_download_finish_animate(cls):
-        """
-        刪除下載已完成動漫。
-        :return:
-        """
-        MyselfDownloadModel.objects.filter(owner__done=True).delete()
 
     @classmethod
     @database_sync_to_async
@@ -359,14 +372,6 @@ class MyselfBase:
         serializer = MyselfFinishAnimateSerializer(page_obj, many=True)
         return MyPageNumberPagination.get_paginated(page_obj=page_obj, paginator=paginator, data=serializer.data)
 
-    @staticmethod
-    @database_sync_to_async
-    def switch_download(switch_data1: dict, switch_data2: dict):
-        MyselfDownloadModel.objects.filter(pk__in=[switch_data1['id'], switch_data2['id']]).delete()
-        switch_data1['id'], switch_data2['id'] = switch_data2['id'], switch_data1['id']
-        MyselfDownloadModel.objects.create(pk=switch_data1['id'], owner_id=switch_data1['episode_id'])
-        MyselfDownloadModel.objects.create(pk=switch_data2['id'], owner_id=switch_data2['episode_id'])
-
 
 class MyBase:
     @staticmethod
@@ -385,7 +390,6 @@ class MyBase:
         page_obj = paginator.page(1)
         serializer = serializer(page_obj, many=True)
         return MyPageNumberPagination.get_paginated(page_obj=page_obj, paginator=paginator, data=serializer.data)
-
 
 
 class CacheBase:
@@ -411,15 +415,19 @@ class CacheBase:
         cls.cache_db.delete(key)
 
 
-class Anime1Base:
+class Anime1Base(Base):
+    animate_info_model = Anime1AnimateInfoModel
+    animate_episode_info_model = Anime1AnimateEpisodeInfoModel
+    download_model = Anime1DownloadModel
+
     @classmethod
     def create_animate_info(cls, **kwargs):
         model, created = Anime1AnimateInfoModel.objects.update_or_create(url=kwargs['url'], defaults=kwargs)
         return model
 
     @classmethod
-    def get_animate_info(cls, url: str):
-        return Anime1AnimateInfoModel.objects.get(url=url)
+    def get_animate_info(cls, **kwargs):
+        return Anime1AnimateInfoModel.objects.get(**kwargs)
 
     @classmethod
     def update_or_create_many_episode(cls, episodes: list, owner):
@@ -428,18 +436,6 @@ class Anime1Base:
                 **episode,
                 'owner': owner
             })
-
-    @staticmethod
-    @database_sync_to_async
-    def create_many_download_models(owner_id_list: list) -> list:
-        """
-        :param owner_id_list:
-        :return:
-        """
-        data = []
-        for owner_id in owner_id_list:
-            data.append(Anime1DownloadModel.objects.create(owner_id=owner_id))
-        return data
 
     @staticmethod
     @database_sync_to_async
@@ -456,15 +452,6 @@ class Anime1Base:
 
     @staticmethod
     @database_sync_to_async
-    def get_total_download_animate_episode_models() -> Union[QuerySet, List[MyselfDownloadModel]]:
-        """
-        取得多個動漫集數資料與更新成下載中。
-        :return:
-        """
-        return Anime1DownloadModel.objects.select_related('owner').select_related('owner__owner').all()
-
-    @staticmethod
-    @database_sync_to_async
     def save_animate_episode_video_file(video_path: str, **kwargs):
         """
         儲存動漫某一集的檔案。
@@ -475,15 +462,6 @@ class Anime1Base:
         model.done = True
         model.video = video_path
         model.save()
-
-    @classmethod
-    @database_sync_to_async
-    def delete_download_finish_animate(cls):
-        """
-        刪除下載已完成動漫。
-        :return:
-        """
-        Anime1DownloadModel.objects.filter(owner__done=True).delete()
 
     @staticmethod
     @database_sync_to_async
@@ -499,14 +477,6 @@ class Anime1Base:
             model.done = False
             model.video = None
             model.save()
-
-    @staticmethod
-    @database_sync_to_async
-    def switch_download(switch_data1: dict, switch_data2: dict):
-        Anime1DownloadModel.objects.filter(pk__in=[switch_data1['id'], switch_data2['id']]).delete()
-        switch_data1['id'], switch_data2['id'] = switch_data2['id'], switch_data1['id']
-        Anime1DownloadModel.objects.create(pk=switch_data1['id'], owner_id=switch_data1['episode_id'])
-        Anime1DownloadModel.objects.create(pk=switch_data2['id'], owner_id=switch_data2['episode_id'])
 
 
 class DB:
