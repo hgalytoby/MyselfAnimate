@@ -1,42 +1,31 @@
 <template>
-  <transition-group appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"
-                    leave-active-class="animate__fadeOut">
-    <div class="card bg-transparent" v-for="animate in myselfAnimateCollect.data" :key="animate.id">
-      <div class="row g-0">
-        <div class="col-md-2">
-          <h5 class="card-title">{{ animate.name }}</h5>
-          <img :src="animate.image" class="img-fluid rounded-start" :alt="animate.name">
-        </div>
-        <div class="col-md-8">
-          <div class="card-body">
-            <p v-for="episode in animate.episode_info_model" :key="episode.id">
-              <a href="" @click.prevent="startFancy(episode.video)">{{ episode.name }}</a>
-            </p>
-          </div>
-        </div>
+  <div class="container">
+    <div class="row align-items-start">
+      <div class="col-auto">
+        <router-link to="/MyCollect/Myself">
+          <figure class="figure">
+            <img src="/animate/myself.png" class="figure-img img-fluid rounded" alt="">
+            <figcaption class="figure-caption text-center text-dark">Myself</figcaption>
+          </figure>
+        </router-link>
+      </div>
+      <div class="col-auto">
+        <router-link to="/MyCollect/Anime1">
+          <figure class="figure">
+            <img src="/animate/anime1.png" class="figure-img img-fluid rounded" alt="">
+            <figcaption class="figure-caption text-center text-dark">Anime1</figcaption>
+          </figure>
+        </router-link>
       </div>
     </div>
-  </transition-group>
+  </div>
 </template>
 
 <script>
-import { useStore } from 'vuex'
-import { computed } from 'vue'
-import { animateCollectState, animateCollectAction } from '../variables/myself'
-import useWindowsFocus from '../hooks/useWindowsFocus'
-import { startFancy } from '../tools'
 
 export default {
   name: 'MyCollect',
   setup () {
-    const store = useStore()
-    const myselfAnimateCollect = computed(() => store.state.myself[animateCollectState])
-    useWindowsFocus(store.dispatch, `myself/${animateCollectAction}`)
-    store.dispatch(`myself/${animateCollectAction}`)
-    return {
-      myselfAnimateCollect,
-      startFancy
-    }
   }
 }
 </script>

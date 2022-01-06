@@ -119,3 +119,4 @@ def use_io_get_image_format(image_bytes: bytes) -> str:
     open_image.close()
     image_io.close()
     return image_type
+

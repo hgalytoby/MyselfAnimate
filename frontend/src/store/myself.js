@@ -20,20 +20,21 @@ import {
   finishAnimateAction,
   addFinishAnimateMutation,
   searchMyselfAnimateMutation,
-  animateCollectState,
-  animateCollectAction,
-  animateCollectMutation,
   animateInfoEpisodeInfoAction,
-  animateInfoEpisodeInfoMutation
+  animateInfoEpisodeInfoMutation, searchAnimateAction, searchAnimateMutation
 } from '../variables/myself'
 import { myselfApi } from '../api'
-import { axiosGet } from '../tools'
+import { axiosGet, axiosPost } from '../tools'
 import {
   clickAllDownloadCheckBoxMutation,
   clickDownloadCheckBoxMutation,
   downloadCheckBoxMutation,
-  downloadCheckBoxState
+  downloadCheckBoxState,
+  animateCollectState,
+  animateCollectAction,
+  animateCollectMutation
 } from '../variables/my'
+import router from '../router'
 
 export const state = {
   [weekAnimateState]: {},
@@ -54,8 +55,14 @@ export const actions = {
     axiosGet(myselfApi.weekAnimate, context, addWeekAnimateMutation)
   },
   [animateInfoAction] (context, value) {
-    // axiosGet(`${myselfApi.animateInfo}?url=${value}`, context, addAnimateInfoMutation)
-    axiosGet(myselfApi.animateInfo(value), context, addAnimateInfoMutation)
+    axiosPost(myselfApi.animateInfo, value, context, addAnimateInfoMutation)
+    // console.log('animateInfoAction', 1111, myselfApi.animateInfo(value.url))
+    // if (Object.keys(value).length === 1) {
+    //   console.log('animateInfoAction', 1111, myselfApi.animateInfo(value.url))
+    //   axiosGet(myselfApi.animateInfo(value.url), context, addAnimateInfoMutation)
+    // } else {
+    //   console.log('animateInfoAction', value.url)
+    //   axiosGet(myselfApi.animateInfo(JSON.stringify(value)), context, addAnimateInfoMutation)
   },
   [finishListAction] (context, value) {
     axiosGet(myselfApi.finishList, context, addFinishListMutation)
@@ -70,6 +77,9 @@ export const actions = {
     if (value.value.id) {
       axiosGet(myselfApi.animateInfoEpisodeInfo(value.value.id), context, animateInfoEpisodeInfoMutation)
     }
+  },
+  [searchAnimateAction] (context, value) {
+    axiosPost(myselfApi.searchAnimate, value, context, searchAnimateMutation)
   }
 }
 
@@ -130,6 +140,19 @@ export const mutations = {
   },
   [clickAllDownloadCheckBoxMutation] (state, value) {
     state[downloadCheckBoxState].push(value)
+  },
+  [searchAnimateMutation] (state, value) {
+    console.log(value)
+    if (value.result) {
+      router.push({
+        name: 'MyselfAnimate',
+        query: {
+          url: JSON.stringify(value.url)
+        }
+      })
+    } else {
+      alert('網址錯誤，沒有搜尋到動漫!')
+    }
   }
 }
 export const getters = {

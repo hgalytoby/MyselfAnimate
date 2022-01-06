@@ -1,4 +1,4 @@
-import Myself from '../views/Myself'
+import Myself from '../views/Myself/Myself'
 import Animate from '../views/Myself/Animate'
 import Finish from '../views/Myself/Finish'
 import Search from '../views/Myself/Search'
@@ -6,14 +6,15 @@ import Search from '../views/Myself/Search'
 export const myselfRoute = [
   {
     path: '/Myself',
-    component: Myself
+    component: Myself,
+    children: []
   },
   {
     path: '/Myself/Animate',
     component: Animate,
     name: 'MyselfAnimate',
     props ($route) {
-      return { url: $route.query.url }
+      return { query: $route.query }
     }
   },
   {

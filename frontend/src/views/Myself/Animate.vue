@@ -53,7 +53,7 @@ import DownloadStatus from '../../components/AnimateEpisode'
 export default {
   name: 'Animate',
   props: {
-    url: String
+    query: Object
   },
   components: { Loading, DownloadStatus },
   setup (props) {
@@ -61,7 +61,7 @@ export default {
     const loading = computed(() => store.state.myself[loadingState])
     const animateInfo = computed(() => store.state.myself[animateInfoState])
     store.commit(`myself/${loadingMutation}`)
-    store.dispatch(`myself/${animateInfoAction}`, props.url)
+    store.dispatch(`myself/${animateInfoAction}`, props.query)
     useWindowsFocus(store.dispatch, `myself/${animateInfoEpisodeInfoAction}`, animateInfo)
     const downloadMyselfAnimate = computed(() => {
       return store.state.myself[downloadMyselfAnimateState].filter((item) => item.animate_id === animateInfo.value.id)

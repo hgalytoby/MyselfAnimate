@@ -1,3 +1,5 @@
+import json
+
 from django.db.models import Prefetch
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
@@ -25,19 +27,38 @@ class MyselfWeekAnimateView(APIView):
 
 
 class MyselfAnimateInfoView(APIView):
-    @method_decorator(cache_page(1800))
-    def get(self, request):
-        url = request.query_params.get('url')
-        if not url:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        animate_url = f'{MyselfUrl}{url}'
-        data = Myself.animate_info(url=animate_url)
+    def post(self, request):
+        print(request.data)
+        animate_url = '&'.join([f'{key}={value}' for key, value in request.data.items()]).replace('url=', '')
+        if 'myself-bbs.com/' in animate_url:
+            animate_url = animate_url.split('myself-bbs.com/')[1]
+        data = DB.Cache.get_cache_data(key=animate_url)
+        if data:
+            return Response(data)
+        data = Myself.animate_info(url=f'{MyselfUrl}{animate_url}')
         image = req_bytes(url=data['image'])
         video = data.pop('video')
         model = DB.Myself.update_or_create_animate_info_model(data=data, image=image)
         DB.Myself.create_many_animate_episode(video, owner=model)
         serializer = MyselfAnimateInfoSerializer(model)
+        DB.Cache.set_cache_data(key=animate_url, data=serializer.data, timeout=1800)
         return Response(serializer.data)
+
+
+class MyselfUrlAnimate(MyselfAnimateInfoView):
+    def post(self, request):
+        print(request.data)
+        try:
+            super(MyselfUrlAnimate, self).post(request)
+            return Response({
+                'result': True,
+                'url': '&'.join([f'{key}={value}' for key, value in request.data.items()]).replace('url=', '')
+            })
+        except (KeyError, TypeError, ):
+            return Response({
+                'result': False,
+                'url': '&'.join([f'{key}={value}' for key, value in request.data.items()]).replace('url=', '')
+            })
 
 
 class MyselfFinishListView(APIView):

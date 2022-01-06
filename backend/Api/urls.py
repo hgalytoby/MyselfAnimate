@@ -3,7 +3,7 @@ from django.urls import path
 from Api.views import MyselfWeekAnimateView, MyselfAnimateInfoView, MyselfAnimateInfoEpisodeView, MyselfFinishListView, \
     MyselfFinishAnimateView, MyselfAnimateEpisodeInfoView, MyselfDownloadView, MyselfAnimateEpisodeDoneView, \
     MySystemView, MyHistoryView, MyLogView, Anime1AnimateListView, Anime1AnimateInfoView, TestView, \
-    Anime1AnimateInfoEpisodeView, Anime1AnimateEpisodeDoneView
+    Anime1AnimateInfoEpisodeView, Anime1AnimateEpisodeDoneView, MyselfUrlAnimate
 from project.settings import DEBUG
 
 app_name = 'api'
@@ -19,6 +19,7 @@ myself_api = [
          name='myself_animate_episode_info'),
     path('myself/download/<str:pk>/', MyselfDownloadView.as_view(), name='myself_download'),
     path('myself/animate-episode-done/', MyselfAnimateEpisodeDoneView.as_view(), name='myself_animate_episode_done'),
+    path('myself/url-search/', MyselfUrlAnimate.as_view(), name='myself_url_search'),
 ]
 
 my_api = [

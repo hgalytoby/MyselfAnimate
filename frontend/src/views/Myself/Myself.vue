@@ -1,4 +1,13 @@
 <template>
+  <div class="row align-items-center">
+    <div class="col">
+      <input type="text" class="form-control shadow-sm p-3 mb-2 bg-body rounded" id="search"
+       v-model="searchText" placeholder="貼上網址搜尋指定動漫">
+    </div>
+    <div class="col-1 d-flex justify-content-center">
+      <button type="button" class="btn btn-primary" @click="searchAnimate">搜尋</button>
+    </div>
+  </div>
   <ul class="nav nav-tabs" id="pills-tab" role="tablist">
     <li class="nav-item" role="presentation" v-for="(_, week, index) of weekAnimate" :key="week">
       <button class="nav-link" :class="index === 0 ? 'active' : ''" :id="`pills-${week}-tab`" data-bs-toggle="pill"
@@ -34,12 +43,14 @@
 </template>
 
 <script>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
+// import { useRouter } from 'vue-router'
 import {
+  searchAnimateAction,
   weekAnimateAction,
   weekAnimateState
-} from '../variables/myself'
+} from '../../variables/myself'
 
 export default {
   name: 'Myself',
@@ -53,12 +64,28 @@ export default {
       Saturday: '星期六',
       Sunday: '星期日'
     }
+
     const store = useStore()
+    // const router = useRouter()
+    const searchText = ref('')
     const weekAnimate = computed(() => store.state.myself[weekAnimateState])
     store.dispatch(`myself/${weekAnimateAction}`)
+
+    function searchAnimate () {
+      store.dispatch(`myself/${searchAnimateAction}`, searchText.value)
+      // console.log('searchAnimate', JSON.stringify(searchText.value))
+      // router.push({
+      //   name: 'MyselfAnimate',
+      //   query: {
+      //     url: searchText.value
+      //   }
+      // })
+    }
     return {
       weekAnimate,
-      weekDict
+      weekDict,
+      searchText,
+      searchAnimate
     }
   }
 }

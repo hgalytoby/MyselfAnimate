@@ -6,6 +6,9 @@ export const downloadCheckBoxState = 'downloadCheckBoxState'
 export const logAction = 'logAction'
 export const systemAction = 'systemAction'
 export const historyAction = 'historyAction'
+export const animateCollectState = 'animateCollectState'
+
+export const animateCollectAction = 'animateCollectAction'
 
 export const logMutation = 'logMutation'
 export const systemMutation = 'systemMutation'
@@ -13,6 +16,7 @@ export const historyMutation = 'historyMutation'
 export const downloadCheckBoxMutation = 'downloadCheckBoxMutation'
 export const clickDownloadCheckBoxMutation = 'clickDownloadCheckBoxMutation'
 export const clickAllDownloadCheckBoxMutation = 'clickAllDownloadCheckBoxMutation'
+export const animateCollectMutation = 'animateCollectMutation'
 
 export const systemTable = {
   title: ['操作', '訊息', '時間'],

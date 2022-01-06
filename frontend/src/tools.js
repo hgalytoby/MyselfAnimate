@@ -26,7 +26,6 @@ export const axiosPost = (url, data, context, mutation) => {
 }
 
 export const startFancy = (video) => {
-  console.log('startFancy', video)
   Fancybox.show([
     {
       src: video,

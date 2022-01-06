@@ -14,6 +14,8 @@ import {
 import { axiosGet, axiosPost } from '../tools'
 import { anima1Api } from '../api'
 import {
+  animateCollectAction, animateCollectMutation,
+  animateCollectState,
   clickAllDownloadCheckBoxMutation,
   clickDownloadCheckBoxMutation,
   downloadCheckBoxMutation,
@@ -25,7 +27,8 @@ export const state = {
   [animateInfoState]: [],
   [downloadAnime1AnimateState]: [],
   [loadingState]: true,
-  [downloadCheckBoxState]: []
+  [downloadCheckBoxState]: [],
+  [animateCollectState]: []
 }
 
 export const actions = {
@@ -34,6 +37,9 @@ export const actions = {
   },
   [animateInfoAction] (context, value) {
     axiosPost(anima1Api.animateInfo(value.url), value.animateData, context, animateInfoMutation)
+  },
+  [animateCollectAction] (context, value) {
+    axiosGet(anima1Api.animateEpisodeDone, context, animateCollectMutation)
   }
 }
 
@@ -64,6 +70,9 @@ export const mutations = {
   },
   [clickAllDownloadCheckBoxMutation] (state, value) {
     state[downloadCheckBoxState].push(value)
+  },
+  [animateCollectMutation] (state, value) {
+    state[animateCollectState] = value
   }
 }
 

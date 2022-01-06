@@ -89,6 +89,10 @@ class Base:
         return cls.download_model.objects.select_related('owner').select_related('owner__owner').all()
 
     @classmethod
+    def get_animate_info(cls, **kwargs):
+        return cls.animate_info_model.objects.get(**kwargs)
+
+    @classmethod
     @database_sync_to_async
     def delete_download_finish_animate(cls):
         """
@@ -397,10 +401,7 @@ class CacheBase:
 
     @classmethod
     def get_cache_data(cls, key: str):
-        result = cls.cache_db.get(key)
-        if result:
-            return json.loads(result)
-        return result
+        return cls.cache_db.get(key)
 
     @classmethod
     def set_cache_data(cls, key: str, data: str, timeout: int):
@@ -425,9 +426,9 @@ class Anime1Base(Base):
         model, created = Anime1AnimateInfoModel.objects.update_or_create(url=kwargs['url'], defaults=kwargs)
         return model
 
-    @classmethod
-    def get_animate_info(cls, **kwargs):
-        return Anime1AnimateInfoModel.objects.get(**kwargs)
+    # @classmethod
+    # def get_animate_info(cls, **kwargs):
+    #     return Anime1AnimateInfoModel.objects.get(**kwargs)
 
     @classmethod
     def update_or_create_many_episode(cls, episodes: list, owner):

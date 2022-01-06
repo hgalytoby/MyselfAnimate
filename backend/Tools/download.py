@@ -206,10 +206,10 @@ class MyselfDownloadManage(BaseDownloadManage):
         try:
             model = await DB.Myself.get_animate_episode_info_model(owner__name=task_data['animate_name'],
                                                                    name=task_data['episode_name'])
-            ts_list_path = f"{self.from_website}/{task_data['animate_name']}/video/ts/{task_data['episode_name']}/ts_list.txt"
-            video_path = f"{self.from_website}/{task_data['animate_name']}/video/{task_data['episode_name']}.mp4"
+            ts_list_path = f'{self.from_website}/{task_data["animate_name"]}/video/ts/{task_data["episode_name"]}/ts_list.txt'
+            video_path = f'{self.from_website}/{task_data["animate_name"]}/video/{task_data["episode_name"]}.mp4'
             ts_path_list = await DB.Myself.filter_animate_episode_ts_list(owner=model)
-            with open(f"{ROOT_MEDIA_PATH}{ts_list_path}", 'w', encoding='utf-8') as f:
+            with open(f'{ROOT_MEDIA_PATH}{ts_list_path}', 'w', encoding='utf-8') as f:
                 f.write('\n'.join(ts_path_list))
             cmd = f'ffmpeg -f concat -safe 0 -y -i "{ROOT_MEDIA_PATH}{ts_list_path}" -c copy "{ROOT_MEDIA_PATH}{video_path}"'
             _ = threading.Thread(target=self.__process_merge_video, args=(cmd,))
@@ -299,10 +299,12 @@ class Anime1DownloadManage(BaseDownloadManage):
             async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=True)) as session:
                 async with session.get(url=animate_url, headers=_headers, timeout=_timeout) as res:
                     task_data.update({'status': '下載中'})
-                    path = f'{MEDIA_PATH}/{self.from_website}/{task_data["animate_name"]}/'
-                    if not os.path.isdir(f'.{path}'):
-                        os.makedirs(f'.{path}')
-                    video_path = f'{path}{task_data["episode_name"]}.mp4'
+                    # video_path = f'{self.from_website}/{task_data["animate_name"]}/'
+                    animate_dir_path = f'{MEDIA_PATH}/{self.from_website}/{task_data["animate_name"]}/'
+                    if not os.path.isdir(f'.{animate_dir_path}'):
+                        os.makedirs(f'.{animate_dir_path}')
+                    save_path = f'{self.from_website}/{task_data["animate_name"]}/{task_data["episode_name"]}.mp4'
+                    video_path = f'{MEDIA_PATH}/{save_path}'
                     with open(f'.{video_path}', 'wb') as fd:
                         download_content_length = 0
                         while True:
@@ -313,7 +315,7 @@ class Anime1DownloadManage(BaseDownloadManage):
                             fd.write(chunk)
                             task_data['progress_value'] = int(download_content_length / res.content_length * 100)
                         await DB.Anime1.save_animate_episode_video_file(pk=task_data['episode_id'],
-                                                                        video_path=video_path)
+                                                                        video_path=save_path)
                         task_data['video'] = video_path
                         task_data['done'] = True
         except Exception as e:
