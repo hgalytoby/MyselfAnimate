@@ -21,6 +21,7 @@ class BaseDownloadManage:
         self.tasks_dict = {}
         self.now = 0
         self.max = 2
+        self.ws = []
         self.switch_db_function = NotImplemented
 
     async def clear_finish_animate_list(self):
@@ -103,6 +104,16 @@ class BaseDownloadManage:
                 self.tasks_dict.update({task_data['id']: asyncio.create_task(self.download_animate_script(task_data))})
                 pass
             await asyncio.sleep(0.1)
+
+    async def animate_finish_send_ws(self, task_data):
+        for ws in self.ws:
+            await ws.send(text_data=json.dumps({
+                'msg': f'下載完成',
+                'data': {
+                    'animate_name': task_data['animate_name'],
+                    'episode_name': task_data['episode_name'],
+                },
+                'action': 'download_animate_finish'}))
 
 
 class MyselfDownloadManage(BaseDownloadManage):
@@ -259,8 +270,9 @@ class MyselfDownloadManage(BaseDownloadManage):
             if not task_data['video']:
                 await self._process_merge_video(task_data=task_data)
                 await DB.My.create_history(animate_website_name=self.from_website,
-                                           animate_name=task_data["animate_name"],
-                                           episode_name=task_data["episode_name"])
+                                           animate_name=task_data['animate_name'],
+                                           episode_name=task_data['episode_name'])
+                await self.animate_finish_send_ws(task_data=task_data)
             task_data.update({'status': '下載完成'})
         self.now -= 1
 
@@ -332,6 +344,7 @@ class Anime1DownloadManage(BaseDownloadManage):
                 await DB.My.create_history(animate_website_name=self.from_website,
                                            animate_name=task_data["animate_name"],
                                            episode_name=task_data["episode_name"])
+                await self.animate_finish_send_ws(task_data=task_data)
         except asyncio.CancelledError:
             print(f'取消下載: {task_data["name"]}')
         else:

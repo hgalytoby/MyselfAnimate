@@ -1,5 +1,6 @@
 import { useStore } from 'vuex'
 import { finishAnimateUpdateButtonMutation } from '../variables/myself'
+import { setToast } from '../tools'
 
 const wsUrl = process.env.VUE_APP_WS === 'dev' ? 'ws://127.0.0.1:8000/ws/' : `ws://${location.host}/ws/`
 const socket = new WebSocket(wsUrl)
@@ -29,6 +30,23 @@ export const connectSocket = () => {
     } else if (receive.action === 'download_order_myself_animate') {
     } else if (receive.action === 'download_anime1_animate_array') {
       store.commit('anime1/downloadAnime1AnimateMutation', receive.data)
+    } else if (receive.action === 'download_animate_finish') {
+      setToast(
+        {
+          message: `${receive.data.animate_name}<br>${receive.data.episode_name}下載完成!!`,
+          type: 'info',
+          automatically: false
+        }
+      )
+    } else if (receive.action === 'connect') {
+      setToast(
+        {
+          message: '歡迎~',
+          type: 'success',
+          automatically: true,
+          duration: 3000
+        }
+      )
     } else {
       store.commit('ws/setWsRes', JSON.parse(msg.data))
     }

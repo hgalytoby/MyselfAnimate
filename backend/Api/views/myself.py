@@ -1,5 +1,3 @@
-import json
-
 from django.db.models import Prefetch
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
@@ -28,7 +26,6 @@ class MyselfWeekAnimateView(APIView):
 
 class MyselfAnimateInfoView(APIView):
     def post(self, request):
-        print(request.data)
         animate_url = '&'.join([f'{key}={value}' for key, value in request.data.items()]).replace('url=', '')
         if 'myself-bbs.com/' in animate_url:
             animate_url = animate_url.split('myself-bbs.com/')[1]

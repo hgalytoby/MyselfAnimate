@@ -18,6 +18,8 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
         super().__init__(*args, **kwargs)
         self.Myself = MyselfManage(parent=self, manage=myself_download_manage)
         self.Anime1 = Anime1Manage(parent=self, manage=anime1_download_manage)
+        myself_download_manage.ws.append(self)
+        anime1_download_manage.ws.append(self)
         self.action_function = {
             'myself_finish_animate_update': self.Myself.finish_animate_update,
             'download_myself_animate': self.Myself.animate_download,
@@ -51,7 +53,8 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
         :param close_code:
         :return:
         """
-        pass
+        myself_download_manage.ws.remove(self)
+        anime1_download_manage.ws.remove(self)
 
     async def receive(self, text_data: str = None, bytes_data: bytes = None):
         """

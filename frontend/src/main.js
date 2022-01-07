@@ -6,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap'
 import BootstrapIcon from '@dvuckovic/vue3-bootstrap-icons'
 import VueProgressBar from '@aacassandra/vue3-progressbar'
+import VueNotificationList from '@dafcoe/vue-notification'
 
 const options = {
   color: '#478aff',
@@ -21,7 +22,7 @@ const options = {
   location: 'top',
   inverse: false
 }
-export const app = createApp(App).use(store).use(VueProgressBar, options).use(router)
+export const app = createApp(App).use(store).use(VueProgressBar, options).use(router).use(VueNotificationList)
 
 app.component('BootstrapIcon', BootstrapIcon)
 app.mount('#app')

@@ -1,12 +1,14 @@
 <template>
   <vue-progress-bar></vue-progress-bar>
   <Sidebar/>
+  <vue-notification-list position="bottom-right"></vue-notification-list>
 </template>
 
 <script>
 import Sidebar from './components/Sidebar'
 import { connectSocket } from './hooks/useWS'
 import 'animate.css'
+import '@dafcoe/vue-notification/dist/vue-notification.css'
 
 export default {
   name: 'App',

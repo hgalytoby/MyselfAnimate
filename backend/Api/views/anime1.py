@@ -1,5 +1,3 @@
-import json
-
 from django.db.models import Prefetch
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
@@ -40,7 +38,7 @@ class Anime1AnimateInfoView(APIView):
         episode_data = Anime1.get_animate_info(url=animate_url, data=[])
         DB.Anime1.update_or_create_many_episode(episodes=episode_data, owner=model)
         serializer = Anime1AnimateInfoSerializer(model)
-        DB.Cache.set_cache_data(key=animate_url, data=json.dumps(serializer.data), timeout=1800)
+        DB.Cache.set_cache_data(key=animate_url, data=serializer.data, timeout=1800)
         return Response(serializer.data)
 
 
