@@ -13,4 +13,4 @@ m3u8
 Pillow
 requests
 lxml
-# uwsgi
+uwsgi
