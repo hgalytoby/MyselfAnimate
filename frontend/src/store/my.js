@@ -15,14 +15,17 @@ import {
   systemState
 } from '../variables/my'
 import { myApi } from '../api'
-import { axiosGet, axiosPut } from '../tools'
+import { axiosGet, axiosPut, setToast, toastData } from '../tools'
 import { sendSocketMessage } from '../hooks/useWS'
 
 export const state = {
   [logState]: [],
   [historyState]: [],
   [systemState]: [],
-  [settingsState]: {}
+  [settingsState]: {
+    myself_download_value: 2,
+    anime1_download_value: 2
+  }
 }
 
 export const actions = {
@@ -62,6 +65,7 @@ export const mutations = {
       action: 'update_download_value',
       data: value
     })
+    setToast(toastData.settingsPutOk)
   }
 }
 export const getters = {

@@ -58,8 +58,8 @@ class BaseDownloadManage:
             await self.cancel_all_task()
 
     async def cancel_all_task(self):
-        for k, v in self.tasks_dict.items():
-            v.cancel()
+        for task in list(self.tasks_dict.values()):
+            task.cancel()
         self.wait_download_list.clear()
         self.download_list.clear()
         await self.update_tasks()
@@ -158,28 +158,6 @@ class MyselfDownloadManage(BaseDownloadManage):
             pass
 
     @staticmethod
-    def __process_merge_video(cmd: str):
-        """
-        以下這三行程式碼是在 Windows 上需要這麼做，但是會報 Cannot run the event loop while another loop is running 錯誤訊息。
-        我用一般 py 寫一個測試時可以這樣使用，但是在 Django 裡會不行。
-        也有找過
-        import nest_asyncio
-        nest_asyncio.apply()
-        依然不行，暫時無解。
-        loop = asyncio.ProactorEventLoop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(self.__process_merge_video(cmd=cmd))
-        :param cmd: str - ffmpeg 合併的指令。
-        :return:
-        """
-        run = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        run.communicate()
-        run.wait()
-        # proc = await asyncio.create_subprocess_shell(cmd, stdout=asyncio.subprocess.PIPE,
-        #                                              stderr=asyncio.subprocess.PIPE)
-        # _, _ = await proc.communicate()
-
-    @staticmethod
     async def _process_host(task_data: dict) -> bool:
         """
         取得動漫集數的 host 資料。
@@ -235,9 +213,9 @@ class MyselfDownloadManage(BaseDownloadManage):
             with open(f'{ROOT_MEDIA_PATH}{ts_list_path}', 'w', encoding='utf-8') as f:
                 f.write('\n'.join(ts_path_list))
             cmd = f'ffmpeg -f concat -safe 0 -y -i "{ROOT_MEDIA_PATH}{ts_list_path}" -c copy "{ROOT_MEDIA_PATH}{video_path}"'
-            _ = threading.Thread(target=self.__process_merge_video, args=(cmd,))
-            _.start()
-            _.join()
+            proc = await asyncio.create_subprocess_shell(cmd, stdout=asyncio.subprocess.PIPE,
+                                                         stderr=asyncio.subprocess.PIPE)
+            _, _ = await proc.communicate()
             await DB.Myself.save_animate_episode_video_file(pk=task_data['episode_id'], video_path=video_path)
             await DB.Myself.delete_filter_animate_episode_ts(owner_id=task_data['episode_id'])
             task_data['video'] = f'{MEDIA_PATH}/{video_path}'
@@ -326,7 +304,6 @@ class Anime1DownloadManage(BaseDownloadManage):
             async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=True)) as session:
                 async with session.get(url=animate_url, headers=_headers, timeout=_timeout) as res:
                     task_data.update({'status': '下載中'})
-                    # video_path = f'{self.from_website}/{task_data["animate_name"]}/'
                     animate_dir_path = f'{MEDIA_PATH}/{self.from_website}/{task_data["animate_name"]}/'
                     if not os.path.isdir(f'.{animate_dir_path}'):
                         os.makedirs(f'.{animate_dir_path}')

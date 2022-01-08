@@ -24,7 +24,7 @@ import {
   animateInfoEpisodeInfoMutation, searchAnimateAction, searchAnimateMutation
 } from '../variables/myself'
 import { myselfApi } from '../api'
-import { axiosGet, axiosPost } from '../tools'
+import { axiosGet, axiosPost, setToast, toastData } from '../tools'
 import {
   clickAllDownloadCheckBoxMutation,
   clickDownloadCheckBoxMutation,
@@ -144,7 +144,7 @@ export const mutations = {
         }
       })
     } else {
-      alert('網址錯誤，沒有搜尋到動漫!')
+      setToast(toastData.searchMyselfAnimateFail)
     }
   }
 }

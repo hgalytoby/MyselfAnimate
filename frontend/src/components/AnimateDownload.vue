@@ -91,12 +91,6 @@ export default {
 
     function clickDownloadCheckBox (downloadID) {
       store.commit(`${props.animate}/${clickDownloadCheckBoxMutation}`, downloadID)
-      // const index = downloadCheckBoxArray.value.indexOf(downloadID)
-      // if (index !== -1) {
-      //   this.downloadCheckBox.splice(index, 1)
-      // } else {
-      //   this.downloadCheckBox.push(downloadID)
-      // }
     }
 
     function clickAllDownloadCheckBox () {

@@ -27,6 +27,7 @@ import { sendSocketMessage } from '../../hooks/useWS'
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { downloadCheckBoxMutation } from '../../variables/my'
+import { setToast, toastData } from '../../tools'
 
 export default {
   name: 'TabModel',
@@ -44,6 +45,7 @@ export default {
       sendSocketMessage({
         action: props.clearAction
       })
+      setToast(toastData.clearDownloadArrayOk)
     }
     function deleteAnimate () {
       sendSocketMessage({
@@ -51,6 +53,7 @@ export default {
         deletes: downloadCheckBoxArray.value
       })
       store.commit(`${props.animate}/${downloadCheckBoxMutation}`)
+      setToast(toastData.deleteAnimateOk)
     }
     return {
       clearFinishDownload,

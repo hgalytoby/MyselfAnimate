@@ -31,7 +31,7 @@
 
 <script>
 import { computed, ref } from 'vue'
-import { setToast, startFancy } from '../tools'
+import { setToast, startFancy, toastData } from '../tools'
 import { sendSocketMessage } from '../hooks/useWS'
 
 export default {
@@ -69,14 +69,7 @@ export default {
         animateName: animateInfo.value.name
       })
       clickCheckboxData.value = []
-      setToast(
-        {
-          message: `下載清單新增<br>${animateInfo.value.name}!!`,
-          type: 'success',
-          automatically: true,
-          duration: 3000
-        }
-      )
+      setToast(toastData.downloadArrayCreateAnimate(animateInfo.value.name))
     }
 
     function clickCheckbox (id) {
