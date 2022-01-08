@@ -5,6 +5,7 @@ from rest_framework.utils import json
 from Tools.db import DB
 from Tools.myself import Myself
 from Tools.urls import MyselfFinishAnimateUrl, MyselfFinishAnimateBaseUrl
+import copy
 
 
 class Base:
@@ -13,13 +14,16 @@ class Base:
         將現在正要下載的動漫資料傳給前端。
         :return:
         """
+        temp = None
         while True:
-            await self.parent.send(
-                text_data=json.dumps({
-                    'msg': 'now download array',
-                    'data': getattr(self.manage, 'download_list') + getattr(self.manage, 'wait_download_list'),
-                    'action': self.task_action}))
-            await asyncio.sleep(1)
+            if temp != getattr(self.manage, 'download_list') + getattr(self.manage, 'wait_download_list'):
+                temp = copy.deepcopy(self.manage.download_list + self.manage.wait_download_list)
+                await self.parent.send(
+                    text_data=json.dumps({
+                        'msg': 'now download array',
+                        'data': getattr(self.manage, 'download_list') + getattr(self.manage, 'wait_download_list'),
+                        'action': self.task_action}))
+            await asyncio.sleep(0.1)
 
 
 class MyselfManage(Base):
@@ -64,7 +68,6 @@ class MyselfManage(Base):
                     download_models = await DB.Myself.create_many_download_models(owner_id_list=kwargs['episodes'])
                     download_data_list = await DB.Myself.get_download_animate_episode_data_list(
                         download_models=download_models)
-
                     self.manage.wait_download_list.extend(download_data_list)
                 except Exception as error:
                     print(error)

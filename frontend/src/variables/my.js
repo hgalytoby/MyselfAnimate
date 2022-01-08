@@ -1,17 +1,21 @@
 export const logState = 'logState'
 export const systemState = 'systemState'
+export const settingsState = 'settingsState'
 export const historyState = 'historyState'
 export const downloadCheckBoxState = 'downloadCheckBoxState'
+export const animateCollectState = 'animateCollectState'
 
 export const logAction = 'logAction'
 export const systemAction = 'systemAction'
+export const settingsGetAction = 'settingsGetAction'
+export const settingsPutAction = 'settingsPutAction'
 export const historyAction = 'historyAction'
-export const animateCollectState = 'animateCollectState'
-
 export const animateCollectAction = 'animateCollectAction'
 
 export const logMutation = 'logMutation'
 export const systemMutation = 'systemMutation'
+export const settingsGetMutation = 'settingsGetMutation'
+export const settingsPutMutation = 'settingsPutMutation'
 export const historyMutation = 'historyMutation'
 export const downloadCheckBoxMutation = 'downloadCheckBoxMutation'
 export const clickDownloadCheckBoxMutation = 'clickDownloadCheckBoxMutation'

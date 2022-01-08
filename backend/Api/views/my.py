@@ -2,8 +2,8 @@ from rest_framework.generics import ListAPIView, ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from Api.serializers.my import MySystemSerializer, MyHistorySerializer
-from Database.models.my import MySystemModel, MyHistoryModel
+from Api.serializers.my import MySystemSerializer, MyHistorySerializer, MySettingsSerializer
+from Database.models.my import MySystemModel, MyHistoryModel, MySettingsModel
 from Tools.db import DB, MyPageNumberPagination
 
 
@@ -27,3 +27,17 @@ class MyLogView(APIView):
             'system': system_data,
             'history': history_data,
         })
+
+
+class MySettingsView(APIView):
+    def get(self, request):
+        my_settings = MySettingsModel.objects.all().last()
+        serializer = MySettingsSerializer(my_settings)
+        return Response(serializer.data)
+
+    def put(self, request):
+        my_settings = MySettingsModel.objects.all().last()
+        serializer = MySettingsSerializer(my_settings, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)

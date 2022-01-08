@@ -11,6 +11,7 @@ export const myselfApi = {
 
 export const myApi = {
   log: '/api/my/log/',
+  settings: '/api/my/settings/',
   system: (page, size) => `/api/my/log/system/?page=${page}&size=${size}`,
   history: (page, size) => `/api/my/log/history/?page=${page}&size=${size}`
 }

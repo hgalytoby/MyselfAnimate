@@ -6,7 +6,6 @@
   <div><a href="https://github.com/dafcoe/vue-notification">notification/toast</a></div>
   <div><a href="https://github.com/aacassandra/vue3-progressbar">Progressbar</a></div>
   <div><a href="https://github.com/dvuckovic/vue3-bootstrap-icons">bootstrap-icons</a></div>
-  <button @click="test">click</button>
 </template>
 
 <script>

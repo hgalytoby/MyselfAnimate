@@ -14,14 +14,14 @@ from project.settings import MEDIA_PATH, ROOT_MEDIA_PATH
 
 
 class BaseDownloadManage:
-    def __init__(self):
+    def __init__(self, max_value):
         self.download_list = []
         self.wait_download_list = []
         self.connections = 10
         self.tasks_dict = {}
         self.now = 0
-        self.max = 2
         self.ws = []
+        self.max = max_value
         self.switch_db_function = NotImplemented
 
     async def clear_finish_animate_list(self):
@@ -51,6 +51,18 @@ class BaseDownloadManage:
         #         if not item['done']:
         #             self.tasks_dict[item['id']].cancel()
         #         self.download_list.remove(item)
+
+    async def update_download_value(self, value):
+        if self.max != value:
+            self.max = value
+            await self.cancel_all_task()
+
+    async def cancel_all_task(self):
+        for k, v in self.tasks_dict.items():
+            v.cancel()
+        self.wait_download_list.clear()
+        self.download_list.clear()
+        await self.update_tasks()
 
     async def switch_download_order(self, data: dict):
         """
@@ -117,8 +129,8 @@ class BaseDownloadManage:
 
 
 class MyselfDownloadManage(BaseDownloadManage):
-    def __init__(self):
-        super(MyselfDownloadManage, self).__init__()
+    def __init__(self, max_value):
+        super(MyselfDownloadManage, self).__init__(max_value)
         self.from_website = 'Myself'
         self.switch_db_function = DB.Myself.switch_download
         threading.Thread(target=self.main, args=()).start()
@@ -276,14 +288,17 @@ class MyselfDownloadManage(BaseDownloadManage):
             task_data.update({'status': '下載完成'})
         self.now -= 1
 
+    async def update_tasks(self):
+        download_models = await DB.Myself.get_total_download_animate_episode_models()
+        self.wait_download_list += await DB.Myself.get_download_animate_episode_data_list(
+            download_models=download_models)
+
     async def main_task(self):
         """
         主要方法。
         :return:
         """
-        download_models = await DB.Myself.get_total_download_animate_episode_models()
-        self.wait_download_list += await DB.Myself.get_download_animate_episode_data_list(
-            download_models=download_models)
+        await self.update_tasks()
         await super(MyselfDownloadManage, self).main_task()
 
     def main(self):
@@ -295,8 +310,8 @@ class MyselfDownloadManage(BaseDownloadManage):
 
 
 class Anime1DownloadManage(BaseDownloadManage):
-    def __init__(self):
-        super(Anime1DownloadManage, self).__init__()
+    def __init__(self, max_value):
+        super(Anime1DownloadManage, self).__init__(max_value)
         self.from_website = 'Anime1'
         self.switch_db_function = DB.Anime1.switch_download
         threading.Thread(target=self.main, args=()).start()
@@ -351,10 +366,13 @@ class Anime1DownloadManage(BaseDownloadManage):
             task_data.update({'status': '下載完成'})
         self.now -= 1
 
-    async def main_task(self):
+    async def update_tasks(self):
         download_models = await DB.Anime1.get_total_download_animate_episode_models()
         self.wait_download_list += await DB.Anime1.get_download_animate_episode_data_list(
             download_models=download_models)
+
+    async def main_task(self):
+        await self.update_tasks()
         await super(Anime1DownloadManage, self).main_task()
 
     def main(self):

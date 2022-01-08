@@ -9,7 +9,7 @@
               <span class="text-center">嘟嘟嚕</span>
             </h4>
             <!--            <BootstrapIcon icon="list" color="white" size="2x"/>-->
-            <h6 class="text-white">請教我刻板</h6>
+            <h6 class="text-white">我還在學習刻板</h6>
             <a class="nav-link py-2 px-2" title="" href="https://github.com/hgalytoby/MyselfAnimate"
                data-bs-toggle="tooltip"
                data-bs-placement="right"

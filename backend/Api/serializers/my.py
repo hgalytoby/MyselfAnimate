@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from Database.models.my import MyHistoryModel, MySystemModel
+from Database.models.my import MyHistoryModel, MySystemModel, MySettingsModel
 
 
 class MyHistorySerializer(serializers.ModelSerializer):
@@ -15,4 +15,13 @@ class MySystemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MySystemModel
+        fields = '__all__'
+
+
+class MySettingsSerializer(serializers.ModelSerializer):
+    myself_download_value = serializers.IntegerField(min_value=1, max_value=30)
+    anime1_download_value = serializers.IntegerField(min_value=1, max_value=30)
+
+    class Meta:
+        model = MySettingsModel
         fields = '__all__'

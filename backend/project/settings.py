@@ -160,3 +160,5 @@ MEDIA_ROOT = Path(BASE_DIR, 'static/uploads')
 MEDIA_PATH = '/static/uploads'
 
 ROOT_MEDIA_PATH = f"{BASE_DIR}{MEDIA_PATH}/"
+
+DOWNLOAD_MAX_VALUE = 2

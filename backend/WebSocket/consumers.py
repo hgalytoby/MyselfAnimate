@@ -1,15 +1,13 @@
 import json
 import asyncio
 from Tools.db import DB
-from Tools.myself import Myself
 from Tools.download import MyselfDownloadManage, Anime1DownloadManage
-from Tools.urls import MyselfFinishAnimateUrl, MyselfFinishAnimateBaseUrl
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 from WebSocket.actions import MyselfManage, Anime1Manage
-
-myself_download_manage = MyselfDownloadManage()
-anime1_download_manage = Anime1DownloadManage()
+settings = DB.My.get_or_create_settings()
+myself_download_manage = MyselfDownloadManage(settings.myself_download_value)
+anime1_download_manage = Anime1DownloadManage(settings.anime1_download_value)
 
 
 class AsyncChatConsumer(AsyncWebsocketConsumer):
@@ -31,11 +29,16 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
             'clear_finish_anime1_animate': self.Anime1.clear_finish_animate,
             'delete_anime1_download_animate': self.Anime1.delete_download_animate,
             'download_order_anime1_animate': self.Anime1.download_order,
+            'update_download_value': self.update_download_value,
             'connect': self.connect_action,
         }
 
     async def connect_action(self, *args, **kwargs):
         await self.send(text_data=json.dumps({'action': 'connect', 'msg': f'連線成功!!'}))
+
+    async def update_download_value(self, *args, **kwargs):
+        await self.Myself.manage.update_download_value(value=kwargs['data']['myself_download_value'])
+        await self.Anime1.manage.update_download_value(value=kwargs['data']['anime1_download_value'])
 
     async def connect(self):
         """

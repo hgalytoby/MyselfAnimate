@@ -40,7 +40,7 @@ export const state = {
   [weekAnimateState]: {},
   [animateInfoState]: {},
   [loadingState]: true,
-  [finishListState]: {},
+  [finishListState]: [],
   [finishAnimateUpdateState]: false,
   [finishAnimateUpdateButtonState]: '更新資料',
   [finishAnimateState]: [],
@@ -56,13 +56,6 @@ export const actions = {
   },
   [animateInfoAction] (context, value) {
     axiosPost(myselfApi.animateInfo, value, context, addAnimateInfoMutation)
-    // console.log('animateInfoAction', 1111, myselfApi.animateInfo(value.url))
-    // if (Object.keys(value).length === 1) {
-    //   console.log('animateInfoAction', 1111, myselfApi.animateInfo(value.url))
-    //   axiosGet(myselfApi.animateInfo(value.url), context, addAnimateInfoMutation)
-    // } else {
-    //   console.log('animateInfoAction', value.url)
-    //   axiosGet(myselfApi.animateInfo(JSON.stringify(value)), context, addAnimateInfoMutation)
   },
   [finishListAction] (context, value) {
     axiosGet(myselfApi.finishList, context, addFinishListMutation)

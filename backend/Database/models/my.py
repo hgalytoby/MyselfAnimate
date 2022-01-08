@@ -26,4 +26,12 @@ class MyLoveGroupModel(models.Model):
     name = models.CharField(max_length=32)
 
     class Meta:
-        db_table = 'MyLoveGroupModel'
+        db_table = 'MyLoveGroup'
+
+
+class MySettingsModel(models.Model):
+    myself_download_value = models.IntegerField(default=1)
+    anime1_download_value = models.IntegerField(default=1)
+
+    class Meta:
+        db_table = 'MySettings'

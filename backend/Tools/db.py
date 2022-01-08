@@ -16,11 +16,11 @@ from django.core.files.base import ContentFile
 
 from Database.models import MyselfFinishAnimateModel, MyselfAnimateEpisodeInfoModel, MyselfAnimateEpisodeTsModel, \
     MyselfDownloadModel, MyselfAnimateInfoModel, MyHistoryModel, MySystemModel, Anime1AnimateInfoModel, \
-    Anime1AnimateEpisodeInfoModel, Anime1DownloadModel
+    Anime1AnimateEpisodeInfoModel, Anime1DownloadModel, MySettingsModel
 from Tools.tools import aiohttp_bytes, use_io_get_image_format
 from django.core.cache import caches
 
-from project.settings import MEDIA_PATH, BASE_DIR
+from project.settings import MEDIA_PATH, BASE_DIR, DOWNLOAD_MAX_VALUE
 
 
 class MyPageNumberPagination(PageNumberPagination):
@@ -378,6 +378,14 @@ class MyselfBase(Base):
 
 
 class MyBase:
+    @staticmethod
+    def get_or_create_settings():
+        my_settings = MySettingsModel.objects.all().last()
+        if not my_settings:
+            return MySettingsModel.objects.create(myself_download_value=DOWNLOAD_MAX_VALUE,
+                                                  anime1_download_value=DOWNLOAD_MAX_VALUE)
+        return my_settings
+
     @staticmethod
     @database_sync_to_async
     def create_history(**kwargs):

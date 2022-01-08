@@ -1,16 +1,28 @@
 import {
-  historyAction, historyMutation,
+  historyAction,
+  historyMutation,
   historyState,
-  logAction, logMutation,
-  logState, systemAction, systemMutation, systemState
+  logAction,
+  logMutation,
+  logState,
+  settingsGetAction,
+  settingsGetMutation,
+  settingsPutMutation,
+  settingsPutAction,
+  settingsState,
+  systemAction,
+  systemMutation,
+  systemState
 } from '../variables/my'
 import { myApi } from '../api'
-import { axiosGet } from '../tools'
+import { axiosGet, axiosPut } from '../tools'
+import { sendSocketMessage } from '../hooks/useWS'
 
 export const state = {
   [logState]: [],
   [historyState]: [],
-  [systemState]: []
+  [systemState]: [],
+  [settingsState]: {}
 }
 
 export const actions = {
@@ -22,6 +34,12 @@ export const actions = {
   },
   [systemAction] (context, value) {
     axiosGet(myApi.system(value.page, value.size), context, systemMutation)
+  },
+  [settingsGetAction] (context, value) {
+    axiosGet(myApi.settings, context, settingsGetMutation)
+  },
+  [settingsPutAction] (context, value) {
+    axiosPut(myApi.settings, context.state[settingsState], context, settingsPutMutation)
   }
 }
 export const mutations = {
@@ -34,6 +52,16 @@ export const mutations = {
   },
   [systemMutation] (state, value) {
     state[systemState] = value
+  },
+  [settingsGetMutation] (state, value) {
+    state[settingsState] = value
+  },
+  [settingsPutMutation] (state, value) {
+    state[settingsState] = value
+    sendSocketMessage({
+      action: 'update_download_value',
+      data: value
+    })
   }
 }
 export const getters = {

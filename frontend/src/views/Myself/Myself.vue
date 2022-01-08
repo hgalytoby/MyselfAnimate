@@ -45,7 +45,6 @@
 <script>
 import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
-// import { useRouter } from 'vue-router'
 import {
   searchAnimateAction,
   weekAnimateAction,
@@ -66,20 +65,12 @@ export default {
     }
 
     const store = useStore()
-    // const router = useRouter()
     const searchText = ref('')
     const weekAnimate = computed(() => store.state.myself[weekAnimateState])
     store.dispatch(`myself/${weekAnimateAction}`)
 
     function searchAnimate () {
       store.dispatch(`myself/${searchAnimateAction}`, searchText.value)
-      // console.log('searchAnimate', JSON.stringify(searchText.value))
-      // router.push({
-      //   name: 'MyselfAnimate',
-      //   query: {
-      //     url: searchText.value
-      //   }
-      // })
     }
     return {
       weekAnimate,
