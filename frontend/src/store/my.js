@@ -15,8 +15,9 @@ import {
   systemState
 } from '../variables/my'
 import { myApi } from '../api'
-import { axiosGet, axiosPut, setToast, toastData } from '../tools'
+import { axiosGet, axiosPut, toastData } from '../tools'
 import { sendSocketMessage } from '../hooks/useWS'
+import { createToast } from 'mosha-vue-toastify'
 
 export const state = {
   [logState]: [],
@@ -65,7 +66,7 @@ export const mutations = {
       action: 'update_download_value',
       data: value
     })
-    setToast(toastData.settingsPutOk)
+    createToast(...toastData.settingsPutOk)
   }
 }
 export const getters = {

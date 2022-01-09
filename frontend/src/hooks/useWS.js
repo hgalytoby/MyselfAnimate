@@ -1,6 +1,7 @@
 import { useStore } from 'vuex'
 import { finishAnimateUpdateButtonMutation } from '../variables/myself'
 import { setToast, toastData } from '../tools'
+import { createToast } from 'mosha-vue-toastify'
 
 const wsUrl = process.env.VUE_APP_WS === 'dev' ? 'ws://127.0.0.1:8000/ws/' : `ws://${location.host}/ws/`
 const socket = new WebSocket(wsUrl)
@@ -20,7 +21,11 @@ export const connectSocket = () => {
     const receive = JSON.parse(msg.data)
     if (receive.action === 'myself_finish_animate_update') {
       store.commit(`myself/${finishAnimateUpdateButtonMutation}`, receive)
-      setToast(toastData.myselfFinishAnimateUpdate)
+      if (receive.updating) {
+        createToast(...toastData.myselfFinishAnimateUpdate)
+      } else {
+        setToast(toastData.myselfFinishAnimateUpdateFinish)
+      }
     } else if (receive.action === 'download_myself_animate') {
       console.log(receive)
     } else if (receive.action === 'download_myself_animate_array') {
@@ -34,7 +39,7 @@ export const connectSocket = () => {
     } else if (receive.action === 'download_animate_finish') {
       setToast(toastData.downloadAnimateFinish(receive.data))
     } else if (receive.action === 'connect') {
-      setToast(toastData.connectOk)
+      createToast(...toastData.connectOk)
     } else {
       store.commit('ws/setWsRes', JSON.parse(msg.data))
     }

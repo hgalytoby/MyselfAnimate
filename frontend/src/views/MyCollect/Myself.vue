@@ -22,11 +22,11 @@
 <script>
 import { animateCollectAction, animateCollectState } from '../../variables/my'
 import { startFancy } from '../../tools'
-import uwsAnimateCollect from '../../hooks/uwsAnimateCollect'
+import useAnimateCollect from '../../hooks/uwsAnimateCollect'
 export default {
   name: 'Myself',
   setup () {
-    const animateCollect = uwsAnimateCollect('myself', animateCollectAction, animateCollectState)
+    const animateCollect = useAnimateCollect('myself', animateCollectAction, animateCollectState)
     return {
       animateCollect,
       startFancy

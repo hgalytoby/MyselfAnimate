@@ -9,6 +9,7 @@ import Sidebar from './components/Sidebar'
 import { connectSocket } from './hooks/useWS'
 import 'animate.css'
 import '@dafcoe/vue-notification/dist/vue-notification.css'
+import 'mosha-vue-toastify/dist/style.css'
 
 export default {
   name: 'App',

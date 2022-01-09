@@ -24,7 +24,7 @@ import {
   animateInfoEpisodeInfoMutation, searchAnimateAction, searchAnimateMutation
 } from '../variables/myself'
 import { myselfApi } from '../api'
-import { axiosGet, axiosPost, setToast, toastData } from '../tools'
+import { axiosGet, axiosPost, toastData } from '../tools'
 import {
   clickAllDownloadCheckBoxMutation,
   clickDownloadCheckBoxMutation,
@@ -35,6 +35,7 @@ import {
   animateCollectMutation
 } from '../variables/my'
 import router from '../router'
+import { createToast } from 'mosha-vue-toastify'
 
 export const state = {
   [weekAnimateState]: {},
@@ -144,7 +145,8 @@ export const mutations = {
         }
       })
     } else {
-      setToast(toastData.searchMyselfAnimateFail)
+      console.log(value.url)
+      createToast(...toastData.searchMyselfAnimateFail)
     }
   }
 }

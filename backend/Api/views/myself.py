@@ -44,17 +44,18 @@ class MyselfAnimateInfoView(APIView):
 
 class MyselfUrlAnimate(MyselfAnimateInfoView):
     def post(self, request):
-        print(request.data)
         try:
             super(MyselfUrlAnimate, self).post(request)
             return Response({
                 'result': True,
-                'url': '&'.join([f'{key}={value}' for key, value in request.data.items()]).replace('url=', '')
+                'url': '&'.join([f'{key}{"=" if value else ""}{value}' for key, value in request.data.items()]).replace(
+                    'url=', '')
             })
-        except (KeyError, TypeError, ):
+        except (KeyError, TypeError,):
             return Response({
                 'result': False,
-                'url': '&'.join([f'{key}={value}' for key, value in request.data.items()]).replace('url=', '')
+                'url': '&'.join([f'{key}{"=" if value else ""}{value}' for key, value in request.data.items()]).replace(
+                    'url=', '')
             })
 
 

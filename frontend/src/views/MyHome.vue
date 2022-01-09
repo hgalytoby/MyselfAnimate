@@ -6,31 +6,29 @@
   <div><a href="https://github.com/dafcoe/vue-notification">notification/toast</a></div>
   <div><a href="https://github.com/aacassandra/vue3-progressbar">Progressbar</a></div>
   <div><a href="https://github.com/dvuckovic/vue3-bootstrap-icons">bootstrap-icons</a></div>
+  <div><a href="https://github.com/szboynono/mosha-vue-toastify">Mosha Vue Toastify</a></div>
+  <div></div>
+  <button @click="toast">Toast it!</button>
 </template>
 
 <script>
-import { useNotificationStore } from '@dafcoe/vue-notification'
+
+import { createToast, withProps } from 'mosha-vue-toastify'
+import CustomToast from '../components/CustomToast'
 
 export default {
   name: 'MyHome',
   setup () {
-    const { setNotification } = useNotificationStore()
-    function test () {
-      setNotification({
-        message: '<h1>Line 2<p>',
-        type: 'info',
-        showIcon: true,
-        dismiss: {
-          manually: true,
-          automatically: true
-        },
-        duration: 5000,
-        showDurationProgress: true,
-        appearance: 'light'
-      })
+    function toast () {
+      createToast(withProps(CustomToast, { msg: '哈哈哈' }),
+        {
+          transition: 'slide',
+          position: 'top-center',
+          showCloseButton: false
+        })
     }
     return {
-      test
+      toast
     }
   }
 }

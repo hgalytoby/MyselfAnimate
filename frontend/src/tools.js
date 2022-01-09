@@ -2,6 +2,8 @@ import axios from 'axios'
 import { Fancybox } from '@fancyapps/ui/src/Fancybox'
 import { app } from './main'
 import { useNotificationStore } from '@dafcoe/vue-notification'
+import { createToast, withProps } from 'mosha-vue-toastify'
+import CustomToast from './components/CustomToast'
 
 const { setNotification } = useNotificationStore()
 
@@ -13,7 +15,7 @@ export const axiosGet = (url, context, mutation) => {
   }).catch(function (_) {
     // console.log(error.response)
     app.config.globalProperties.$Progress.fail()
-    setToast(toastData.apiFail)
+    createToast(...toastData.apiFail)
     // alert(error.response.statusText)
   })
 }
@@ -27,6 +29,7 @@ export const axiosPost = (url, data, context, mutation) => {
     // console.log(error.response)
     app.config.globalProperties.$Progress.fail()
     setToast(toastData.apiFail)
+    createToast(...toastData.apiFail)
   })
 }
 
@@ -38,7 +41,7 @@ export const axiosPut = (url, data, context, mutation) => {
   }).catch(function (_) {
     // console.log(error.response)
     app.config.globalProperties.$Progress.fail()
-    setToast(toastData.apiFail)
+    createToast(...toastData.apiFail)
   })
 }
 
@@ -66,18 +69,18 @@ export const setToast = (data) => {
 }
 
 export const toastData = {
-  settingsPutOk: {
-    message: '更新成功!',
-    type: 'success',
-    automatically: true,
-    duration: 3000
-  },
-  searchMyselfAnimateFail: {
-    message: '沒有搜尋動漫',
-    type: 'alert',
-    automatically: true,
-    duration: 3000
-  },
+  settingsPutOk: [withProps(CustomToast, { msg: '更新成功!' }), {
+    position: 'top-center',
+    transition: 'slide',
+    showCloseButton: false,
+    timeout: 2000
+  }],
+  searchMyselfAnimateFail: [withProps(CustomToast, { msg: '沒有搜尋動漫!' }), {
+    position: 'top-center',
+    transition: 'slide',
+    showCloseButton: false,
+    timeout: 3000
+  }],
   downloadAnimateFinish: (data) => {
     return {
       message: `${data.animate_name}<br>${data.episode_name}下載完成!!`,
@@ -85,12 +88,12 @@ export const toastData = {
       automatically: false
     }
   },
-  connectOk: {
-    message: '歡迎~',
-    type: 'success',
-    automatically: true,
-    duration: 3000
-  },
+  connectOk: [withProps(CustomToast, { msg: '歡迎' }), {
+    position: 'top-center',
+    transition: 'slide',
+    showCloseButton: false,
+    timeout: 2000
+  }],
   downloadArrayCreateAnimate: (data) => {
     return {
       message: `下載清單新增<br>${data}!!`,
@@ -99,28 +102,33 @@ export const toastData = {
       duration: 3000
     }
   },
-  apiFail: {
-    message: '請求失敗了',
-    type: 'alert',
-    automatically: true,
-    duration: 3000
-  },
-  myselfFinishAnimateUpdate: {
-    message: '更新完結動漫，請耐心稍等!!',
+  apiFail: [withProps(CustomToast, { msg: '請求失敗了' }), {
+    position: 'top-center',
+    transition: 'slide',
+    showCloseButton: false,
+    timeout: 2000
+  }],
+  myselfFinishAnimateUpdate: [withProps(CustomToast, { msg: '開始更新完結動漫，請耐心稍等!!' }), {
+    position: 'top-center',
+    transition: 'slide',
+    showCloseButton: false,
+    timeout: 2000
+  }],
+  myselfFinishAnimateUpdateFinish: {
+    message: '完結動漫已更新完畢!',
     type: 'info',
-    automatically: true,
-    duration: 5000
+    automatically: false
   },
-  clearDownloadArrayOk: {
-    message: '清除所有已完成下載!',
-    type: 'success',
-    automatically: true,
-    duration: 3000
-  },
-  deleteAnimateOk: {
-    message: '已刪除所有選擇的動漫!',
-    type: 'success',
-    automatically: true,
-    duration: 3000
-  }
+  clearDownloadArrayOk: [withProps(CustomToast, { msg: '清除所有已完成下載!' }), {
+    position: 'top-center',
+    transition: 'slide',
+    showCloseButton: false,
+    timeout: 2000
+  }],
+  deleteAnimateOk: [withProps(CustomToast, { msg: '已刪除所有選擇的動漫!' }), {
+    position: 'top-center',
+    transition: 'slide',
+    showCloseButton: false,
+    timeout: 2000
+  }]
 }

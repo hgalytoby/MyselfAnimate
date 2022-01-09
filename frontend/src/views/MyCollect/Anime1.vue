@@ -17,12 +17,12 @@
 <script>
 import { animateCollectAction, animateCollectState } from '../../variables/my'
 import { startFancy } from '../../tools'
-import uwsAnimateCollect from '../../hooks/uwsAnimateCollect'
+import useAnimateCollect from '../../hooks/uwsAnimateCollect'
 
 export default {
   name: 'Anime1',
   setup () {
-    const animateCollect = uwsAnimateCollect('anime1', animateCollectAction, animateCollectState)
+    const animateCollect = useAnimateCollect('anime1', animateCollectAction, animateCollectState)
     return {
       animateCollect,
       startFancy

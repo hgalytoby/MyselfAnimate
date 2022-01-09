@@ -51,7 +51,7 @@ class MyselfManage(Base):
 
         await DB.My.create_log(msg='Myself 完結動漫更新完成', action='updated')
         await self.parent.send(
-            text_data=json.dumps({'msg': '更新完成', 'action': 'myself_finish_animate_update', 'updating': False}))
+            text_data=json.dumps({'msg': '更新完成', 'action': kwargs['action'], 'updating': False}))
 
     async def animate_download(self, *args, **kwargs):
         """
