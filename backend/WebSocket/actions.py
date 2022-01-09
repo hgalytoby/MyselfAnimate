@@ -33,11 +33,7 @@ class MyselfManage(Base):
         self.parent = parent
         self.manage = manage
 
-    async def finish_animate_update(self, *args, **kwargs):
-        """
-        更新完結動漫。
-        :return:
-        """
+    async def _finish_animate_update(self, *args, **kwargs):
         await self.parent.send(text_data=json.dumps({'msg': f'正在更新中', 'action': kwargs['action'], 'updating': True}))
         await DB.My.create_log(msg='Myself 更新完結動漫', action='update')
         total_page_data = await Myself.finish_animate_total_page(url=MyselfFinishAnimateUrl, get_res_text=True)
@@ -52,6 +48,13 @@ class MyselfManage(Base):
         await DB.My.create_log(msg='Myself 完結動漫更新完成', action='updated')
         await self.parent.send(
             text_data=json.dumps({'msg': '更新完成', 'action': kwargs['action'], 'updating': False}))
+
+    async def finish_animate_update(self, *args, **kwargs):
+        """
+        更新完結動漫。
+        :return:
+        """
+        asyncio.create_task(self._finish_animate_update(*args, **kwargs))
 
     async def animate_download(self, *args, **kwargs):
         """
