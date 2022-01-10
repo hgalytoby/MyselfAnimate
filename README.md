@@ -20,7 +20,7 @@
 謝謝。
 
 ### 點擊圖片可以在 Youtube 上觀看。
-[![Demo](https://i.imgur.com/bRDMtif.png)](https://youtu.be/ZW70RJYAwek)
+[![Demo](https://i.imgur.com/6G1kPWD.png)](https://youtu.be/ZW70RJYAwek)
 
 ## 目標是想做一個整合下載的網頁
 - 我現在只有 [Myself](https://myself-bbs.com/portal.php) 與 [Anime1.me](https://anime1.me/) 不需登入會員就能下載 `720p` 影片。
