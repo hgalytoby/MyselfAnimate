@@ -6,8 +6,16 @@
 正因為我都 push master，所以 clone 下來運行可能會發生程式錯誤的關係導致無法運行是正常的。
 
 
-## Demo
+## Demo 2022/01.08
 ### 點擊可以播放。
+此影片為技術探討，不作其他營利用途。
+
+研究爬蟲 Api 。
+
+研究完畢請將下載的影片刪除。
+
+謝謝。
+
 [![Demo](https://i.imgur.com/bRDMtif.png)](https://youtu.be/ZW70RJYAwek)
 
 ## 目標是想做一個整合下載的網頁
