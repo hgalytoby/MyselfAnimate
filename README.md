@@ -6,6 +6,22 @@
 正因為我都 push master，所以 clone 下來運行可能會發生程式錯誤的關係導致無法運行是正常的。
 
 
+## Demo 2022/01/08
+頁面刻板還在學習，目前先做功能出來，此專案還有 Bug 要修。
+
+看影片了解一下此專案有哪些功能。
+
+此影片為技術探討，不作其他營利用途。
+
+研究爬蟲 Api 。
+
+研究完畢請將下載的影片刪除。
+
+謝謝。
+
+### 點擊圖片可以在 Youtube 上觀看。
+[![Demo](https://i.imgur.com/6G1kPWD.png)](https://youtu.be/ZW70RJYAwek)
+
 ## 目標是想做一個整合下載的網頁
 - 我現在只有 [Myself](https://myself-bbs.com/portal.php) 與 [Anime1.me](https://anime1.me/) 不需登入會員就能下載 `720p` 影片。
 - 前端使用 Vue3
