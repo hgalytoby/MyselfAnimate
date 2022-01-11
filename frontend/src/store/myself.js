@@ -136,16 +136,16 @@ export const mutations = {
     state[downloadCheckBoxState].push(value)
   },
   [searchAnimateMutation] (state, value) {
-    console.log(value)
     if (value.result) {
-      router.push({
-        name: 'MyselfAnimate',
-        query: {
-          url: JSON.stringify(value.url)
-        }
-      })
+      setTimeout(() => {
+        router.push({
+          name: 'MyselfAnimate',
+          query: {
+            url: JSON.stringify(value.url)
+          }
+        })
+      }, 500)
     } else {
-      console.log(value.url)
       createToast(...toastData.searchMyselfAnimateFail)
     }
   }

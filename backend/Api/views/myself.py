@@ -1,3 +1,5 @@
+import json
+from django.http import JsonResponse
 from django.db.models import Prefetch
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
@@ -26,19 +28,21 @@ class MyselfWeekAnimateView(APIView):
 
 class MyselfAnimateInfoView(APIView):
     def post(self, request):
-        animate_url = '&'.join([f'{key}={value}' for key, value in request.data.items()]).replace('url=', '')
+        animate_url = '&'.join([f'{key}{"=" if value else ""}{value}' for key, value in request.data.items()]).replace(
+            'url=', '')
         if 'myself-bbs.com/' in animate_url:
             animate_url = animate_url.split('myself-bbs.com/')[1]
         data = DB.Cache.get_cache_data(key=animate_url)
         if data:
-            return Response(data)
-        data = Myself.animate_info(url=f'{MyselfUrl}{animate_url}')
-        image = req_bytes(url=data['image'])
-        video = data.pop('video')
-        model = DB.Myself.update_or_create_animate_info_model(data=data, image=image)
-        DB.Myself.create_many_animate_episode(video, owner=model)
+            model = DB.Myself.get_animate_info(url=data['url'])
+        else:
+            data = Myself.animate_info(url=f'{MyselfUrl}{animate_url}')
+            DB.Cache.set_cache_data(key=animate_url, data=data, timeout=1800)
+            image = req_bytes(url=data['image'])
+            video = data.pop('video')
+            model = DB.Myself.update_or_create_animate_info_model(data=data, image=image)
+            DB.Myself.create_many_animate_episode(video, owner=model)
         serializer = MyselfAnimateInfoSerializer(model)
-        DB.Cache.set_cache_data(key=animate_url, data=serializer.data, timeout=1800)
         return Response(serializer.data)
 
 

@@ -57,7 +57,9 @@ export default {
       const downloadingID = downloadAnimateArray.value.filter((item) => item.done).map((item) => item.episode_id)
       const downloadingVideoPath = new Map(downloadAnimateArray.value.map(i => [i.episode_id, i.video]))
       return animateInfo.value.episode_info_model.filter((item) => item.done || downloadingID.indexOf(item.id) !== -1).map((item) => {
-        item.video = downloadingVideoPath.get(item.id)
+        if (downloadingVideoPath.get(item.id)) {
+          item.video = downloadingVideoPath.get(item.id)
+        }
         return item
       })
     })

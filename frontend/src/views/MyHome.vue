@@ -7,18 +7,22 @@
   <div><a href="https://github.com/aacassandra/vue3-progressbar">Progressbar</a></div>
   <div><a href="https://github.com/dvuckovic/vue3-bootstrap-icons">bootstrap-icons</a></div>
   <div><a href="https://github.com/szboynono/mosha-vue-toastify">Mosha Vue Toastify</a></div>
-  <div></div>
-  <button @click="toast">Toast it!</button>
+  <div>學習與研究!</div>
+  <div>應在24小時內刪除影片。</div>
 </template>
 
 <script>
 
 import { createToast, withProps } from 'mosha-vue-toastify'
 import CustomToast from '../components/CustomToast'
+import { useStore } from 'vuex'
+import { animateInfoEpisodeInfoAction } from '../variables/myself'
 
 export default {
   name: 'MyHome',
   setup () {
+    const store = useStore()
+    store.dispatch(`myself/${animateInfoEpisodeInfoAction}`, { value: { id: 1 } })
     function toast () {
       createToast(withProps(CustomToast, { msg: '哈哈哈' }),
         {

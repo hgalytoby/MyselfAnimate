@@ -10,25 +10,24 @@ const { setNotification } = useNotificationStore()
 export const axiosGet = (url, context, mutation) => {
   app.config.globalProperties.$Progress.start()
   axios.get(url).then(function (response) {
-    app.config.globalProperties.$Progress.finish()
     context.commit(mutation, response.data)
+    app.config.globalProperties.$Progress.finish()
   }).catch(function (_) {
-    // console.log(error.response)
     app.config.globalProperties.$Progress.fail()
     createToast(...toastData.apiFail)
-    // alert(error.response.statusText)
   })
 }
 
 export const axiosPost = (url, data, context, mutation) => {
+  console.log('start')
+  app.config.globalProperties.$Progress.set(0)
   app.config.globalProperties.$Progress.start()
   axios.post(url, data).then(function (response) {
-    app.config.globalProperties.$Progress.finish()
     context.commit(mutation, response.data)
+    app.config.globalProperties.$Progress.finish()
   }).catch(function (_) {
     // console.log(error.response)
     app.config.globalProperties.$Progress.fail()
-    setToast(toastData.apiFail)
     createToast(...toastData.apiFail)
   })
 }
