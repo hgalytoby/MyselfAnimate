@@ -17,8 +17,9 @@ def badname(name: str) -> str:
     :param name: str -> 名字。
     :return: str -> 名字。
     """
-    ban = r'\/:*?"<>|'
-    return reduce(lambda x, y: x + y if y not in ban else x + ' ', name).strip()
+    if name:
+        ban = r'\/:*?"<>|'
+        return reduce(lambda x, y: x + y if y not in ban else x + ' ', name).strip()
 
 
 async def base_aiohttp_req(url: str, method: str, timeout: tuple, **kwargs):
