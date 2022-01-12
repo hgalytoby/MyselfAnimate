@@ -144,7 +144,7 @@ export const mutations = {
             url: JSON.stringify(value.url)
           }
         })
-      }, 500)
+      }, 350)
     } else {
       createToast(...toastData.searchMyselfAnimateFail)
     }

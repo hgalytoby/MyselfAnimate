@@ -19,8 +19,6 @@ export const axiosGet = (url, context, mutation) => {
 }
 
 export const axiosPost = (url, data, context, mutation) => {
-  console.log('start')
-  app.config.globalProperties.$Progress.set(0)
   app.config.globalProperties.$Progress.start()
   axios.post(url, data).then(function (response) {
     context.commit(mutation, response.data)
