@@ -200,6 +200,50 @@ class Anime1:
         animate_url = f'https:{"".join(res_json.values())}'
         return animate_url, cookies
 
+    @staticmethod
+    def get_season_list(url):
+        res = requests.get(url=url, headers=headers)
+        if res.ok:
+            html = BeautifulSoup(res.text, 'lxml')
+            entry_header = html.find('h2', class_='entry-title').text
+            entry_title = html.find('th', colspan='7').text
+            days = html.find('thead').find_all('tr')[1].text
+            week_animate = html.find('tbody').find_all('tr')
+            week_data = []
+            for animates in week_animate:
+                _ = []
+                for animate in animates.find_all('td'):
+                    _.append(animate.text)
+                week_data.append(_)
+            season_data = []
+            for season_urls in html.find('div', class_='entry-content').find('p'):
+                if '>> ' in season_urls.text:
+                    if hasattr(season_urls, 'attrs'):
+                        season_data.append({
+                            'season': season_urls.text,
+                            'url': season_urls.attrs['href']
+                        })
+                    else:
+                        season_data.append({'season': season_urls.text})
+            return {
+                'header': entry_header,
+                'title': entry_title,
+                'days': days,
+                'week_data': week_data,
+                'season_data': season_data
+            }
+        return {}
+
+    @staticmethod
+    def get_home_season_url() -> dict:
+        res = requests.get(url=Anime1AnimateUrl, headers=headers)
+        if res:
+            html = BeautifulSoup(res.text, 'lxml')
+            menu_item = html.find_all('li', class_='menu-item-type-custom')[1]
+            return {'url': menu_item.find('a')['href'], 'text': menu_item.text}
+        return {}
+
 
 if __name__ == '__main__':
-    pass
+    # season = Anime1.get_home_season_url()
+    print(Anime1.get_season_list(url='https://anime1.me/2022%e5%b9%b4%e5%86%ac%e5%ad%a3%e6%96%b0%e7%95%aa'))
