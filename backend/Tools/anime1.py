@@ -201,8 +201,8 @@ class Anime1:
         return animate_url, cookies
 
     @staticmethod
-    def get_season_list(url):
-        res = requests.get(url=url, headers=headers)
+    def get_season_list(season):
+        res = requests.get(url=f'{Anime1AnimateUrl}/{season}', headers=headers)
         if res.ok:
             html = BeautifulSoup(res.text, 'lxml')
             entry_header = html.find('h2', class_='entry-title').text
@@ -221,15 +221,19 @@ class Anime1:
                     if hasattr(season_urls, 'attrs'):
                         season_data.append({
                             'season': season_urls.text,
-                            'url': season_urls.attrs['href']
+                            'url': True,
                         })
                     else:
-                        season_data.append({'season': season_urls.text})
+                        divmod()
+                        season_data.append({
+                            'season': season_urls.text,
+                            'url': False,
+                        })
             return {
                 'header': entry_header,
                 'title': entry_title,
                 'days': days,
-                'week_data': week_data,
+                'week_data': week_data[:-1],
                 'season_data': season_data
             }
         return {}
@@ -246,4 +250,4 @@ class Anime1:
 
 if __name__ == '__main__':
     # season = Anime1.get_home_season_url()
-    print(Anime1.get_season_list(url='https://anime1.me/2022%e5%b9%b4%e5%86%ac%e5%ad%a3%e6%96%b0%e7%95%aa'))
+    print(Anime1.get_season_list(url='https://anime1.me/2021%e5%b9%b4%e7%a7%8b%e5%ad%a3%e6%96%b0%e7%95%aa'))

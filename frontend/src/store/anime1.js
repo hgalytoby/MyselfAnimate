@@ -9,7 +9,10 @@ import {
   downloadAnime1AnimateMutation,
   downloadAnime1AnimateState,
   loadingMutation,
-  loadingState
+  loadingState,
+  homeMenuState,
+  homeMenuAction,
+  homeMenuMutation
 } from '../variables/anime1'
 import { axiosGet, axiosPost } from '../tools'
 import { anima1Api } from '../api'
@@ -28,7 +31,8 @@ export const state = {
   [downloadAnime1AnimateState]: [],
   [loadingState]: true,
   [downloadCheckBoxState]: [],
-  [animateCollectState]: []
+  [animateCollectState]: [],
+  [homeMenuState]: {}
 }
 
 export const actions = {
@@ -40,6 +44,9 @@ export const actions = {
   },
   [animateCollectAction] (context, value) {
     axiosGet(anima1Api.animateEpisodeDone, context, animateCollectMutation)
+  },
+  [homeMenuAction] (context, value) {
+    axiosGet(anima1Api.homeMenu, context, homeMenuMutation)
   }
 }
 
@@ -73,6 +80,10 @@ export const mutations = {
   },
   [animateCollectMutation] (state, value) {
     state[animateCollectState] = value
+  },
+  [homeMenuMutation] (state, value) {
+    console.log(value)
+    state[homeMenuState] = value
   }
 }
 

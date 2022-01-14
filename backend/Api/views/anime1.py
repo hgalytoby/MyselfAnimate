@@ -54,6 +54,7 @@ class Anime1AnimateInfoEpisodeView(ListAPIView):
         return Response(serializer.data)
 
 
+# TODO 晚點改
 class Anime1AnimateEpisodeDoneView(ListAPIView):
     serializer_class = Anime1AnimateInfoSerializer
     queryset = Anime1AnimateInfoModel.objects.all()
@@ -66,3 +67,21 @@ class Anime1AnimateEpisodeDoneView(ListAPIView):
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
+
+
+class Anime1MenuSeasonView(APIView):
+    @method_decorator(cache_page(300))
+    def get(self, request):
+        data = Anime1.get_home_season_url()
+        if data:
+            return Response(data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class Anime1SeasonView(APIView):
+    # @method_decorator(cache_page(300))
+    def get(self, request, season):
+        data = Anime1.get_season_list(season=season)
+        if data:
+            return Response(data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_404_NOT_FOUND)

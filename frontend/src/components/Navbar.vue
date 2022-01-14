@@ -25,6 +25,9 @@
               <li>
                 <router-link class="dropdown-item" to="/AnimateList">動畫列表</router-link>
               </li>
+              <li>
+                <router-link class="dropdown-item" to="/AnimateList">{{ homeMenu.text }}</router-link>
+              </li>
             </ul>
           </div>
         </ul>
@@ -34,8 +37,20 @@
 </template>
 
 <script>
+import { useStore } from 'vuex'
+import { computed } from 'vue'
+import { homeMenuAction, homeMenuState } from '../variables/anime1'
+
 export default {
-  name: 'Navbar'
+  name: 'Navbar',
+  setup () {
+    const store = useStore()
+    store.dispatch(`anime1/${homeMenuAction}`)
+    const homeMenu = computed(() => store.state.anime1[homeMenuState])
+    return {
+      homeMenu
+    }
+  }
 }
 </script>
 
