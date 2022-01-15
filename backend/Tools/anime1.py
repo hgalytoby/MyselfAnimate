@@ -124,9 +124,18 @@ class Anime1:
             headers=headers)
         if res.ok:
             for item in res.json():
+                if '.pw/?cat=' not in item[1]:
+                    _ = {
+                        'url': item[0],
+                        'name': badname(item[1]),
+                    }
+                else:
+                    _ = {
+                        'url': re.findall("cat=\d*", item[1])[0],
+                        'name': badname(re.findall('>.*<', item[1])[0][1:-1]),
+                    }
                 data.append({
-                    'url': f'?cat={item[0]}',
-                    'name': badname(item[1]),
+                    **_,
                     'episode': item[2],
                     'years': item[3],
                     'season': item[4],
@@ -166,12 +175,14 @@ class Anime1:
                         _.update({'updated': element.text})
                 _.update({
                     'name': elements.find('h2', class_='entry-title').text.strip(),
-                    'url': elements.find('button', class_='loadvideo')['data-src']
                 })
+                if elements.find('button', class_='loadvideo'):
+                    _.update({'url': elements.find('button', class_='loadvideo')['data-src']})
+                else:
+                    _.update({'url': elements.find('video').find('source')['src']})
                 data.append(_)
             previous = html.find('div', class_='nav-previous')
             if previous:
-                time.sleep(1)
                 return cls.get_animate_info(url=previous.find('a')['href'], data=data)
         return data
 
@@ -224,7 +235,6 @@ class Anime1:
                             'url': True,
                         })
                     else:
-                        divmod()
                         season_data.append({
                             'season': season_urls.text,
                             'url': False,
@@ -250,4 +260,4 @@ class Anime1:
 
 if __name__ == '__main__':
     # season = Anime1.get_home_season_url()
-    print(Anime1.get_season_list(url='https://anime1.me/2021%e5%b9%b4%e7%a7%8b%e5%ad%a3%e6%96%b0%e7%95%aa'))
+    print(Anime1.get_animate_info(url='https://anime1.me/?cat=0', data=[]))

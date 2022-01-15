@@ -18,7 +18,7 @@
                 animateData: JSON.stringify(animate)
                 },
               query: {
-                url: animate.url
+                url: animate.url === '0' ? 123456 : animate.url
               }
             }">{{ animate.name }}
         </router-link>

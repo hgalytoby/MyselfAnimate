@@ -10,12 +10,13 @@ from Api.serializers import Anime1AnimateEpisodeInfoSerializer, Anime1AnimateInf
 from Database.models import Anime1AnimateEpisodeInfoModel, Anime1AnimateInfoModel
 from Tools.anime1 import Anime1
 from Tools.db import DB, MyPageNumberPagination
-from Tools.urls import Anime1AnimateUrl
+from Tools.urls import Anime1AnimateUrl, Anime1AnimatePWUrl
 
 
 class Anime1AnimateListView(APIView):
     @method_decorator(cache_page(300))
     def get(self, request):
+        # DB.Cache.clear_cache()
         data = Anime1.get_home_animate_data()
         if data:
             return Response(data, status=status.HTTP_200_OK)
@@ -25,17 +26,22 @@ class Anime1AnimateListView(APIView):
 class Anime1AnimateInfoView(APIView):
     def post(self, request):
         url = request.query_params.get('url')
-        if not url:
+        if not request.query_params.get('url'):
             return Response(status=status.HTTP_404_NOT_FOUND)
-        animate_url = f'{Anime1AnimateUrl}{url}'
-        data = DB.Cache.get_cache_data(key=animate_url)
-        if data:
-            return Response(data, status=status.HTTP_200_OK)
+        if 'cat=' in request.query_params.get('url'):
+            animate_url = f'{Anime1AnimatePWUrl}/?cat={request.query_params.get("url").split("=")[1]}'
+        else:
+            animate_url = f'{Anime1AnimateUrl}/?cat={url}'
+        # data = DB.Cache.get_cache_data(key=animate_url)
+        # if data:
+        #     return Response(data, status=status.HTTP_200_OK)
         if request.data:
             model = DB.Anime1.create_animate_info(**request.data)
         else:
             model = DB.Anime1.get_animate_info(url=url)
+        print(1)
         episode_data = Anime1.get_animate_info(url=animate_url, data=[])
+        print(3, episode_data)
         DB.Anime1.update_or_create_many_episode(episodes=episode_data, owner=model)
         serializer = Anime1AnimateInfoSerializer(model)
         DB.Cache.set_cache_data(key=animate_url, data=serializer.data, timeout=1800)

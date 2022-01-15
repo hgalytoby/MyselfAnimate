@@ -330,8 +330,11 @@ class Anime1DownloadManage(BaseDownloadManage):
             if task_data['done']:
                 task_data['progress_value'] = 100
             else:
-                api_key, api_value = await Anime1.get_api_key_and_value(url=task_data['url'])
-                animate_url, cookies = await Anime1.get_cookies_and_animate_url(api_key=api_key, api_value=api_value)
+                if 'https' in task_data['url']:
+                    api_key, api_value = await Anime1.get_api_key_and_value(url=task_data['url'])
+                    animate_url, cookies = await Anime1.get_cookies_and_animate_url(api_key=api_key, api_value=api_value)
+                else:
+                    animate_url, cookies = f'https:{task_data["url"]}', ''
                 await self.download_animate(task_data, animate_url, cookies)
                 await DB.My.create_history(animate_website_name=self.from_website,
                                            animate_name=task_data["animate_name"],
