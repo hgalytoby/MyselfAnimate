@@ -23,10 +23,16 @@
                aria-expanded="false">Anime1</div>
             <ul class="dropdown-menu" aria-labelledby="anime1">
               <li>
-                <router-link class="dropdown-item" to="/AnimateList">動畫列表</router-link>
+                <router-link class="dropdown-item" to="/Anime1/AnimateList">動畫列表</router-link>
               </li>
               <li>
-                <router-link class="dropdown-item" to="/AnimateList">{{ homeMenu.text }}</router-link>
+                <router-link v-if="homeMenu.text" class="dropdown-item" :to="{
+                    name: 'Anime1Season',
+                    params: {
+                      season: homeMenu.text
+                    }
+                  }">{{ homeMenu.text }}
+                </router-link>
               </li>
             </ul>
           </div>

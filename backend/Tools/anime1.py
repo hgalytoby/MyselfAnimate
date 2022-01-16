@@ -144,7 +144,7 @@ class Anime1:
         return data
 
     @classmethod
-    def get_animate_info(cls, url: str, data: list) -> list:
+    def get_animate_info(cls, url: str, data: list) -> tuple:
         """
         取得動漫資料。
         ※ 如果有下一頁就會遞迴。
@@ -184,7 +184,8 @@ class Anime1:
             previous = html.find('div', class_='nav-previous')
             if previous:
                 return cls.get_animate_info(url=previous.find('a')['href'], data=data)
-        return data
+            return html.find('h1', class_='page-title').text, data
+        return '', data
 
     @staticmethod
     async def get_api_key_and_value(url: str) -> tuple:
@@ -224,7 +225,12 @@ class Anime1:
             for animates in week_animate:
                 _ = []
                 for animate in animates.find_all('td'):
-                    _.append(animate.text)
+                    if 'Anime1.me' not in animate.text:
+                        if animate.find('a'):
+                            print(animate.text, animate.find('a')['href'])
+                            _.append({'name': animate.text, 'url': animate.find('a')['href'].split('=')[1]})
+                        else:
+                            _.append({'name': animate.text, 'url': None})
                 week_data.append(_)
             season_data = []
             for season_urls in html.find('div', class_='entry-content').find('p'):
@@ -260,4 +266,4 @@ class Anime1:
 
 if __name__ == '__main__':
     # season = Anime1.get_home_season_url()
-    print(Anime1.get_animate_info(url='https://anime1.me/?cat=0', data=[]))
+    print(Anime1.get_animate_info(url='https://anime1.me/?cat=905', data=[]))

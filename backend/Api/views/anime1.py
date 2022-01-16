@@ -32,16 +32,8 @@ class Anime1AnimateInfoView(APIView):
             animate_url = f'{Anime1AnimatePWUrl}/?cat={request.query_params.get("url").split("=")[1]}'
         else:
             animate_url = f'{Anime1AnimateUrl}/?cat={url}'
-        # data = DB.Cache.get_cache_data(key=animate_url)
-        # if data:
-        #     return Response(data, status=status.HTTP_200_OK)
-        if request.data:
-            model = DB.Anime1.create_animate_info(**request.data)
-        else:
-            model = DB.Anime1.get_animate_info(url=url)
-        print(1)
-        episode_data = Anime1.get_animate_info(url=animate_url, data=[])
-        print(3, episode_data)
+        animate_name, episode_data = Anime1.get_animate_info(url=animate_url, data=[])
+        model = DB.Anime1.update_or_create_animate_info(url=url, name=animate_name)
         DB.Anime1.update_or_create_many_episode(episodes=episode_data, owner=model)
         serializer = Anime1AnimateInfoSerializer(model)
         DB.Cache.set_cache_data(key=animate_url, data=serializer.data, timeout=1800)
@@ -85,7 +77,7 @@ class Anime1MenuSeasonView(APIView):
 
 
 class Anime1SeasonView(APIView):
-    # @method_decorator(cache_page(300))
+    @method_decorator(cache_page(300))
     def get(self, request, season):
         data = Anime1.get_season_list(season=season)
         if data:

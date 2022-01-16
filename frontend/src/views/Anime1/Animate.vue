@@ -4,10 +4,10 @@
   </div>
   <div v-else>
     <h1>{{ animateInfo.name }}</h1>
-    <span>集數: {{ animateInfo.episode }}</span>
-    <span>年份: {{ animateInfo.years }}</span>
-    <span>季節: {{ animateInfo.season }}</span>
-    <span>字幕組: {{ animateInfo.subtitle_group }}</span>
+<!--    <span>集數: {{ animateInfo.episode }}</span>-->
+<!--    <span>年份: {{ animateInfo.years }}</span>-->
+<!--    <span>季節: {{ animateInfo.season }}</span>-->
+<!--    <span>字幕組: {{ animateInfo.subtitle_group }}</span>-->
     <DownloadStatus :animate-info-obj="animateInfo" :download-state-array="downloadAnime1Animate"
                     action="download_anime1_animate"/>
   </div>
@@ -29,8 +29,7 @@ import Loading from '../../components/Loading'
 export default {
   name: 'Animate',
   props: {
-    url: String,
-    animateData: String
+    url: String
   },
   components: { Loading, DownloadStatus },
   setup (props) {
@@ -39,7 +38,8 @@ export default {
     const animateInfo = computed(() => store.state.anime1[animateInfoState])
     store.commit(`anime1/${loadingMutation}`)
     store.dispatch(`anime1/${animateInfoAction}`, {
-      animateData: props.animateData !== undefined ? JSON.parse(props.animateData) : null,
+      // animateData: props.animateData !== undefined ? JSON.parse(props.animateData) : null,
+      name: animateInfo.value.name,
       url: props.url
     })
     const downloadAnime1Animate = computed(() => {

@@ -14,9 +14,6 @@
       <td>
         <router-link :to="{
               name: 'Anime1Animate',
-              params: {
-                animateData: JSON.stringify(animate)
-                },
               query: {
                 url: animate.url === '0' ? 123456 : animate.url
               }

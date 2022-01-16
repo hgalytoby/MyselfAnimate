@@ -12,7 +12,7 @@ import {
   loadingState,
   homeMenuState,
   homeMenuAction,
-  homeMenuMutation
+  homeMenuMutation, seasonState, seasonMutation, seasonAction
 } from '../variables/anime1'
 import { axiosGet, axiosPost } from '../tools'
 import { anima1Api } from '../api'
@@ -32,7 +32,8 @@ export const state = {
   [loadingState]: true,
   [downloadCheckBoxState]: [],
   [animateCollectState]: [],
-  [homeMenuState]: {}
+  [homeMenuState]: {},
+  [seasonState]: []
 }
 
 export const actions = {
@@ -47,6 +48,9 @@ export const actions = {
   },
   [homeMenuAction] (context, value) {
     axiosGet(anima1Api.homeMenu, context, homeMenuMutation)
+  },
+  [seasonAction] (context, value) {
+    axiosGet(anima1Api.season(value), context, seasonMutation)
   }
 }
 
@@ -82,8 +86,10 @@ export const mutations = {
     state[animateCollectState] = value
   },
   [homeMenuMutation] (state, value) {
-    console.log(value)
     state[homeMenuState] = value
+  },
+  [seasonMutation] (state, value) {
+    state[seasonState] = value
   }
 }
 

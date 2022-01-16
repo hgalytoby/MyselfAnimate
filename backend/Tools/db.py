@@ -430,21 +430,22 @@ class Anime1Base(Base):
     download_model = Anime1DownloadModel
 
     @classmethod
-    def create_animate_info(cls, **kwargs):
-        model, created = Anime1AnimateInfoModel.objects.update_or_create(url=kwargs['url'], defaults=kwargs)
+    def update_or_create_animate_info(cls, **kwargs):
+        model, created = cls.animate_info_model.objects.update_or_create(url=kwargs['url'], defaults=kwargs)
         return model
-
-    # @classmethod
-    # def get_animate_info(cls, **kwargs):
-    #     return Anime1AnimateInfoModel.objects.get(**kwargs)
 
     @classmethod
     def update_or_create_many_episode(cls, episodes: list, owner):
         for episode in episodes:
-            Anime1AnimateEpisodeInfoModel.objects.update_or_create(name=episode['name'], defaults={
+            cls.animate_episode_info_model.objects.update_or_create(name=episode['name'], defaults={
                 **episode,
                 'owner': owner
             })
+
+    @classmethod
+    def get_or_create_animate_info(cls, **kwargs):
+        model, created = cls.animate_info_model.objects.get_or_create(url=kwargs['url'], defaults=kwargs)
+        return model
 
     @staticmethod
     @database_sync_to_async
@@ -459,30 +460,30 @@ class Anime1Base(Base):
             result.append(data)
         return result
 
-    @staticmethod
+    @classmethod
     @database_sync_to_async
-    def save_animate_episode_video_file(video_path: str, **kwargs):
+    def save_animate_episode_video_file(cls, video_path: str, **kwargs):
         """
         儲存動漫某一集的檔案。
         :param video_path:
         :return:
         """
-        model = Anime1AnimateEpisodeInfoModel.objects.get(**kwargs)
+        model = cls.animate_episode_info_model.objects.get(**kwargs)
         model.done = True
         model.video = video_path
         model.save()
 
-    @staticmethod
+    @classmethod
     @database_sync_to_async
-    def delete_download(**kwargs):
+    def delete_download(cls, **kwargs):
         """
         刪除 Download 的資料庫資料。
         :param kwargs:
         :return:
         """
-        models = Anime1AnimateEpisodeInfoModel.objects.select_related('owner').filter(**kwargs)
+        models = cls.animate_episode_info_model.objects.select_related('owner').filter(**kwargs)
         for model in models:
-            Anime1DownloadModel.objects.filter(owner_id=model.pk).delete()
+            cls.download_model.objects.filter(owner_id=model.pk).delete()
             model.done = False
             model.video = None
             model.save()

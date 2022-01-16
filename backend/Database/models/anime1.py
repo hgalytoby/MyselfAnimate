@@ -15,10 +15,10 @@ class Anime1AnimateInfoModel(models.Model):
     from_website = 'Anime1'
     name = models.CharField(max_length=128)
     url = models.URLField(unique=True)
-    episode = models.CharField(max_length=16)
-    years = models.CharField(max_length=8)
-    season = models.CharField(max_length=32)
-    subtitle_group = models.CharField(max_length=32, null=True, blank=True)
+    # episode = models.CharField(max_length=16)
+    # years = models.CharField(max_length=8)
+    # season = models.CharField(max_length=32)
+    # subtitle_group = models.CharField(max_length=32, null=True, blank=True)
 
     class Meta:
         db_table = 'Anime1AnimateInfo'

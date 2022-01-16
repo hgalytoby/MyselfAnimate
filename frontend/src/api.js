@@ -20,5 +20,6 @@ export const anima1Api = {
   animateList: '/api/anime1/animate-list/',
   animateInfo: (url) => `/api/anime1/animate-info/?url=${url}`,
   animateEpisodeDone: '/api/anime1/animate-episode-done/',
-  homeMenu: 'api/anime1/home-menu/'
+  homeMenu: '/api/anime1/home-menu/',
+  season: (season) => `/api/anime1/season/${season}/`
 }
