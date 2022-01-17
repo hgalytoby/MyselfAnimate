@@ -77,6 +77,12 @@ class MyselfFinishAnimateView(ListAPIView):
     queryset = MyselfFinishAnimateModel.objects.all()
     pagination_class = MyPageNumberPagination
 
+    def list(self, request, *args, **kwargs):
+        settings = DB.My.get_or_create_settings()
+        if settings.myself_finish_animate_update:
+            return super(MyselfFinishAnimateView, self).list(request, *args, **kwargs)
+        return Response({})
+
 
 class MyselfAnimateEpisodeInfoView(RetrieveUpdateAPIView):
     serializer_class = MyselfAnimateEpisodeInfoSerializer

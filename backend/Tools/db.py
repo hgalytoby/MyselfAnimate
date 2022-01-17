@@ -388,6 +388,11 @@ class MyBase:
 
     @staticmethod
     @database_sync_to_async
+    def get_last_settings():
+        return MySettingsModel.objects.all().last()
+
+    @staticmethod
+    @database_sync_to_async
     def create_history(**kwargs):
         MyHistoryModel.objects.create(**kwargs)
 
@@ -402,6 +407,20 @@ class MyBase:
         page_obj = paginator.page(1)
         serializer = serializer(page_obj, many=True)
         return MyPageNumberPagination.get_paginated(page_obj=page_obj, paginator=paginator, data=serializer.data)
+
+    @staticmethod
+    @database_sync_to_async
+    def save_settings(**kwargs):
+        model = MySettingsModel.objects.get(pk=kwargs['id'])
+        model.__dict__.update(kwargs)
+        model.save()
+
+    @staticmethod
+    @database_sync_to_async
+    def save_settings_update_false(**kwargs):
+        model = MySettingsModel.objects.get(pk=kwargs['id'])
+        model.myself_finish_animate_update = False
+        model.save()
 
 
 class CacheBase:

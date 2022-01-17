@@ -25,7 +25,7 @@
 <script>
 import { computed, reactive } from 'vue'
 import { useStore } from 'vuex'
-import { settingsState, settingsGetAction, settingsPutAction } from '../variables/my'
+import { settingsState, settingsGetAction, settingsUpdateDownloadValueAction } from '../variables/my'
 
 export default {
   name: 'MySettings',
@@ -40,7 +40,7 @@ export default {
 
     function update () {
       if (Object.values(validation).filter((value) => value !== 'is-valid').length === 0) {
-        store.dispatch(`my/${settingsPutAction}`)
+        store.dispatch(`my/${settingsUpdateDownloadValueAction}`)
       }
     }
 

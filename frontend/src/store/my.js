@@ -12,7 +12,7 @@ import {
   settingsState,
   systemAction,
   systemMutation,
-  systemState
+  systemState, settingsUpdateDownloadValueAction, settingsUpdateDownloadValueMutation
 } from '../variables/my'
 import { myApi } from '../api'
 import { axiosGet, axiosPut, toastData } from '../tools'
@@ -23,10 +23,7 @@ export const state = {
   [logState]: [],
   [historyState]: [],
   [systemState]: [],
-  [settingsState]: {
-    myself_download_value: 2,
-    anime1_download_value: 2
-  }
+  [settingsState]: {}
 }
 
 export const actions = {
@@ -43,6 +40,9 @@ export const actions = {
     axiosGet(myApi.settings, context, settingsGetMutation)
   },
   [settingsPutAction] (context, value) {
+    axiosGet(myApi.settings, value, settingsPutMutation)
+  },
+  [settingsUpdateDownloadValueAction] (context, value) {
     axiosPut(myApi.settings, context.state[settingsState], context, settingsPutMutation)
   }
 }
@@ -61,6 +61,9 @@ export const mutations = {
     state[settingsState] = value
   },
   [settingsPutMutation] (state, value) {
+    state[settingsState] = value
+  },
+  [settingsUpdateDownloadValueMutation] (state, value) {
     state[settingsState] = value
     sendSocketMessage({
       action: 'update_download_value',

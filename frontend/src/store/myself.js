@@ -18,10 +18,13 @@ import {
   downloadMyselfAnimateGetters,
   finishAnimateState,
   finishAnimateAction,
-  addFinishAnimateMutation,
   searchMyselfAnimateMutation,
   animateInfoEpisodeInfoAction,
-  animateInfoEpisodeInfoMutation, searchAnimateAction, searchAnimateMutation
+  animateInfoEpisodeInfoMutation,
+  searchAnimateAction,
+  searchAnimateMutation,
+  finishAnimateMutation,
+  finishAnimateInitMutation
 } from '../variables/myself'
 import { myselfApi } from '../api'
 import { axiosGet, axiosPost, toastData } from '../tools'
@@ -62,7 +65,7 @@ export const actions = {
     axiosGet(myselfApi.finishList, context, addFinishListMutation)
   },
   [finishAnimateAction] (context, value) {
-    axiosGet(myselfApi.finishAnimate, context, addFinishAnimateMutation)
+    axiosGet(myselfApi.finishAnimate, context, finishAnimateMutation)
   },
   [animateCollectAction] (context, value) {
     axiosGet(myselfApi.animateEpisodeDone, context, animateCollectMutation)
@@ -91,8 +94,11 @@ export const mutations = {
   [addFinishListMutation] (state, value) {
     state[finishListState] = value.data
   },
-  [addFinishAnimateMutation] (state, value) {
+  [finishAnimateMutation] (state, value) {
     state[finishAnimateState] = value
+  },
+  [finishAnimateInitMutation] (state, value) {
+    state[finishAnimateState] = {}
   },
   [finishAnimateUpdateButtonMutation] (state, value) {
     state[finishAnimateUpdateButtonState] = value.msg

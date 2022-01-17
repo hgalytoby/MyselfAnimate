@@ -3,9 +3,15 @@
     <input type="text" class="form-control shadow-sm p-3 mb-2 bg-body rounded" id="search" @keyup="searchAnimate"
            v-model="searchText" placeholder="搜尋動漫">
   </div>
-  <button type="button" class="btn btn-primary mb-2" :disabled="finishAnimateUpdate" @click="updateFinishAnimateData">
-    {{ finishAnimateUpdateButton }}
-  </button>
+  <div class="row align-items-center">
+    <button type="button" class="btn btn-primary mb-2 col-auto" :disabled="finishAnimateUpdate"
+            @click="updateFinishAnimateData">
+      {{ finishAnimateUpdateButton }}
+    </button>
+    <h6 class="col-auto">最後更新時間: {{ !settings.myself_finish_animate_date ? '尚未更新' : settings.myself_finish_animate_date
+      }}</h6>
+  </div>
+
   <div class="row justify-content-center">
     <transition-group appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"
                       leave-active-class="animate__fadeOut">
@@ -39,12 +45,13 @@
 import { sendSocketMessage } from '../../hooks/useWS'
 import { computed, ref } from 'vue'
 import {
-  finishAnimateAction, finishAnimateState,
+  finishAnimateAction, finishAnimateInitMutation, finishAnimateState,
   finishAnimateUpdateButtonState,
   finishAnimateUpdateState
 } from '../../variables/myself'
 import { useStore } from 'vuex'
 import Pagination from '../../components/Pagination'
+import { settingsGetAction, settingsState } from '../../variables/my'
 
 export default {
   name: 'Search',
@@ -60,11 +67,20 @@ export default {
       const endMsgNum = finishAnimate.value.count > finishAnimate.value.page * 15 ? finishAnimate.value.page * 15 : finishAnimate.value.count
       return `顯示 ${startMsgNum} 到 ${endMsgNum} 共 ${finishAnimate.value.count} 個動漫`
     })
+    const settings = computed(() => store.state.my[settingsState])
     store.dispatch(`myself/${finishAnimateAction}`)
+    store.dispatch(`my/${settingsGetAction}`)
     const updateFinishAnimateData = () => {
+      const date = new Date()
       sendSocketMessage({
-        action: 'myself_finish_animate_update'
+        action: 'myself_finish_animate_update',
+        data: {
+          ...settings.value,
+          myself_finish_animate_date: date.toISOString().slice(0, 10) + ' ' + date.toTimeString().slice(0, 8),
+          myself_finish_animate_update: true
+        }
       })
+      store.commit(`myself/${finishAnimateInitMutation}`)
     }
     const searchAnimate = () => {
       sendSocketMessage({
@@ -74,7 +90,6 @@ export default {
     }
 
     function changePage (page) {
-      console.log('changePage')
       sendSocketMessage({
         action: 'search_myself_animate',
         msg: searchText.value,
@@ -90,7 +105,8 @@ export default {
       searchText,
       searchAnimate,
       changePage,
-      pageMsg
+      pageMsg,
+      settings
     }
   }
 }

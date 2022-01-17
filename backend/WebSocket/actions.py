@@ -1,11 +1,13 @@
 import asyncio
 
+from channels.db import database_sync_to_async
 from rest_framework.utils import json
 
 from Tools.db import DB
+import copy
+
 from Tools.myself import Myself
 from Tools.urls import MyselfFinishAnimateUrl, MyselfFinishAnimateBaseUrl
-import copy
 
 
 class Base:
@@ -36,15 +38,17 @@ class MyselfManage(Base):
     async def _finish_animate_update(self, *args, **kwargs):
         await self.parent.send(text_data=json.dumps({'msg': f'正在更新中', 'action': kwargs['action'], 'updating': True}))
         await DB.My.create_log(msg='Myself 更新完結動漫', action='update')
+        await DB.My.save_settings_update_false(**kwargs['data'])
         total_page_data = await Myself.finish_animate_total_page(url=MyselfFinishAnimateUrl, get_res_text=True)
-        for page in range(1, total_page_data['total_page'] + 1):
+        # for page in range(1, total_page_data['total_page'] + 1):
+        for page in range(1, 2):
             if page == 1:
                 page_data = await Myself.finish_animate_page_data(url=MyselfFinishAnimateBaseUrl.format(page),
                                                                   res_text=total_page_data['res_text'])
             else:
                 page_data = await Myself.finish_animate_page_data(url=MyselfFinishAnimateBaseUrl.format(page))
             await DB.Myself.create_many_finish_animate(data=page_data)
-
+        await DB.My.save_settings(**kwargs['data'])
         await DB.My.create_log(msg='Myself 完結動漫更新完成', action='updated')
         await self.parent.send(
             text_data=json.dumps({'msg': '更新完成', 'action': kwargs['action'], 'updating': False}))
@@ -86,14 +90,16 @@ class MyselfManage(Base):
         :param data: dict -> 前端傳來要搜尋動漫的資料。
         :return:
         """
-        if kwargs['msg']:
-            await DB.My.create_log(msg=f'Myself 搜尋{kwargs["msg"]}動漫', action='search')
-            model = await DB.Myself.filter_finish_animate(name__contains=kwargs['msg'])
-        else:
-            await DB.My.create_log(msg=f'Myself 搜尋動漫', action='search')
-            model = await DB.Myself.All_finish_animate()
-        serializer_data = await DB.Myself.search_finish_animate_paginator(model=model, page=kwargs.get('page'))
-        await self.parent.send(text_data=json.dumps({'data': serializer_data, 'action': kwargs['action']}))
+        settings_model = await DB.My.get_last_settings()
+        if settings_model.myself_finish_animate_update:
+            if kwargs['msg']:
+                await DB.My.create_log(msg=f'Myself 搜尋{kwargs["msg"]}動漫', action='search')
+                model = await DB.Myself.filter_finish_animate(name__contains=kwargs['msg'])
+            else:
+                await DB.My.create_log(msg=f'Myself 搜尋動漫', action='search')
+                model = await DB.Myself.All_finish_animate()
+            serializer_data = await DB.Myself.search_finish_animate_paginator(model=model, page=kwargs.get('page'))
+            await self.parent.send(text_data=json.dumps({'data': serializer_data, 'action': kwargs['action']}))
 
     async def clear_finish_animate(self, *args, **kwargs):
         """

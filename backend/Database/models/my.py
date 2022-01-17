@@ -32,6 +32,8 @@ class MyLoveGroupModel(models.Model):
 class MySettingsModel(models.Model):
     myself_download_value = models.IntegerField(default=1)
     anime1_download_value = models.IntegerField(default=1)
+    myself_finish_animate_date = models.DateTimeField(blank=True, null=True)
+    myself_finish_animate_update = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'MySettings'
