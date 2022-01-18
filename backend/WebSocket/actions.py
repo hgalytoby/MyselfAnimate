@@ -40,8 +40,8 @@ class MyselfManage(Base):
         await DB.My.create_log(msg='Myself 更新完結動漫', action='update')
         await DB.My.save_settings_update_false(**kwargs['data'])
         total_page_data = await Myself.finish_animate_total_page(url=MyselfFinishAnimateUrl, get_res_text=True)
-        # for page in range(1, total_page_data['total_page'] + 1):
-        for page in range(1, 2):
+        for page in range(1, total_page_data['total_page'] + 1):
+        # for page in range(1, 2):
             if page == 1:
                 page_data = await Myself.finish_animate_page_data(url=MyselfFinishAnimateBaseUrl.format(page),
                                                                   res_text=total_page_data['res_text'])
