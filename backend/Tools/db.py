@@ -5,7 +5,7 @@ from typing import Union, List
 
 from django.core.files.images import ImageFile
 from django.core.paginator import Paginator
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Prefetch
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
@@ -100,6 +100,12 @@ class Base:
         :return:
         """
         cls.download_model.objects.filter(owner__done=True).delete()
+
+    @classmethod
+    def filter_episode_done(cls):
+        prefetch = Prefetch('episode_info_model', queryset=cls.animate_episode_info_model.objects.filter(done=True))
+        return cls.animate_info_model.objects.prefetch_related(prefetch).filter(
+            episode_info_model__done=True).distinct()
 
 
 class MyselfBase(Base):

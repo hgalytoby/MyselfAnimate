@@ -1,5 +1,3 @@
-import json
-from django.http import JsonResponse
 from django.db.models import Prefetch
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
@@ -9,6 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, DestroyAPIView
 from Api.serializers import MyselfFinishAnimateSerializer, MyselfAnimateEpisodeInfoSerializer, \
     MyselfAnimateInfoSerializer, MyselfDownloadSerializer
+from Api.views.base import BaseAnimateEpisodeDone
 from Database.models.myself import MyselfFinishAnimateModel, MyselfAnimateEpisodeInfoModel, MyselfAnimateEpisodeTsModel, \
     MyselfDownloadModel, MyselfAnimateInfoModel
 from Tools.db import DB, MyPageNumberPagination
@@ -107,18 +106,10 @@ class MyselfAnimateInfoEpisodeView(ListAPIView):
         return Response(serializer.data)
 
 
-class MyselfAnimateEpisodeDoneView(ListAPIView):
+class MyselfAnimateEpisodeDoneView(BaseAnimateEpisodeDone, ListAPIView):
     serializer_class = MyselfAnimateInfoSerializer
     queryset = MyselfAnimateInfoModel.objects.all()
     pagination_class = MyPageNumberPagination
-
-    def list(self, request, *args, **kwargs):
-        prefetch = Prefetch('episode_info_model', queryset=MyselfAnimateEpisodeInfoModel.objects.filter(done=True))
-        queryset = MyselfAnimateInfoModel.objects.prefetch_related(prefetch).filter(
-            episode_info_model__done=True).distinct()
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
 
 
 class MyselfDownloadView(DestroyAPIView):

@@ -144,24 +144,27 @@ class Anime1:
         return data
 
     @classmethod
-    def get_animate_info(cls, url: str, data: list) -> tuple:
+    def get_animate_info(cls, url: str, data: list) -> dict:
         """
         取得動漫資料。
         ※ 如果有下一頁就會遞迴。
         :param url: str -> 網址。
         :param data: list ->
-        :return: list -> [
-            {
+        :return: dict ->
+        {
+        animate_name: str -> 動漫名字,
+        episode_data: list -> 集數資料
+        [{
                 published_updated_date: 發布日期 %Y-%m-%d,
                 updated: 更新日其 %Y-%m-%d, ※ 最新的一集可能會沒有這個資料
                 name: 集數名,
                 url': 播放器 Url
-            },
-            {
-                ...
-            },
+        },
+        {
             ...
-        ]
+        },
+        ...
+        ]}
         """
         res = requests.get(url=url, headers=headers)
         if res.ok:
@@ -184,8 +187,8 @@ class Anime1:
             previous = html.find('div', class_='nav-previous')
             if previous:
                 return cls.get_animate_info(url=previous.find('a')['href'], data=data)
-            return html.find('h1', class_='page-title').text, data
-        return '', data
+            return {'animate_name': html.find('h1', class_='page-title').text, 'episode_data': data}
+        return {}
 
     @staticmethod
     async def get_api_key_and_value(url: str) -> tuple:
@@ -227,7 +230,6 @@ class Anime1:
                 for animate in animates.find_all('td'):
                     if 'Anime1.me' not in animate.text:
                         if animate.find('a'):
-                            print(animate.text, animate.find('a')['href'])
                             _.append({'name': animate.text, 'url': animate.find('a')['href'].split('=')[1]})
                         else:
                             _.append({'name': animate.text, 'url': None})
