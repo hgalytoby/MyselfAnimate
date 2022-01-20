@@ -1,3 +1,4 @@
+import json
 import time
 import datetime
 from urllib.parse import unquote
@@ -181,8 +182,15 @@ class Anime1:
                 })
                 if elements.find('button', class_='loadvideo'):
                     _.update({'url': elements.find('button', class_='loadvideo')['data-src']})
-                else:
+                elif elements.find('video').find('source'):
                     _.update({'url': elements.find('video').find('source')['src']})
+                else:
+                    # print(unquote(elements.find('video')['data-vid']))
+                    _.update({'url': json.dumps({'url': url, 'data-vid': elements.find('video')['data-vid']})})
+                    print(elements.find('video')['data-vid'])
+                    print(unquote(elements.find('video')['data-apireq']))
+                    # print(elements.find('video').find({'data-vid': elements.find('video')['data-vid']}))
+                    print(elements.find('video', {'data-vid': elements.find('video')['data-vid']}))
                 data.append(_)
             previous = html.find('div', class_='nav-previous')
             if previous:
@@ -214,6 +222,14 @@ class Anime1:
         res_json, cookies = await aiohttp_post_json(url=Anime1Api, data=data, cookie=True)
         animate_url = f'https:{"".join(res_json.values())}'
         return animate_url, cookies
+
+    @staticmethod
+    async def get_api_key_and_value_v2(data):
+        data = json.loads(data)
+        res_html = await aiohttp_text(url=data['url'])
+        html = BeautifulSoup(res_html, 'lxml')
+        dom = html.find('video', {'data-vid': html.find('video')['data-vid']})
+        return 'd', unquote(dom['data-apireq'])
 
     @staticmethod
     def get_season_list(season):
@@ -268,4 +284,6 @@ class Anime1:
 
 if __name__ == '__main__':
     # season = Anime1.get_home_season_url()
-    print(Anime1.get_animate_info(url='https://anime1.me/?cat=905', data=[]))
+    print(Anime1.get_animate_info(url='https://anime1.me/?cat=968', data=[]))
+    # print(Anime1.get_animate_info(url='https://anime1.pw/?cat=23', data=[]))
+    v =  '%7B%22c%22%3A%221000%22%2C%22e%22%3A%222%22%2C%22t%22%3A1642680563%2C%22p%22%3A0%2C%22s%22%3A%22543c4500fb3f2006cde612ad5052024f%22%7D'

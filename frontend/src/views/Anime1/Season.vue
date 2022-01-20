@@ -16,7 +16,7 @@
         <router-link v-if="animate.url" :to="{
                 name: 'Anime1Animate',
                 query: {
-                  url: animate.url === '0' ? 123456 : animate.url
+                  url: animate.url
                 }
               }">{{ animate.name }}
         </router-link>
