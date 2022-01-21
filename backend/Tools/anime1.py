@@ -6,7 +6,7 @@ import re
 import requests
 import aiohttp
 from bs4 import BeautifulSoup
-from Tools.tools import aiohttp_text, badname, aiohttp_json, aiohttp_post_json
+from Tools.tools import aiohttp_text, badname, aiohttp_post_json
 from Tools.urls import Anime1AnimateUrl, Anime1Api, NewAnime1AnimateUrl
 
 headers = {
@@ -185,12 +185,7 @@ class Anime1:
                 elif elements.find('video').find('source'):
                     _.update({'url': elements.find('video').find('source')['src']})
                 else:
-                    # print(unquote(elements.find('video')['data-vid']))
                     _.update({'url': json.dumps({'url': url, 'data-vid': elements.find('video')['data-vid']})})
-                    print(elements.find('video')['data-vid'])
-                    print(unquote(elements.find('video')['data-apireq']))
-                    # print(elements.find('video').find({'data-vid': elements.find('video')['data-vid']}))
-                    print(elements.find('video', {'data-vid': elements.find('video')['data-vid']}))
                 data.append(_)
             previous = html.find('div', class_='nav-previous')
             if previous:

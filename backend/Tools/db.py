@@ -1,25 +1,19 @@
 import io
 import asyncio
-import json
 from typing import Union, List
-
 from django.core.files.images import ImageFile
 from django.core.paginator import Paginator
 from django.db.models import QuerySet, Prefetch
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-
 from Api.serializers import MyselfFinishAnimateSerializer
 from channels.db import database_sync_to_async
-
 from django.core.files.base import ContentFile
-
 from Database.models import MyselfFinishAnimateModel, MyselfAnimateEpisodeInfoModel, MyselfAnimateEpisodeTsModel, \
     MyselfDownloadModel, MyselfAnimateInfoModel, MyHistoryModel, MySystemModel, Anime1AnimateInfoModel, \
     Anime1AnimateEpisodeInfoModel, Anime1DownloadModel, MySettingsModel
 from Tools.tools import aiohttp_bytes, use_io_get_image_format
 from django.core.cache import caches
-
 from project.settings import MEDIA_PATH, BASE_DIR, DOWNLOAD_MAX_VALUE
 
 

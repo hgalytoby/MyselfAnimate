@@ -9,30 +9,65 @@
   <div><a href="https://github.com/szboynono/mosha-vue-toastify">Mosha Vue Toastify</a></div>
   <div>學習與研究!</div>
   <div>應在24小時內刪除影片。</div>
-  <div class="card" aria-hidden="true">
-    <img src="" class="card-img-top" alt="">
-    <div class="card-body">
-      <h5 class="card-title placeholder-glow">
-        <span class="placeholder col-6"></span>
-      </h5>
-      <p class="card-text placeholder-glow">
-        <span class="placeholder col-7"></span>
-        <span class="placeholder col-4"></span>
-        <span class="placeholder col-4"></span>
-        <span class="placeholder col-6"></span>
-        <span class="placeholder col-8"></span>
-      </p>
-      <a href="#" tabindex="-1" class="btn btn-primary disabled placeholder col-6"></a>
-    </div>
-  </div>
+  <vue-table-lite
+    :is-static-mode="true"
+    :columns="table.columns"
+    :rows="table.rows"
+    :total="table.totalRecordCount"
+    :sortable="table.sortable"
+  ></vue-table-lite>
 </template>
 
 <script>
+import VueTableLite from 'vue3-table-lite'
+import { computed, reactive } from 'vue'
 
 export default {
   name: 'MyHome',
+  components: { VueTableLite },
   setup () {
-    return {}
+    const data = reactive([])
+    for (let i = 0; i < 126; i++) {
+      data.push({
+        id: i,
+        name: 'TEST' + i,
+        email: 'test' + i + '@example.com'
+      })
+    }
+    const table = reactive({
+      columns: [
+        {
+          label: 'ID',
+          field: 'id',
+          width: '3%',
+          sortable: true,
+          isKey: true
+        },
+        {
+          label: 'Name',
+          field: 'name',
+          width: '10%',
+          sortable: true
+        },
+        {
+          label: 'Email',
+          field: 'email',
+          width: '15%',
+          sortable: true
+        }
+      ],
+      rows: data,
+      totalRecordCount: computed(() => {
+        return table.rows.length
+      }),
+      sortable: {
+        order: 'id',
+        sort: 'asc'
+      }
+    })
+    return {
+      table
+    }
   }
 }
 </script>
