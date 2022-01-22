@@ -5,25 +5,25 @@
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <div class="nav-item dropdown">
             <div class="nav-link dropdown-toggle" id="myself-animate" role="button" data-bs-toggle="dropdown"
-             aria-expanded="false">MyselfAnimate</div>
+             aria-expanded="false" title="MyselfAnimate">MyselfAnimate</div>
             <ul class="dropdown-menu" aria-labelledby="myself-animate">
               <li>
-                <router-link class="dropdown-item" to="/Myself">本季新番</router-link>
+                <router-link class="dropdown-item" to="/Myself" title="本季新番">本季新番</router-link>
               </li>
               <li>
-                <router-link class="dropdown-item" to="/Myself/AnimateSearch">搜尋動漫</router-link>
+                <router-link class="dropdown-item" to="/Myself/AnimateSearch" title="搜尋動漫">搜尋動漫</router-link>
               </li>
               <li>
-                <router-link class="dropdown-item" to="/Myself/AnimateFinish">完結動漫</router-link>
+                <router-link class="dropdown-item" to="/Myself/AnimateFinish" title="完結動漫">完結動漫</router-link>
               </li>
             </ul>
           </div>
           <div class="nav-item dropdown">
             <div class="nav-link dropdown-toggle" id="anime1" role="button" data-bs-toggle="dropdown"
-               aria-expanded="false">Anime1</div>
+               aria-expanded="false" title="Anime1">Anime1</div>
             <ul class="dropdown-menu" aria-labelledby="anime1">
               <li>
-                <router-link class="dropdown-item" to="/Anime1/AnimateList">動畫列表</router-link>
+                <router-link class="dropdown-item" to="/Anime1/AnimateList" title="動畫列表">動畫列表</router-link>
               </li>
               <li>
                 <router-link v-if="homeMenu.text" class="dropdown-item" :to="{
@@ -31,7 +31,7 @@
                     params: {
                       season: homeMenu.text
                     }
-                  }">{{ homeMenu.text }}
+                  }" :title="homeMenu.text">{{ homeMenu.text }}
                 </router-link>
               </li>
             </ul>

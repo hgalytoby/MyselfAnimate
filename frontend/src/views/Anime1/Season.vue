@@ -1,12 +1,12 @@
 <template>
-  <p class="fs-1">{{seasonData.header}}</p>
+  <p class="fs-1" :title="seasonData.header">{{seasonData.header}}</p>
   <table class="table border week">
     <thead>
     <tr>
-      <th class="text-center" colspan="7">{{ seasonData.title }}</th>
+      <th class="text-center" colspan="7" :title="seasonData.title">{{ seasonData.title }}</th>
     </tr>
     <tr>
-      <th v-for="(day, index) in seasonData.days" :key="index">{{ day }}</th>
+      <th v-for="(day, index) in seasonData.days" :key="index" :title="day">{{ day }}</th>
     </tr>
     </thead>
     <tbody>
@@ -18,9 +18,9 @@
                 query: {
                   url: animate.url
                 }
-              }">{{ animate.name }}
+              }" :title="animate.name">{{ animate.name }}
         </router-link>
-        <template v-else>{{ animate.name }}</template>
+        <template v-else :title="animate.name">{{ animate.name }}</template>
       </td>
     </tr>
     </tbody>
@@ -32,7 +32,7 @@
             params: {
               season: season.season.split('(')[0].split(' ')[1]
             }
-          }">{{ season.season }}
+          }" :title="season.season.split('(')[0].split(' ')[1]">{{ season.season }}
         <br>
       </router-link>
       <template v-else>{{ season.season }}</template>

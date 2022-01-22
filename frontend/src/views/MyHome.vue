@@ -7,6 +7,7 @@
   <div><a href="https://github.com/aacassandra/vue3-progressbar">Progressbar</a></div>
   <div><a href="https://github.com/dvuckovic/vue3-bootstrap-icons">bootstrap-icons</a></div>
   <div><a href="https://github.com/szboynono/mosha-vue-toastify">Mosha Vue Toastify</a></div>
+  <div><a href="https://github.com/linmasahiro/vue3-table-lite">vue3-table-lite</a></div>
   <div>學習與研究!</div>
   <div>應在24小時內刪除影片。</div>
 </template>

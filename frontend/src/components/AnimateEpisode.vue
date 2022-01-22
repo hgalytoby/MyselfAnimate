@@ -2,27 +2,27 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-sm">
-        <h5>尚未下載</h5>
+        <h5 title="尚未下載">尚未下載</h5>
         <div v-for="data in animateUndone" :key="data.id">
           <BootstrapIcon icon="check2-square" v-show="checkCheckboxArray(data.id)"
                          @click="clickCheckbox(data.id)"/>
           <BootstrapIcon icon="square" v-show="!checkCheckboxArray(data.id)"
                          @click="clickCheckbox(data.id)"/>
-          <span>{{ data.name }}</span>
+          <span :title="data.name">{{ data.name }}</span>
         </div>
-        <button type="button" class="btn btn-primary" @click="downloadAnimate">下載所選的集數</button>
+        <button type="button" class="btn btn-primary" title="下載所選的集數" @click="downloadAnimate">下載所選的集數</button>
       </div>
       <div class="col-sm">
-        <h5>正在下載</h5>
+        <h5 title="正在下載">正在下載</h5>
         <div v-for="data in animateDownloading" :key="data.id">
-          <span>{{ data.name }}</span>
+          <span :title="data.name">{{ data.name }}</span>
         </div>
       </div>
       <div class="col-sm">
-        <h5>下載完成</h5>
+        <h5 title="下載完成">下載完成</h5>
         <div v-for="data in animateDone" :key="data.id">
           <BootstrapIcon class="video-play" icon="play-btn" @click="startFancy(data.video)"/>
-          <span>{{ data.name }}</span>
+          <span :title="data.name">{{ data.name }}</span>
         </div>
       </div>
     </div>

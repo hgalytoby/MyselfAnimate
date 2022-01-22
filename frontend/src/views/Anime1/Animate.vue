@@ -3,7 +3,7 @@
     <Loading/>
   </div>
   <div v-else>
-    <h1>{{ animateInfo.name }}</h1>
+    <h1 :title="animateInfo.name">{{ animateInfo.name }}</h1>
     <DownloadStatus :animate-info-obj="animateInfo" :download-state-array="downloadAnime1Animate"
                     action="download_anime1_animate"/>
   </div>

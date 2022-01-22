@@ -2,18 +2,17 @@
   <div class="row align-items-center">
     <div class="col">
       <input type="text" class="form-control shadow-sm p-3 mb-2 bg-body rounded" id="search"
-       v-model="searchText" placeholder="貼上網址搜尋指定動漫">
+       v-model="searchText" title="貼上網址搜尋指定動漫" placeholder="貼上網址搜尋指定動漫">
     </div>
     <div class="col-1 d-flex justify-content-center">
-      <button type="button" class="btn btn-primary" @click="searchAnimate">搜尋</button>
+      <button type="button" class="btn btn-primary" title="搜尋" @click="searchAnimate">搜尋</button>
     </div>
   </div>
   <ul class="nav nav-tabs" id="pills-tab" role="tablist">
     <li class="nav-item" role="presentation" v-for="(_, week, index) of weekAnimate" :key="week">
       <button class="nav-link" :class="index === 0 ? 'active' : ''" :id="`pills-${week}-tab`" data-bs-toggle="pill"
-              :data-bs-target="`#pills-${week}`"
-              type="button" role="tab" :aria-controls="`pills-${week}`" :aria-selected="index === 0"> {{ weekDict[week]
-        }}
+              :data-bs-target="`#pills-${week}`" :title="weekDict[week]"
+              type="button" role="tab" :aria-controls="`pills-${week}`" aria-selected="true"> {{ weekDict[week] }}
       </button>
     </li>
   </ul>
@@ -24,7 +23,7 @@
         <li v-for="animate in animateArray" :key="animate.url">
           <div class="row justify-content-start">
             <div class="col animateLink">
-              <router-link :to="{
+              <router-link :title="animate.name" :to="{
               name: 'MyselfAnimate',
               query: {
                 url: animate.url.split('/').at(-1)

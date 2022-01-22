@@ -10,7 +10,7 @@
                 data-bs-toggle="pill"
                 :data-bs-target="`#pills-${years.data[s].title}`"
                 type="button" role="tab" :aria-controls="`pills-${years.data[s].title}`"
-                aria-selected="true">{{ years.data[s].title }}
+                aria-selected="true" :title="years.data[s].title">{{ years.data[s].title }}
         </button>
       </li>
     </ul>

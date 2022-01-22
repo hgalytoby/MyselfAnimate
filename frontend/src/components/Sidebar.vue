@@ -25,7 +25,7 @@
                            data-bs-placement="right"
                            data-bs-original-title="Home">
                 <BootstrapIcon icon="house" color="white"/>
-                <span class="text-white ms-2">首頁</span>
+                <span class="text-white ms-2" title="首頁">首頁</span>
               </router-link>
             </li>
             <li class="nav-item m-1">
@@ -33,7 +33,7 @@
                            data-bs-placement="right"
                            data-bs-original-title="Orders">
                 <BootstrapIcon icon="cloud-download" color="white"/>
-                <span class="text-white ms-2">下載</span>
+                <span class="text-white ms-2" title="下載">下載</span>
               </router-link>
             </li>
             <li class="nav-item m-1">
@@ -41,7 +41,7 @@
                            data-bs-placement="right"
                            data-bs-original-title="Products">
                 <BootstrapIcon icon="collection-play" color="white"/>
-                <span class="text-white ms-2">收藏</span>
+                <span class="text-white ms-2" title="收藏">收藏</span>
               </router-link>
             </li>
             <li class="nav-item m-1">
@@ -49,7 +49,7 @@
                            data-bs-placement="right"
                            data-bs-original-title="Products">
                 <BootstrapIcon icon="journal-text" color="white"/>
-                <span class="text-white ms-2">日誌</span>
+                <span class="text-white ms-2" title="日誌">日誌</span>
               </router-link>
             </li>
             <li class="nav-item m-1">
@@ -57,7 +57,7 @@
                            data-bs-placement="right"
                            data-bs-original-title="Products">
                 <BootstrapIcon icon="gear" color="white"/>
-                <span class="text-white ms-2">設定</span>
+                <span class="text-white ms-2" title="設定">設定</span>
               </router-link>
             </li>
           </ul>

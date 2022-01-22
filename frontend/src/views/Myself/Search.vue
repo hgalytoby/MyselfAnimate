@@ -1,15 +1,13 @@
 <template>
   <div class="row">
     <input type="text" class="form-control shadow-sm p-3 mb-2 bg-body rounded" id="search" @keyup="searchAnimate"
-           v-model="searchText" placeholder="搜尋動漫">
+           v-model="searchText" title="搜尋動漫" placeholder="搜尋動漫">
   </div>
   <div class="row align-items-center">
     <button type="button" class="btn btn-primary mb-2 col-auto" :disabled="finishAnimateUpdate"
-            @click="updateFinishAnimateData">
-      {{ finishAnimateUpdateButton }}
+            :title="finishAnimateUpdateButton" @click="updateFinishAnimateData">{{ finishAnimateUpdateButton }}
     </button>
-    <h6 class="col-auto">最後更新時間: {{ !settings.myself_finish_animate_date ? '尚未更新' : settings.myself_finish_animate_date
-      }}</h6>
+    <h6 class="col-auto" title="最後更新時間">最後更新時間: {{ lastUpdateMsg }}</h6>
   </div>
 
   <div class="row justify-content-center">
@@ -24,9 +22,9 @@
           }
         }">
           <img :src="animate.image" class="card-img-top rounded d-block img-thumbnail p-2 w-100"
-               alt="animate.name">
+               alt="animate.name" :title="animate.name">
           <div class="card-body">
-            <p class="card-title text-center text-white p-bg">{{ animate.info }}</p>
+            <p class="card-title text-center text-white p-bg" :title="animate.info">{{ animate.info }}</p>
             <p class="card-text overflow-hidden text-nowrap animate-name text-center" data-toggle="tooltip"
                data-placement="bottom"
                :title="animate.name">{{ animate.name }}</p>
@@ -68,6 +66,7 @@ export default {
       return `顯示 ${startMsgNum} 到 ${endMsgNum} 共 ${finishAnimate.value.count} 個動漫`
     })
     const settings = computed(() => store.state.my[settingsState])
+    const lastUpdateMsg = computed(() => !settings.value.myself_finish_animate_date ? '尚未更新' : settings.value.myself_finish_animate_date)
     store.dispatch(`myself/${finishAnimateAction}`)
     store.dispatch(`my/${settingsGetAction}`)
     const updateFinishAnimateData = () => {
@@ -99,6 +98,7 @@ export default {
 
     return {
       updateFinishAnimateData,
+      lastUpdateMsg,
       finishAnimateUpdate,
       finishAnimateUpdateButton,
       finishAnimate,
