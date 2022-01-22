@@ -50,7 +50,11 @@ export const actions = {
     axiosGet(anima1Api.homeMenu, context, homeMenuMutation)
   },
   [seasonAction] (context, value) {
-    axiosGet(anima1Api.season(value), context, seasonMutation)
+    if (value?.params) {
+      axiosGet(anima1Api.season(value.params.season), context, seasonMutation)
+    } else {
+      axiosGet(anima1Api.season(value), context, seasonMutation)
+    }
   }
 }
 

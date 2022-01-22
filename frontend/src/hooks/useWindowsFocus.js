@@ -5,7 +5,6 @@ export default function (func, action, args) {
   function windowsFocus () {
     const nowTimestamp = Math.floor(Date.now() / 1000)
     if (nowTimestamp - timestamp > 2) {
-      console.log('axios')
       timestamp = nowTimestamp
       func(action, args)
     }

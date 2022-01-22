@@ -45,21 +45,20 @@ import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import { computed } from 'vue'
 import { seasonState, seasonAction } from '../../variables/anime1'
+import useWindowsFocus from '../../hooks/useWindowsFocus'
 
 export default {
   name: 'Season',
   setup () {
     const route = useRoute()
-    const season = route.params.season
     const store = useStore()
-    store.dispatch(`anime1/${seasonAction}`, season)
+    store.dispatch(`anime1/${seasonAction}`, route)
     const seasonData = computed(() => store.state.anime1[seasonState])
     const today = new Date().getDay()
-
     function getSeasonData (season) {
       store.dispatch(`anime1/${seasonAction}`, season)
     }
-
+    useWindowsFocus(store.dispatch, `anime1/${seasonAction}`, route)
     return {
       seasonData,
       today,

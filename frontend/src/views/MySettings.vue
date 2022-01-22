@@ -26,6 +26,7 @@
 import { computed, reactive } from 'vue'
 import { useStore } from 'vuex'
 import { settingsState, settingsGetAction, settingsUpdateDownloadValueAction } from '../variables/my'
+import useWindowsFocus from '../hooks/useWindowsFocus'
 
 export default {
   name: 'MySettings',
@@ -47,6 +48,7 @@ export default {
     function isNumber (event) {
       if (!/^[0-9]+$/.test(event.key) || event.key === '.') return event.preventDefault()
     }
+    useWindowsFocus(store.dispatch, `my/${settingsGetAction}`)
     return {
       settings,
       update,

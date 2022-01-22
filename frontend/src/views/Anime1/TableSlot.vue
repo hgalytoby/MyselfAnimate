@@ -15,7 +15,6 @@ export default {
     data: Object
   },
   setup (props) {
-    console.log(props.data)
     return {
       props
     }

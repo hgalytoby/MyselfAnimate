@@ -6,6 +6,7 @@
     :rows="table.rows"
     :total="table.totalRecordCount"
     :sortable="table.sortable"
+    :page-size="table.pageSize"
   >
     <template v-slot:name="data">
       <Test :data="data"></Test>
@@ -19,6 +20,7 @@ import { computed, reactive } from 'vue'
 import VueTableLite from 'vue3-table-lite'
 import { animateListAction, animateListState } from '../../variables/anime1'
 import Test from './TableSlot'
+import useWindowsFocus from '../../hooks/useWindowsFocus'
 
 export default {
   name: 'AnimateList',
@@ -33,8 +35,8 @@ export default {
           label: '動漫名稱',
           field: 'name',
           width: '20%',
-          sortable: true
-          // isKey: true
+          sortable: true,
+          isKey: true
         },
         {
           label: '集數',
@@ -62,14 +64,22 @@ export default {
         }
       ],
       rows: computed(() => animateList.value),
+      pageSize: 25,
       totalRecordCount: computed(() => {
         return table.rows.length
       }),
       sortable: {
         order: 'id',
         sort: 'asc'
+      },
+      messages: {
+        pagingInfo: '現在顯示 {0} 到 {1}筆 共{2}筆',
+        pageSizeChangeLabel: '每頁筆數:',
+        gotoPageLabel: '現在頁數:',
+        noDataAvailable: '沒有資料'
       }
     })
+    useWindowsFocus(store.dispatch, `anime1/${animateListAction}`)
     return {
       animateList,
       table

@@ -95,12 +95,6 @@ class Base:
         """
         cls.download_model.objects.filter(owner__done=True).delete()
 
-    @classmethod
-    def filter_episode_done(cls):
-        prefetch = Prefetch('episode_info_model', queryset=cls.animate_episode_info_model.objects.filter(done=True))
-        return cls.animate_info_model.objects.prefetch_related(prefetch).filter(
-            episode_info_model__done=True).distinct()
-
 
 class MyselfBase(Base):
     animate_info_model = MyselfAnimateInfoModel
