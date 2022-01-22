@@ -52,9 +52,9 @@ export default {
   setup () {
     const route = useRoute()
     const store = useStore()
-    store.dispatch(`anime1/${seasonAction}`, route)
     const seasonData = computed(() => store.state.anime1[seasonState])
     const today = new Date().getDay()
+    store.dispatch(`anime1/${seasonAction}`, route)
     function getSeasonData (season) {
       store.dispatch(`anime1/${seasonAction}`, season)
     }
@@ -62,6 +62,7 @@ export default {
     return {
       seasonData,
       today,
+      seasonAction,
       getSeasonData
     }
   }

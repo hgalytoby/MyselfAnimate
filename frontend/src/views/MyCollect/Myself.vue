@@ -4,11 +4,11 @@
     <div class="card bg-transparent" v-for="animate in animateCollect.data" :key="animate.id">
       <div class="row g-0">
         <div class="col-md-2">
-          <h5 class="card-title">{{ animate.name }}</h5>
           <img :src="animate.image" class="img-fluid rounded-start" :alt="animate.name">
         </div>
-        <div class="col-md-8">
+        <div class="col-md-10">
           <div class="card-body">
+            <h4 class="card-title">動漫名稱: {{ animate.name }}</h4>
             <p v-for="episode in animate.episode_info_model" :key="episode.id">
               <a href="" @click.prevent="startFancy(episode.video)">{{ episode.name }}</a>
             </p>

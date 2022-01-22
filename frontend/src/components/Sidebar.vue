@@ -71,7 +71,7 @@
           <img class="wb2-image" src="@/assets/wb2.png" alt="">
         </transition>
         <div class="mt-4 mx-4">
-          <router-view></router-view>
+          <router-view :key="$route.fullPath"></router-view>
         </div>
       </div>
     </div>
