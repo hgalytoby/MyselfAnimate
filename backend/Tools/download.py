@@ -333,7 +333,7 @@ class Anime1DownloadManage(BaseDownloadManage):
                     url, cookies = await Anime1.get_cookies_and_animate_url(api_key=api_key, api_value=api_value)
                 elif 'data-vid' in task_data['url']:
                     api_key, api_value = await Anime1.get_api_key_and_value_v2(data=task_data['url'])
-                    url, cookies = await Anime1.get_cookies_and_animate_url(api_key=api_key, api_value=api_value)
+                    url, cookies = await Anime1.get_cookies_and_animate_url_v2(api_key=api_key, api_value=api_value)
                 else:
                     url, cookies = f'https:{task_data["url"]}', ''
                 await self.download_animate(task_data=task_data, animate_url=url, cookies=cookies)

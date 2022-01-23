@@ -215,11 +215,33 @@ class Anime1:
         """
         data = {api_key: unquote(api_value)}
         res_json, cookies = await aiohttp_post_json(url=Anime1Api, data=data, cookie=True)
+        print(res_json, cookies)
         animate_url = f'https:{"".join(res_json.values())}'
+        print(animate_url, 1111)
         return animate_url, cookies
 
     @staticmethod
+    async def get_cookies_and_animate_url_v2(api_key: str, api_value: str) -> tuple:
+        """
+        2022/1/23 發現官方改 Api 了。
+        :param api_key: str -> Api key。
+        :param api_value: str -> Api value。
+        :return: tuple -> (影片網址, 需要的 cookies)
+        """
+        data = {api_key: unquote(api_value)}
+        res_json, cookies = await aiohttp_post_json(url=Anime1Api, data=data, cookie=True)
+        """
+        {'l': '//korone.v.anime1.me/968/12b.mp4', 's': {'src': '//korone.v.anime1.me/968/12b.mp4', 'type': 'video/mp4'}}
+        """
+        return f'https:{res_json["l"]}', cookies
+
+    @staticmethod
     async def get_api_key_and_value_v2(data):
+        """
+        2022/1/17 官方改 Api了。
+        :param data:
+        :return:
+        """
         data = json.loads(data)
         res_html = await aiohttp_text(url=data['url'])
         html = BeautifulSoup(res_html, 'lxml')
@@ -281,4 +303,4 @@ if __name__ == '__main__':
     # season = Anime1.get_home_season_url()
     print(Anime1.get_animate_info(url='https://anime1.me/?cat=968', data=[]))
     # print(Anime1.get_animate_info(url='https://anime1.pw/?cat=23', data=[]))
-    v =  '%7B%22c%22%3A%221000%22%2C%22e%22%3A%222%22%2C%22t%22%3A1642680563%2C%22p%22%3A0%2C%22s%22%3A%22543c4500fb3f2006cde612ad5052024f%22%7D'
+    v = '%7B%22c%22%3A%221000%22%2C%22e%22%3A%222%22%2C%22t%22%3A1642680563%2C%22p%22%3A0%2C%22s%22%3A%22543c4500fb3f2006cde612ad5052024f%22%7D'

@@ -33,9 +33,7 @@ async def base_aiohttp_req(url: str, method: str, timeout: tuple, **kwargs):
     """
     _timeout = aiohttp.client.ClientTimeout(sock_connect=timeout[0], sock_read=timeout[1])
     async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
-        print(0)
         async with session.get(url=url, headers=headers, timeout=_timeout) as res:
-            print(res)
             return await getattr(res, method)(**kwargs)
 
 

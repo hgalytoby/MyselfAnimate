@@ -1,0 +1,17 @@
+%a-hover {
+  a {
+    color: #3d3d3d;
+    text-decoration: none;
+
+    &:hover {
+      color: #77cc6d;
+    }
+  }
+}
+
+.episode {
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}

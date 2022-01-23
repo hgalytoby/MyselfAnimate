@@ -30,7 +30,7 @@
                     :title="episode.name">{{ episode.name }}</span>
             </div>
           </div>
-          <button type="button" class="col-auto btn btn-danger me-1">
+          <button type="button" class="col-auto btn btn-danger">
             <span style="writing-mode: vertical-lr">刪除所選取的集數</span>
           </button>
         </div>
