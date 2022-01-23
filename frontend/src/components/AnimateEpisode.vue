@@ -22,7 +22,7 @@
         <h5 title="下載完成">下載完成</h5>
         <div v-for="data in animateDone" :key="data.id">
           <BootstrapIcon class="video-play" icon="play-btn" @click="startFancy(data.video)"/>
-          <span :title="data.name">{{ data.name }}</span>
+          <span class="episode" :title="data.name">{{ data.name }}</span>
         </div>
       </div>
     </div>
@@ -103,6 +103,6 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style scoped lang="scss">
+@import "./src/assets/scss/tools";
 </style>

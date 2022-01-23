@@ -70,6 +70,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
+  @import "./src/assets/scss/tools";
+  /*用 @/<scss path> IDE 會顯示紅色的，看了不開心*/
   .week {
     border: #e6e6e6;
   }
@@ -101,14 +103,4 @@ export default {
     color: #666666;
   }
 
-  %a-hover {
-    a {
-      color: #3d3d3d;
-      text-decoration: none;
-
-      &:hover {
-        color: #77cc6d;
-      }
-    }
-  }
 </style>

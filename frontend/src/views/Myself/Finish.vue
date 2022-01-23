@@ -52,18 +52,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  @import "./src/assets/scss/tools";
   .tab-items {
-    a {
-      color: black;
-      text-decoration: none;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
+    @extend %a-hover;
   }
   li {
-    overflow:hidden;
+    overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
   }

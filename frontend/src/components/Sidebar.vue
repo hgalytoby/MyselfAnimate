@@ -68,7 +68,7 @@
         <Navbar/>
         <transition appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn animate__slower"
                     leave-active-class="animate__fadeOut">
-          <img class="wb2-image" src="@/assets/wb2.png" alt="">
+          <img class="wb2-image" src="@/assets/image/wb2.png" alt="">
         </transition>
         <div class="mt-4 mx-4">
           <router-view :key="$route.fullPath"></router-view>

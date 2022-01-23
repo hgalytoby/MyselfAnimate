@@ -6,7 +6,7 @@
         <div class="col-auto" v-for="animate in animateCollect.data" :key="animate.id">
           <h5 class="card-title">{{ animate.name }}</h5>
           <p v-for="episode in animate.episode_info_model" :key="episode.id">
-              <a href="" @click.prevent="startFancy(episode.video)">{{ episode.name }}</a>
+              <a href="javascript:void(0)" @click.prevent="startFancy(episode.video)">{{ episode.name }}</a>
             </p>
         </div>
       </transition-group>

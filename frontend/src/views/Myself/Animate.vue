@@ -10,8 +10,10 @@
                class="rounded mx-auto d-block img-thumbnail w-100 p-2">
         </div>
         <div class="col-lg">
-          <div class="card-body">
-            <h3 class="card-title" :title="animateInfo.name">{{ animateInfo.name }}</h3>
+          <div class="card-body animate">
+            <a :href="animateInfo.url">
+              <h3 class="card-title" :title="animateInfo.name">{{ animateInfo.name }}</h3>
+            </a>
           </div>
           <ul class="list-group list-group-flush">
             <li class="list-group-item" :title="animateInfo.animate_type">作品類型: {{ animateInfo.animate_type }}</li>
@@ -78,8 +80,11 @@ export default {
 
 <style lang="scss" scoped>
   @import '~@fancyapps/ui/dist/fancybox.css';
-
+  @import "../../assets/scss/tools";
   .video-play {
     font-size: 24px;
+  }
+  .animate {
+    @extend %a-hover;
   }
 </style>

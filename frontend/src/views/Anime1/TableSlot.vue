@@ -23,6 +23,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  @import "../../assets/scss/tools";
+  /*用 @/<scss path> IDE 會顯示紅色的，看了不開心*/
   table {
     th {
       background: #f9f9f9;
@@ -34,15 +36,5 @@ export default {
       border: 1px solid #e6e6e6
     }
     @extend %a-hover;
-  }
-  %a-hover {
-    a {
-      color: #3d3d3d;
-      text-decoration: none;
-
-      &:hover {
-        color: #77cc6d;
-      }
-    }
   }
 </style>
