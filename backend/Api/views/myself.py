@@ -117,3 +117,8 @@ class MyselfAnimateEpisodeDoneView(BaseAnimateEpisodeDone, ListAPIView):
 class MyselfDownloadView(DestroyAPIView):
     serializer_class = MyselfDownloadSerializer
     queryset = MyselfDownloadModel.objects.all()
+
+
+class MyselfDestroyManyAnimate(APIView):
+    def delete(self, request):
+        delete_list = request.data.get('deleteArray')

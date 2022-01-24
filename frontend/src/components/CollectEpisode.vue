@@ -2,7 +2,8 @@
   <div class="overflow-auto col-auto" style="max-height: 350px;">
     <div class="row" v-for="episode in props.episodeData" :key="episode.id">
       <div class="col-1">
-        <BootstrapIcon icon="check2-square"/>
+        <BootstrapIcon v-if="!checkBoxFind(episode.id)" icon="square" @click="checkBoxAction(episode.id, 'push')"/>
+        <BootstrapIcon v-else @click="checkBoxAction(episode.id, 'remove')" icon="check2-square"/>
       </div>
       <div class="col-1">
         <BootstrapIcon icon="play-btn" @click="startFancy(episode.video)"/>
@@ -17,16 +18,33 @@
 </template>
 
 <script>
-// import { computed } from 'vue'
+import { reactive } from 'vue'
 
 export default {
-  name: 'Episode',
+  name: 'CollectEpisode',
   props: {
     episodeData: Object
   },
   setup (props) {
+    const checkBox = reactive([])
+    function checkBoxAction (id, action) {
+      if (action === 'push') {
+        checkBox.push(id)
+      } else {
+        const index = checkBox.indexOf(id)
+        if (index !== -1) {
+          checkBox.splice(index, 1)
+        }
+      }
+    }
+    function checkBoxFind (id) {
+      return checkBox.indexOf(id) !== -1
+    }
     return {
-      props
+      props,
+      checkBox,
+      checkBoxAction,
+      checkBoxFind
     }
   }
 }

@@ -17,8 +17,8 @@
     <div class="tab-content" id="pills-tabContent">
       <ul class="tab-pane fade" :class="s === 0 ? 'show active' : ''" :id="`pills-${season.title}`" role="tabpanel"
           :aria-labelledby="`pills-${season.title}-tab`" v-for="(season, s) in years.data" :key="season.title">
-          <div class="row">
-            <li class="tab-items col-3" v-for="animate in season.data" :key="animate.name">
+        <div class="row">
+          <li class="tab-items col-3" v-for="animate in season.data" :key="animate.name">
             <router-link :title="animate.name" :to="{
               name: 'MyselfAnimate',
               query: {
@@ -26,8 +26,8 @@
               }
             }">{{ animate.name }}
             </router-link>
-        </li>
-          </div>
+          </li>
+        </div>
       </ul>
     </div>
   </div>
@@ -53,9 +53,11 @@ export default {
 
 <style lang="scss" scoped>
   @import "./src/assets/scss/tools";
+
   .tab-items {
     @extend %a-hover;
   }
+
   li {
     overflow: hidden;
     white-space: nowrap;

@@ -16,7 +16,7 @@
             </div>
           </router-link>
           <div class="row">
-            <Episode :episode-data="animate.episode_info_model"/>
+            <CollectEpisode :episode-data="animate.episode_info_model"/>
           </div>
         </div>
       </transition-group>
@@ -28,12 +28,12 @@
 import { animateCollectAction, animateCollectState } from '../../variables/my'
 import { startFancy } from '../../tools'
 import useAnimateCollect from '../../hooks/uwsAnimateCollect'
-import Episode from './Episode'
+import CollectEpisode from '../../components/CollectEpisode'
 
 export default {
   name: 'Anime1',
   components: {
-    Episode
+    CollectEpisode
   },
   setup () {
     const animateCollect = useAnimateCollect('anime1', animateCollectAction, animateCollectState)

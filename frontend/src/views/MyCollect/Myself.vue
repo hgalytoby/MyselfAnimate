@@ -18,7 +18,7 @@
           <div class="col-auto">
             <img :src="animate.image" class="img-fluid" :alt="animate.name" :title="animate.name">
           </div>
-          <Episode :episode-data="animate.episode_info_model"/>
+          <CollectEpisode :episode-data="animate.episode_info_model"/>
         </div>
       </div>
     </transition-group>
@@ -29,12 +29,12 @@
 import { animateCollectAction, animateCollectState } from '../../variables/my'
 import { startFancy } from '../../tools'
 import useAnimateCollect from '../../hooks/uwsAnimateCollect'
-import Episode from './Episode'
+import CollectEpisode from '../../components/CollectEpisode'
 
 export default {
   name: 'Myself',
   components: {
-    Episode
+    CollectEpisode
   },
   setup () {
     const animateCollect = useAnimateCollect('myself', animateCollectAction, animateCollectState)
