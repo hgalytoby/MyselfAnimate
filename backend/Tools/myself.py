@@ -145,7 +145,7 @@ class Myself:
             return {}
 
     @staticmethod
-    def finish_list() -> dict:
+    def finish_list() -> list:
         """
         爬完結列表頁面的動漫資訊
         :return: dict。
@@ -165,10 +165,10 @@ class Myself:
                     year_list.append({'title': year_month_title, 'data': season_list})
                 data.append({'data': year_list})
             res.close()
-            return {'data': data}
+            return data
         except requests.exceptions.RequestException as error:
             print(f'finish_list: {error}')
-            return {}
+            return[]
 
     @staticmethod
     async def get_vpx_json(url: str, timeout: tuple = (10, 10)) -> dict:

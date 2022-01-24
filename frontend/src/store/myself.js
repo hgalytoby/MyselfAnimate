@@ -92,7 +92,7 @@ export const mutations = {
     state[loadingState] = true
   },
   [addFinishListMutation] (state, value) {
-    state[finishListState] = value.data
+    state[finishListState] = value
   },
   [finishAnimateMutation] (state, value) {
     state[finishAnimateState] = value
