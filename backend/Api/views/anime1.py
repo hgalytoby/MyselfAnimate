@@ -80,3 +80,10 @@ class Anime1SeasonView(APIView):
         if data:
             return Response(data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class Anime1DestroyManyAnimate(APIView):
+    def delete(self, request):
+        delete_list = request.data.get('deleteArray')
+        DB.Anime1.delete_animate_episode(id__in=delete_list)
+        return Response(status=status.HTTP_204_NO_CONTENT)

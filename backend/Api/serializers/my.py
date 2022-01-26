@@ -21,7 +21,7 @@ class MySystemSerializer(serializers.ModelSerializer):
 class MySettingsSerializer(serializers.ModelSerializer):
     myself_download_value = serializers.IntegerField(min_value=1, max_value=15)
     anime1_download_value = serializers.IntegerField(min_value=1, max_value=10)
-    myself_finish_animate_date = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
+    myself_finish_animate_date = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", allow_null=True)
 
     class Meta:
         model = MySettingsModel

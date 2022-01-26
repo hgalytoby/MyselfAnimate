@@ -27,7 +27,7 @@ import {
   finishAnimateInitMutation
 } from '../variables/myself'
 import { myselfApi } from '../api'
-import { axiosGet, axiosPost, toastData } from '../tools'
+import { axiosDelete, axiosGet, axiosPost, toastData } from '../tools'
 import {
   clickAllDownloadCheckBoxMutation,
   clickDownloadCheckBoxMutation,
@@ -35,7 +35,9 @@ import {
   downloadCheckBoxState,
   animateCollectState,
   animateCollectAction,
-  animateCollectMutation
+  animateCollectMutation,
+  destroyManyAnimateAction,
+  destroyManyAnimateMutation
 } from '../variables/my'
 import router from '../router'
 import { createToast } from 'mosha-vue-toastify'
@@ -77,6 +79,9 @@ export const actions = {
   },
   [searchAnimateAction] (context, value) {
     axiosPost(myselfApi.searchAnimate, value, context, searchAnimateMutation)
+  },
+  [destroyManyAnimateAction] (context, value) {
+    axiosDelete(myselfApi.destroyManyAnimate, value, context, destroyManyAnimateMutation)
   }
 }
 
@@ -154,8 +159,14 @@ export const mutations = {
     } else {
       createToast(...toastData.searchMyselfAnimateFail)
     }
+  },
+  [destroyManyAnimateMutation] (context, value) {
+    context[animateCollectState].data[value.dataIndex].episode_info_model = context[animateCollectState].data[value.dataIndex].episode_info_model.filter(
+      (item) => value.data.deleteArray.indexOf(item.id) === -1)
+    value.data.deleteArray.length = 0
   }
 }
+
 export const getters = {
   getterWeekAnimate (state) {
     return state[weekAnimateState]

@@ -2,7 +2,7 @@
   <div class="row">
     <transition-group appear name="animate__animated animate__bounce" enter-active-class="animate__fadeIn"
                       leave-active-class="animate__fadeOut">
-      <div class="bg-transparent animate mb-4 col-auto" v-for="animate in animateCollect.data"
+      <div class="bg-transparent animate mb-4 col-auto" v-for="(animate, index) in animateCollect.data"
            :key="animate.id">
         <router-link :title="animate.name" :to="{
               name: 'MyselfAnimate',
@@ -18,7 +18,8 @@
           <div class="col-auto">
             <img :src="animate.image" class="img-fluid" :alt="animate.name" :title="animate.name">
           </div>
-          <CollectEpisode :episode-data="animate.episode_info_model"/>
+          <CollectEpisode :episode-data="animate.episode_info_model" :data-index="index"
+                          :delete-action="action" :animate="animateName"/>
         </div>
       </div>
     </transition-group>
@@ -26,10 +27,11 @@
 </template>
 
 <script>
-import { animateCollectAction, animateCollectState } from '../../variables/my'
+import { animateCollectAction, animateCollectState, destroyManyAnimateAction } from '../../variables/my'
 import { startFancy } from '../../tools'
 import useAnimateCollect from '../../hooks/uwsAnimateCollect'
 import CollectEpisode from '../../components/CollectEpisode'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Myself',
@@ -37,10 +39,15 @@ export default {
     CollectEpisode
   },
   setup () {
-    const animateCollect = useAnimateCollect('myself', animateCollectAction, animateCollectState)
+    const store = useStore()
+    const animateName = 'myself'
+    const action = destroyManyAnimateAction
+    const animateCollect = useAnimateCollect(store, animateName, animateCollectAction, animateCollectState)
     return {
       animateCollect,
-      startFancy
+      startFancy,
+      action,
+      animateName
     }
   }
 }

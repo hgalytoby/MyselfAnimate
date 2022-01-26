@@ -122,3 +122,5 @@ class MyselfDownloadView(DestroyAPIView):
 class MyselfDestroyManyAnimate(APIView):
     def delete(self, request):
         delete_list = request.data.get('deleteArray')
+        DB.Myself.delete_animate_episode(id__in=delete_list)
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -12,20 +12,25 @@
             :title="episode.name">{{ episode.name }}</span>
     </div>
   </div>
-  <button type="button" class="col-auto btn btn-danger">
+  <button type="button" @click="deleteAnimate" class="col-auto btn btn-danger">
     <span style="writing-mode: vertical-lr">刪除所選取的集數</span>
   </button>
 </template>
 
 <script>
 import { reactive } from 'vue'
+import { useStore } from 'vuex'
 
 export default {
   name: 'CollectEpisode',
   props: {
-    episodeData: Object
+    episodeData: Object,
+    deleteAction: String,
+    animate: String,
+    dataIndex: Number
   },
   setup (props) {
+    const store = useStore()
     const checkBox = reactive([])
     function checkBoxAction (id, action) {
       if (action === 'push') {
@@ -40,11 +45,19 @@ export default {
     function checkBoxFind (id) {
       return checkBox.indexOf(id) !== -1
     }
+    function deleteAnimate () {
+      store.dispatch(`${props.animate}/${props.deleteAction}`, {
+        data: { deleteArray: checkBox },
+        episodeData: props.episodeData,
+        dataIndex: props.dataIndex
+      })
+    }
     return {
       props,
       checkBox,
       checkBoxAction,
-      checkBoxFind
+      checkBoxFind,
+      deleteAnimate
     }
   }
 }

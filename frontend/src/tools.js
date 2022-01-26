@@ -15,6 +15,7 @@ export const axiosGet = (url, context, mutation) => {
   }).catch(function (_) {
     app.config.globalProperties.$Progress.fail()
     createToast(...toastData.apiFail)
+    console.log(_)
   })
 }
 
@@ -35,6 +36,19 @@ export const axiosPut = (url, data, context, mutation) => {
   axios.put(url, data).then(function (response) {
     app.config.globalProperties.$Progress.finish()
     context.commit(mutation, response.data)
+  }).catch(function (_) {
+    // console.log(error.response)
+    app.config.globalProperties.$Progress.fail()
+    createToast(...toastData.apiFail)
+  })
+}
+
+export const axiosDelete = (url, data, context, mutation) => {
+  app.config.globalProperties.$Progress.start()
+  // console.log('axiosDelete', JSON.stringify(data))
+  axios.delete(url, { data: data.data }).then(function (response) {
+    app.config.globalProperties.$Progress.finish()
+    context.commit(mutation, data)
   }).catch(function (_) {
     // console.log(error.response)
     app.config.globalProperties.$Progress.fail()

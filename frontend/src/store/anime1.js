@@ -14,13 +14,13 @@ import {
   homeMenuAction,
   homeMenuMutation, seasonState, seasonMutation, seasonAction
 } from '../variables/anime1'
-import { axiosGet, axiosPost } from '../tools'
+import { axiosDelete, axiosGet, axiosPost } from '../tools'
 import { anima1Api } from '../api'
 import {
   animateCollectAction, animateCollectMutation,
   animateCollectState,
   clickAllDownloadCheckBoxMutation,
-  clickDownloadCheckBoxMutation,
+  clickDownloadCheckBoxMutation, destroyManyAnimateAction, destroyManyAnimateMutation,
   downloadCheckBoxMutation,
   downloadCheckBoxState
 } from '../variables/my'
@@ -55,6 +55,9 @@ export const actions = {
     } else {
       axiosGet(anima1Api.season(value), context, seasonMutation)
     }
+  },
+  [destroyManyAnimateAction] (context, value) {
+    axiosDelete(anima1Api.destroyManyAnimate, value, context, destroyManyAnimateMutation)
   }
 }
 
@@ -94,6 +97,11 @@ export const mutations = {
   },
   [seasonMutation] (state, value) {
     state[seasonState] = value
+  },
+  [destroyManyAnimateMutation] (context, value) {
+    context[animateCollectState].data[value.dataIndex].episode_info_model = context[animateCollectState].data[value.dataIndex].episode_info_model.filter(
+      (item) => value.data.deleteArray.indexOf(item.id) === -1)
+    value.data.deleteArray.length = 0
   }
 }
 

@@ -12,6 +12,7 @@ export const settingsPutAction = 'settingsPutAction'
 export const settingsUpdateDownloadValueAction = 'settingsUpdateDownloadValueAction'
 export const historyAction = 'historyAction'
 export const animateCollectAction = 'animateCollectAction'
+export const destroyManyAnimateAction = 'destroyManyAnimateAction'
 
 export const logMutation = 'logMutation'
 export const systemMutation = 'systemMutation'
@@ -23,6 +24,7 @@ export const downloadCheckBoxMutation = 'downloadCheckBoxMutation'
 export const clickDownloadCheckBoxMutation = 'clickDownloadCheckBoxMutation'
 export const clickAllDownloadCheckBoxMutation = 'clickAllDownloadCheckBoxMutation'
 export const animateCollectMutation = 'animateCollectMutation'
+export const destroyManyAnimateMutation = 'destroyManyAnimateMutation'
 
 export const systemTable = {
   title: ['操作', '訊息', '時間'],

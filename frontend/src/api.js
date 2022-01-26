@@ -6,7 +6,8 @@ export const myselfApi = {
   finishList: '/api/myself/finish-list/',
   finishAnimate: '/api/myself/finish-animate/',
   animateEpisodeDone: '/api/myself/animate-episode-done/',
-  animateInfoEpisodeInfo: (animateID) => `/api/myself/animate-info/${animateID}/episode-info/`
+  animateInfoEpisodeInfo: (animateID) => `/api/myself/animate-info/${animateID}/episode-info/`,
+  destroyManyAnimate: '/api/myself/destroy-many-animate/'
 }
 
 export const myApi = {
@@ -21,5 +22,6 @@ export const anima1Api = {
   animateInfo: (url) => `/api/anime1/animate-info/?url=${url}`,
   animateEpisodeDone: '/api/anime1/animate-episode-done/',
   homeMenu: '/api/anime1/home-menu/',
-  season: (season) => `/api/anime1/season/${season}/`
+  season: (season) => `/api/anime1/season/${season}/`,
+  destroyManyAnimate: '/api/anime1/destroy-many-animate/'
 }

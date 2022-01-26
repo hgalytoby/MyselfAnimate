@@ -95,11 +95,20 @@ class Base:
         """
         cls.download_model.objects.filter(owner__done=True).delete()
 
+    @classmethod
+    def delete_animate_episode(cls, **kwargs):
+        models = cls.animate_episode_info_model.objects.select_related('owner').filter(**kwargs)
+        for model in models:
+            model.done = False
+            model.video = None
+            model.save()
+
 
 class MyselfBase(Base):
     animate_info_model = MyselfAnimateInfoModel
     animate_episode_info_model = MyselfAnimateEpisodeInfoModel
     download_model = MyselfDownloadModel
+    animate_episode_ts_model = MyselfAnimateEpisodeTsModel
 
     @classmethod
     @database_sync_to_async
@@ -288,18 +297,18 @@ class MyselfBase(Base):
         """
         return list(MyselfFinishAnimateModel.objects.filter(**kwargs))
 
-    @staticmethod
+    @classmethod
     @database_sync_to_async
-    def delete_download_and_ts(**kwargs):
+    def delete_download_and_ts(cls, **kwargs):
         """
         刪除 Download 與 TS 的資料庫資料。
         :param kwargs:
         :return:
         """
-        models = MyselfAnimateEpisodeInfoModel.objects.select_related('owner').filter(**kwargs)
+        models = cls.animate_episode_info_model.objects.select_related('owner').filter(**kwargs)
         for model in models:
-            MyselfDownloadModel.objects.filter(owner_id=model.pk).delete()
-            MyselfAnimateEpisodeTsModel.objects.filter(owner_id=model.pk).delete()
+            cls.download_model.objects.filter(owner_id=model.pk).delete()
+            cls.animate_episode_ts_model.objects.filter(owner_id=model.pk).delete()
             model.done = False
             model.video = None
             model.save()
