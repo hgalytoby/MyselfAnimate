@@ -7,7 +7,7 @@ import requests
 import aiohttp
 from bs4 import BeautifulSoup
 from Tools.tools import aiohttp_text, badname, aiohttp_post_json
-from Tools.urls import Anime1AnimateUrl, Anime1Api, NewAnime1AnimateUrl
+from Tools.urls import Anime1AnimateUrl, Anime1Api, NewAnime1AnimateUrl, YoutubeUrl
 
 headers = {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36'
@@ -180,8 +180,11 @@ class Anime1:
                 _.update({
                     'name': elements.find('h2', class_='entry-title').text.strip(),
                 })
+                # print(html.prettify(), elements.find('div', {'class': 'youtubePlayer'}))
                 if elements.find('button', class_='loadvideo'):
                     _.update({'url': elements.find('button', class_='loadvideo')['data-src']})
+                elif elements.find('div', {'class': 'youtubePlayer'}):
+                    _.update({'url': f'{YoutubeUrl}{elements.find("div", {"class": "youtubePlayer"})["data-vid"]}'})
                 elif elements.find('video').find('source'):
                     _.update({'url': elements.find('video').find('source')['src']})
                 else:
@@ -215,9 +218,7 @@ class Anime1:
         """
         data = {api_key: unquote(api_value)}
         res_json, cookies = await aiohttp_post_json(url=Anime1Api, data=data, cookie=True)
-        print(res_json, cookies)
         animate_url = f'https:{"".join(res_json.values())}'
-        print(animate_url, 1111)
         return animate_url, cookies
 
     @staticmethod
@@ -301,6 +302,6 @@ class Anime1:
 
 if __name__ == '__main__':
     # season = Anime1.get_home_season_url()
-    print(Anime1.get_animate_info(url='https://anime1.me/?cat=968', data=[]))
+    print(Anime1.get_animate_info(url='https://anime1.me/?cat=823', data=[]))
     # print(Anime1.get_animate_info(url='https://anime1.pw/?cat=23', data=[]))
-    v = '%7B%22c%22%3A%221000%22%2C%22e%22%3A%222%22%2C%22t%22%3A1642680563%2C%22p%22%3A0%2C%22s%22%3A%22543c4500fb3f2006cde612ad5052024f%22%7D'
+    # v = '%7B%22c%22%3A%221000%22%2C%22e%22%3A%222%22%2C%22t%22%3A1642680563%2C%22p%22%3A0%2C%22s%22%3A%22543c4500fb3f2006cde612ad5052024f%22%7D'

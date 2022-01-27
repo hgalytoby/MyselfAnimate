@@ -161,8 +161,8 @@ export const mutations = {
     }
   },
   [destroyManyAnimateMutation] (context, value) {
-    context[animateCollectState].data[value.dataIndex].episode_info_model = context[animateCollectState].data[value.dataIndex].episode_info_model.filter(
-      (item) => value.data.deleteArray.indexOf(item.id) === -1)
+    const _ = context[animateCollectState].data[value.dataIndex]
+    _.episode_info_model = _.episode_info_model.filter((item) => value.data.deleteArray.indexOf(item.id) === -1)
     value.data.deleteArray.length = 0
   }
 }

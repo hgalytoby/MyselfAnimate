@@ -7,3 +7,5 @@ Anime1VideoUrl = 'https://v.anime1.me'
 Anime1AnimatePWUrl = 'https://anime1.pw'
 NewAnime1AnimateUrl = 'https://d1zquzjgwo9yb.cloudfront.net?_={}'
 Anime1Api = 'https://v.anime1.me/api'
+
+YoutubeUrl = 'https://youtube.com/watch?v='

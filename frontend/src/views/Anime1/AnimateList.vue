@@ -1,4 +1,6 @@
 <template>
+  <input type="text" class="form-control shadow-sm p-3 mb-2 bg-body rounded" id="search"
+       v-model="searchTerm" title="搜尋動漫" placeholder="搜尋動漫">
   <vue-table-lite
     :is-slot-mode="true"
     :is-static-mode="true"
@@ -6,6 +8,7 @@
     :rows="table.rows"
     :total="table.totalRecordCount"
     :sortable="table.sortable"
+    :messages="table.messages"
     :page-size="table.pageSize"
   >
     <template v-slot:name="data">
@@ -16,7 +19,7 @@
 
 <script>
 import { useStore } from 'vuex'
-import { computed, reactive } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import VueTableLite from 'vue3-table-lite'
 import { animateListAction, animateListState } from '../../variables/anime1'
 import Test from './TableSlot'
@@ -27,6 +30,7 @@ export default {
   components: { VueTableLite, Test },
   setup () {
     const store = useStore()
+    const searchTerm = ref('')
     store.dispatch(`anime1/${animateListAction}`)
     const animateList = computed(() => store.state.anime1[animateListState])
     const table = reactive({
@@ -63,8 +67,13 @@ export default {
           sortable: true
         }
       ],
-      rows: computed(() => animateList.value),
-      pageSize: 25,
+      rows: computed(() => {
+        return computed(() => animateList.value).value.filter(
+          (x) =>
+            x.name.toLowerCase().includes(searchTerm.value.toLowerCase())
+        )
+      }),
+      pageSize: 10,
       totalRecordCount: computed(() => {
         return table.rows.length
       }),
@@ -82,6 +91,7 @@ export default {
     useWindowsFocus(store.dispatch, `anime1/${animateListAction}`)
     return {
       animateList,
+      searchTerm,
       table
     }
   }

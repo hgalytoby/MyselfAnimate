@@ -7,7 +7,7 @@ import aiohttp
 from Tools.anime1 import Anime1
 from Tools.db import DB
 from Tools.myself import Myself
-from Tools.urls import Anime1VideoUrl
+from Tools.urls import Anime1VideoUrl, YoutubeUrl
 from project.settings import MEDIA_PATH, ROOT_MEDIA_PATH
 
 
@@ -328,15 +328,18 @@ class Anime1DownloadManage(BaseDownloadManage):
             if task_data['done']:
                 task_data['progress_value'] = 100
             else:
-                if Anime1VideoUrl in task_data['url']:
-                    api_key, api_value = await Anime1.get_api_key_and_value(url=task_data['url'])
-                    url, cookies = await Anime1.get_cookies_and_animate_url(api_key=api_key, api_value=api_value)
-                elif 'data-vid' in task_data['url']:
-                    api_key, api_value = await Anime1.get_api_key_and_value_v2(data=task_data['url'])
-                    url, cookies = await Anime1.get_cookies_and_animate_url_v2(api_key=api_key, api_value=api_value)
+                if YoutubeUrl in task_data['url']:
+                    ...
                 else:
-                    url, cookies = f'https:{task_data["url"]}', ''
-                await self.download_animate(task_data=task_data, animate_url=url, cookies=cookies)
+                    if Anime1VideoUrl in task_data['url']:
+                        api_key, api_value = await Anime1.get_api_key_and_value(url=task_data['url'])
+                        url, cookies = await Anime1.get_cookies_and_animate_url(api_key=api_key, api_value=api_value)
+                    elif 'data-vid' in task_data['url']:
+                        api_key, api_value = await Anime1.get_api_key_and_value_v2(data=task_data['url'])
+                        url, cookies = await Anime1.get_cookies_and_animate_url_v2(api_key=api_key, api_value=api_value)
+                    else:
+                        url, cookies = f'https:{task_data["url"]}', ''
+                    await self.download_animate(task_data=task_data, animate_url=url, cookies=cookies)
                 await DB.My.create_history(animate_website_name=self.from_website,
                                            animate_name=task_data["animate_name"],
                                            episode_name=task_data["episode_name"])
