@@ -1,7 +1,7 @@
 import asyncio
 import json
 import os
-import shutil
+from yt_dlp import YoutubeDL
 import threading
 import aiohttp
 from Tools.anime1 import Anime1
@@ -316,12 +316,36 @@ class Anime1DownloadManage(BaseDownloadManage):
                                 break
                             fd.write(chunk)
                             task_data['progress_value'] = int(download_content_length / res.content_length * 100)
-                        await DB.Anime1.save_animate_episode_video_file(pk=task_data['episode_id'],
-                                                                        video_path=save_path)
+                        await DB.Anime1.async_save_animate_episode_video_file(pk=task_data['episode_id'],
+                                                                              video_path=save_path)
                         task_data['video'] = video_path
                         task_data['done'] = True
         except Exception as e:
             print(e)
+
+    def _youtube_download(self, task_data):
+        def callback(_):
+            task_data['progress_value'] = int(_['downloaded_bytes'] / _['total_bytes'] * 100)
+
+        task_data.update({'status': '下載中'})
+        save_path = f'{self.from_website}/{task_data["animate_name"]}/{task_data["episode_name"]}'
+        video_path = f'{MEDIA_PATH}/{save_path}'
+        download_opts = {
+            'progress_hooks': [callback],
+            'outtmpl': f'.{video_path}',
+            'quiet': True
+        }
+        with YoutubeDL(download_opts) as ydl:
+            info = ydl.extract_info(task_data['url'])
+            DB.Anime1.save_animate_episode_video_file(pk=task_data['episode_id'],
+                                                      video_path=f'{save_path}.{info["ext"]}')
+            task_data['video'] = f'{video_path}.{info["ext"]}'
+            task_data['done'] = True
+
+    async def youtube_download(self, task_data):
+        threading.Thread(target=self._youtube_download, args=(task_data,)).start()
+        while not task_data['done']:
+            await asyncio.sleep(0.1)
 
     async def download_animate_script(self, task_data):
         try:
@@ -329,7 +353,7 @@ class Anime1DownloadManage(BaseDownloadManage):
                 task_data['progress_value'] = 100
             else:
                 if YoutubeUrl in task_data['url']:
-                    ...
+                    await asyncio.create_task(self.youtube_download(task_data=task_data))
                 else:
                     if Anime1VideoUrl in task_data['url']:
                         api_key, api_value = await Anime1.get_api_key_and_value(url=task_data['url'])

@@ -20,6 +20,7 @@
 <script>
 import { reactive } from 'vue'
 import { useStore } from 'vuex'
+import { startFancy } from '../tools'
 
 export default {
   name: 'CollectEpisode',
@@ -57,7 +58,8 @@ export default {
       checkBox,
       checkBoxAction,
       checkBoxFind,
-      deleteAnimate
+      deleteAnimate,
+      startFancy
     }
   }
 }

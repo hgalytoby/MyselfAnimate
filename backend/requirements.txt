@@ -14,3 +14,4 @@ Pillow
 requests
 lxml
 uwsgi
+yt-dlp

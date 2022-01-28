@@ -477,13 +477,17 @@ class Anime1Base(Base):
             data = {
                 **download_model.get_download_data(),
                 'url': download_model.owner.url,
-                'progress_value': 0,
             }
+            data['progress_value'] = 100 if data['done'] else 0
             result.append(data)
         return result
 
     @classmethod
     @database_sync_to_async
+    def async_save_animate_episode_video_file(cls, video_path: str, **kwargs):
+        cls.save_animate_episode_video_file(video_path, **kwargs)
+
+    @classmethod
     def save_animate_episode_video_file(cls, video_path: str, **kwargs):
         """
         儲存動漫某一集的檔案。
