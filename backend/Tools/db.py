@@ -399,8 +399,12 @@ class MyBase:
     def create_history(**kwargs):
         MyHistoryModel.objects.create(**kwargs)
 
-    @staticmethod
+    @classmethod
     @database_sync_to_async
+    def async_create_log(cls, msg: str, action: str):
+        cls.create_log(msg=msg, action=action)
+
+    @staticmethod
     def create_log(msg: str, action: str):
         MySystemModel.objects.create(msg=msg, action=action)
 

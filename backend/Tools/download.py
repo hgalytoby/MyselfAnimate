@@ -290,6 +290,7 @@ class Anime1DownloadManage(BaseDownloadManage):
         super(Anime1DownloadManage, self).__init__(max_value)
         self.from_website = 'Anime1'
         self.switch_db_function = DB.Anime1.switch_download
+        self._cache = {}
         threading.Thread(target=self.main, args=()).start()
 
     async def download_animate(self, task_data, animate_url, cookies):
@@ -347,26 +348,35 @@ class Anime1DownloadManage(BaseDownloadManage):
         while not task_data['done']:
             await asyncio.sleep(0.1)
 
+    async def wait_cache_set_html(self, animate_name):
+        while animate_name in self._cache:
+            await asyncio.sleep(0.1)
+        self._cache.update({animate_name: True})
+
     async def download_animate_script(self, task_data):
         try:
-            if task_data['done']:
-                task_data['progress_value'] = 100
-            else:
+            if not task_data['done']:
                 if YoutubeUrl in task_data['url']:
+                    # 影片可能是 Youtube 的版本
                     await asyncio.create_task(self.youtube_download(task_data=task_data))
                 else:
                     if Anime1VideoUrl in task_data['url']:
+                        # 第一次整合 Api 的版本
                         api_key, api_value = await Anime1.get_api_key_and_value(url=task_data['url'])
                         url, cookies = await Anime1.get_cookies_and_animate_url(api_key=api_key, api_value=api_value)
                     elif 'data-vid' in task_data['url']:
+                        # 第二次整合 Api 的版本
+                        await self.wait_cache_set_html(animate_name=task_data['animate_name'])
                         api_key, api_value = await Anime1.get_api_key_and_value_v2(data=task_data['url'])
+                        del self._cache[task_data['animate_name']]
                         url, cookies = await Anime1.get_cookies_and_animate_url_v2(api_key=api_key, api_value=api_value)
                     else:
+                        # 18 禁的版本
                         url, cookies = f'https:{task_data["url"]}', ''
                     await self.download_animate(task_data=task_data, animate_url=url, cookies=cookies)
                 await DB.My.create_history(animate_website_name=self.from_website,
-                                           animate_name=task_data["animate_name"],
-                                           episode_name=task_data["episode_name"])
+                                           animate_name=task_data['animate_name'],
+                                           episode_name=task_data['episode_name'])
                 await self.animate_finish_send_ws(task_data=task_data)
         except asyncio.CancelledError:
             print(f'取消下載: {task_data["name"]}')

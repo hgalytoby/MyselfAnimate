@@ -6,6 +6,8 @@ import re
 import requests
 import aiohttp
 from bs4 import BeautifulSoup
+
+from Tools.db import DB
 from Tools.tools import aiohttp_text, badname, aiohttp_post_json
 from Tools.urls import Anime1AnimateUrl, Anime1Api, NewAnime1AnimateUrl, YoutubeUrl
 
@@ -244,7 +246,10 @@ class Anime1:
         :return:
         """
         data = json.loads(data)
-        res_html = await aiohttp_text(url=data['url'])
+        res_html = DB.Cache.get_cache_data(f'api_key: {data["url"]}')
+        if not res_html:
+            res_html = await aiohttp_text(url=data['url'])
+            DB.Cache.set_cache_data(key=f'api_key: {data["url"]}', data=res_html, timeout=600)
         html = BeautifulSoup(res_html, 'lxml')
         dom = html.find('video', {'data-vid': html.find('video')['data-vid']})
         return 'd', unquote(dom['data-apireq'])

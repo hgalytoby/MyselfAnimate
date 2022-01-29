@@ -123,4 +123,5 @@ class MyselfDestroyManyAnimate(APIView):
     def delete(self, request):
         delete_list = request.data.get('deleteArray')
         DB.Myself.delete_animate_episode(id__in=delete_list)
+        await DB.My.create_log(msg='Myself 刪除已選取動漫', action='delete')
         return Response(status=status.HTTP_204_NO_CONTENT)

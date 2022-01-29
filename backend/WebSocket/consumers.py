@@ -46,7 +46,7 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
         :return:
         """
         await self.accept()
-        await DB.My.create_log(msg='已連線', action='connect')
+        await DB.My.async_create_log(msg='已連線', action='connect')
         asyncio.create_task(self.Myself.download_tasks())
         asyncio.create_task(self.Anime1.download_tasks())
 

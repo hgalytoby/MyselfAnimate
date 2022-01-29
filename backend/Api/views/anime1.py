@@ -1,4 +1,3 @@
-from django.db.models import Prefetch
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from rest_framework import status
@@ -86,4 +85,5 @@ class Anime1DestroyManyAnimate(APIView):
     def delete(self, request):
         delete_list = request.data.get('deleteArray')
         DB.Anime1.delete_animate_episode(id__in=delete_list)
+        DB.My.create_log(msg='Anime1 刪除已選取動漫', action='delete')
         return Response(status=status.HTTP_204_NO_CONTENT)
