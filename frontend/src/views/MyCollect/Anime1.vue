@@ -6,9 +6,9 @@
         <template v-for="(animate, index) in animateCollect.data">
           <div class="bg-transparent animate mb-4 col-auto" v-if="animate?.episode_info_model.length" :key="animate.id">
             <router-link :title="animate.name" :to="{
-              name: 'MyselfAnimate',
+              name: 'Anime1Animate',
               query: {
-                url: animate.url.split('/').at(-1)
+                url: animate.url
               }
             }">
               <div class="fs-5 text-nowrap overflow-hidden" style="text-overflow: ellipsis;"

@@ -182,7 +182,6 @@ class Anime1:
                 _.update({
                     'name': elements.find('h2', class_='entry-title').text.strip(),
                 })
-                # print(html.prettify(), elements.find('div', {'class': 'youtubePlayer'}))
                 if elements.find('button', class_='loadvideo'):
                     _.update({'url': elements.find('button', class_='loadvideo')['data-src']})
                 elif elements.find('div', {'class': 'youtubePlayer'}):

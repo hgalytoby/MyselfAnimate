@@ -23,7 +23,10 @@ export const state = {
   [logState]: [],
   [historyState]: [],
   [systemState]: [],
-  [settingsState]: {}
+  [settingsState]: {
+    anime1_download_value: 2,
+    myself_download_value: 2
+  }
 }
 
 export const actions = {

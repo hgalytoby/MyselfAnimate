@@ -9,7 +9,7 @@ import VueProgressBar from '@aacassandra/vue3-progressbar'
 import VueNotificationList from '@dafcoe/vue-notification'
 
 const options = {
-  color: '#43f165',
+  color: '#79dfc1',
   failedColor: '#ff0000',
   thickness: '4px',
   transition: {
