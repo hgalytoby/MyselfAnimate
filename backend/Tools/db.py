@@ -3,12 +3,14 @@ import asyncio
 from typing import Union, List
 from django.core.files.images import ImageFile
 from django.core.paginator import Paginator
-from django.db.models import QuerySet, Prefetch
+from django.db.models import Model
+from django.db.models import QuerySet
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from Api.serializers import MyselfFinishAnimateSerializer
 from channels.db import database_sync_to_async
 from django.core.files.base import ContentFile
+
 from Database.models import MyselfFinishAnimateModel, MyselfAnimateEpisodeInfoModel, MyselfAnimateEpisodeTsModel, \
     MyselfDownloadModel, MyselfAnimateInfoModel, MyHistoryModel, MySystemModel, Anime1AnimateInfoModel, \
     Anime1AnimateEpisodeInfoModel, Anime1DownloadModel, MySettingsModel
@@ -53,6 +55,10 @@ class MyPageNumberPagination(PageNumberPagination):
 
 
 class Base:
+    download_model: Model
+    animate_info_model: Model
+    animate_episode_info_model: Model
+
     @classmethod
     @database_sync_to_async
     def switch_download(cls, switch_data1: dict, switch_data2: dict):

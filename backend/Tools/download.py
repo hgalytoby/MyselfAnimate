@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+from typing import Callable
 from yt_dlp import YoutubeDL
 import threading
 import aiohttp
@@ -12,6 +13,9 @@ from project.settings import MEDIA_PATH, ROOT_MEDIA_PATH
 
 
 class BaseDownloadManage:
+    update_tasks: Callable
+    download_animate_script: Callable
+
     def __init__(self, max_value):
         self.download_list = []
         self.wait_download_list = []
