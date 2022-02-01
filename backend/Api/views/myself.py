@@ -35,9 +35,9 @@ class MyselfAnimateInfoView(APIView):
         if data:
             model = DB.Myself.get_animate_info(url=data['url'])
         else:
-            data = Myself.animate_info(url=f'{MyselfUrl}{animate_url}')
+            data = Myself.animate_info(url=f'{MyselfUrl}{animate_url}'.replace('"', ''))
             DB.Cache.set_cache_data(key=animate_url, data=data, timeout=1800)
-            image = req_bytes(url=data['image'])
+            image = req_bytes(url=data.pop('image'))
             video = data.pop('video')
             model = DB.Myself.update_or_create_animate_info_model(data=data, image=image)
             DB.Myself.create_many_animate_episode(video, owner=model)

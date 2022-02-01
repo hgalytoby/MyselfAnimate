@@ -1,30 +1,25 @@
 <template>
   <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-    <li class="nav-item" role="presentation">
-      <button class="nav-link active" id="pills-myself-tab" data-bs-toggle="pill" data-bs-target="#pills-myself"
-              type="button" role="tab" aria-controls="pills-myself" aria-selected="true">Myself
-      </button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="pills-anime1-tab" data-bs-toggle="pill" data-bs-target="#pills-anime1"
-              type="button" role="tab" aria-controls="pills-anime1" aria-selected="true">Anime1
+    <li class="nav-item" v-for="animate in animateArray" :key=animate role="presentation">
+      <button class="nav-link" :class="animate.upper === downloadSwitch ? 'active' : ''"
+              :id="`pills-${animate.upper}-tab`" @mouseover="hoverDownload(animate.upper)"
+              data-bs-toggle="pill" :data-bs-target="`#pills-${animate.upper}`"
+              type="button" role="tab" :aria-controls="`pills-${animate.upper}`"
+              aria-selected="true">{{ animate.upper }}
       </button>
     </li>
   </ul>
   <div class="tab-content" id="pills-tabContent">
-    <div class="tab-pane fade show active" id="pills-myself" role="tabpanel" aria-labelledby="pills-myself-tab">
-      <TabModel animate="myself" target="myself-target" clear-action="clear_finish_myself_animate"
-                delete-action="delete_myself_download_animate" :download-check-box="myselfDownloadCheckBoxArray"/>
-      <AnimateDownload animate="myself" order-action="download_order_myself_animate"
-                       :download-animate-data="downloadMyselfAnimateArray"
-                       :downloadCheckBox="myselfDownloadCheckBoxArray"/>
-    </div>
-    <div class="tab-pane fade" id="pills-anime1" role="tabpanel" aria-labelledby="pills-anime1-tab">
-      <TabModel animate="anime1" target="anime1-target" clear-action="clear_finish_anime1_animate"
-                delete-action="delete_anime1_download_animate" :download-check-box="anime1DownloadCheckBoxArray"/>
-      <AnimateDownload animate="anime1" order-action="download_order_anime1_animate"
-                       :download-animate-data="downloadAnime1AnimateArray"
-                       :download-check-box="anime1DownloadCheckBoxArray"/>
+    <div v-for="animate in animateArray" :key=animate
+         :class="animate.upper === downloadSwitch ? 'show active' : ''" class="tab-pane fade"
+         :id="`pills-${animate.upper}`" role="tabpanel" :aria-labelledby="`pills-${animate.upper}-tab`">
+      <TabModel :animate="animate.lower" :target="`${animate.lower}-target`"
+                :clear-action="`clear_finish_${animate.lower}_animate`"
+                :delete-action="`delete_${animate.lower}_download_animate`"
+                :download-check-box="animate.downloadCheckBoxArray"/>
+      <AnimateDownload :animate="animate.lower" :order-action="`download_order_${animate.lower}_animate`"
+                       :download-animate-getters="animate.downloadAnimateGetters"
+                       :downloadCheckBox="animate.downloadCheckBoxArray"/>
     </div>
   </div>
 </template>
@@ -32,7 +27,7 @@
 <script>
 import { useStore } from 'vuex'
 import { downloadMyselfAnimateGetters } from '../variables/myself'
-import { computed } from 'vue'
+import { ref } from 'vue'
 import { downloadAnime1AnimateGetters } from '../variables/anime1'
 import AnimateDownload from '../components/AnimateDownload'
 import TabModel from './MyDownload/TabModel'
@@ -46,16 +41,28 @@ export default {
   },
   setup: function () {
     const store = useStore()
-    const downloadMyselfAnimateArray = computed(() => store.getters[`myself/${downloadMyselfAnimateGetters}`])
-    const downloadAnime1AnimateArray = computed(() => store.getters[`anime1/${downloadAnime1AnimateGetters}`])
-    const myselfDownloadCheckBoxArray = computed(() => store.state.myself[downloadCheckBoxState])
-    const anime1DownloadCheckBoxArray = computed(() => store.state.anime1[downloadCheckBoxState])
-
+    const downloadSwitch = ref('Myself')
+    const animateArray = [
+      {
+        upper: 'Myself',
+        lower: 'myself',
+        downloadAnimateGetters: `myself/${downloadMyselfAnimateGetters}`,
+        downloadCheckBoxArray: store.state.myself[downloadCheckBoxState]
+      },
+      {
+        upper: 'Anime1',
+        lower: 'anime1',
+        downloadAnimateGetters: `anime1/${downloadAnime1AnimateGetters}`,
+        downloadCheckBoxArray: store.state.anime1[downloadCheckBoxState]
+      }
+    ]
+    function hoverDownload (animate) {
+      downloadSwitch.value = animate
+    }
     return {
-      downloadMyselfAnimateArray,
-      downloadAnime1AnimateArray,
-      myselfDownloadCheckBoxArray,
-      anime1DownloadCheckBoxArray
+      hoverDownload,
+      downloadSwitch,
+      animateArray
     }
   }
 }

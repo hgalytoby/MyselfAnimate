@@ -168,7 +168,7 @@ class Myself:
             return data
         except requests.exceptions.RequestException as error:
             print(f'finish_list: {error}')
-            return[]
+            return []
 
     @staticmethod
     async def get_vpx_json(url: str, timeout: tuple = (10, 10)) -> dict:
@@ -298,21 +298,10 @@ class Myself:
                     change += 1
                 print('ServerClientConnectionError')
             except Exception as error:
-                # print(error, 'download_ts_content')
+                print(error, 'download_ts_content')
                 pass
             await asyncio.sleep(1)
 
 
-async def main():
-    # async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
-    #     async with session.get(url='https://vpx06.myself-bbs.com/47690/003/720p.m3u8', headers=headers) as res:
-    #         print(await res.text(encoding='utf-8', errors='ignore'))
-    _ = await Myself.finish_animate_page_data(url='https://myself-bbs.com/forum-113-1.html')
-    # await DB.Myself.create_many_finish_animate(_)
-    # a = await Myself.get_m3u8_data(url='https://vpx.myself-bbs.com/47731/012/720p.m3u8')
-    pass
-
-
 if __name__ == '__main__':
-    asyncio.run(main())
-    pass
+    ...

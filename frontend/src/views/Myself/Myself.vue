@@ -9,16 +9,17 @@
     </div>
   </div>
   <ul class="nav nav-tabs" id="pills-tab" role="tablist">
-    <li class="nav-item" role="presentation" v-for="(_, week, index) of weekAnimate" :key="week">
-      <button class="nav-link" :class="index === 0 ? 'active' : ''" :id="`pills-${week}-tab`" data-bs-toggle="pill"
-              :data-bs-target="`#pills-${week}`" :title="weekDict[week]"
-              type="button" role="tab" :aria-controls="`pills-${week}`" aria-selected="true"> {{ weekDict[week] }}
+    <li class="nav-item" role="presentation" v-for="(_, week) of weekAnimate" :key="week">
+      <button class="nav-link" :class="week === daySwitch ? 'active' : ''" :id="`pills-${week}-tab`"
+              data-bs-toggle="pill" :data-bs-target="`#pills-${week}`" :title="weekDict[week]"
+              @mouseover="hoverDay(week)" type="button" role="tab" :aria-controls="`pills-${week}`"
+              aria-selected="true">{{ weekDict[week] }}
       </button>
     </li>
   </ul>
   <div class="tab-content" id="pills-tabContent">
-    <template v-for="(animateArray, week, index) of weekAnimate" :key="week">
-      <ul class="tab-pane fade list-unstyled" :class="index===0 ? 'show active' : ''"
+    <template v-for="(animateArray, week) of weekAnimate" :key="week">
+      <ul class="tab-pane fade list-unstyled" :class="week === daySwitch ? 'show active' : ''"
           :id="`pills-${week}`" role="tabpanel" :aria-labelledby="`pills-${week}-tab`">
         <li v-for="animate in animateArray" :key="animate.url">
           <div class="row justify-content-start">
@@ -67,15 +68,20 @@ export default {
     const searchText = ref('')
     const weekAnimate = computed(() => store.state.myself[weekAnimateState])
     store.dispatch(`myself/${weekAnimateAction}`)
-
+    const daySwitch = ref('Monday')
     function searchAnimate () {
       store.dispatch(`myself/${searchAnimateAction}`, searchText.value)
+    }
+    function hoverDay (day) {
+      daySwitch.value = day
     }
     return {
       weekAnimate,
       weekDict,
       searchText,
-      searchAnimate
+      searchAnimate,
+      daySwitch,
+      hoverDay
     }
   }
 }

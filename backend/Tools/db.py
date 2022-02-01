@@ -1,7 +1,6 @@
-import io
 import asyncio
+import os
 from typing import Union, List
-from django.core.files.images import ImageFile
 from django.core.paginator import Paginator
 from django.db.models import Model
 from django.db.models import QuerySet
@@ -74,6 +73,7 @@ class Base:
         :param owner_id_list:
         :return:
         """
+
         data = []
         for owner_id in owner_id_list:
             data.append(cls.download_model.objects.create(owner_id=owner_id))
@@ -86,6 +86,7 @@ class Base:
         取得多個動漫集數資料與更新成下載中。
         :return:
         """
+
         return cls.download_model.objects.select_related('owner').select_related('owner__owner').all()
 
     @classmethod
@@ -99,6 +100,7 @@ class Base:
         刪除下載已完成動漫。
         :return:
         """
+
         cls.download_model.objects.filter(owner__done=True).delete()
 
     @classmethod
@@ -116,6 +118,12 @@ class MyselfBase(Base):
     download_model = MyselfDownloadModel
     animate_episode_ts_model = MyselfAnimateEpisodeTsModel
 
+    @staticmethod
+    def _get_image_path(model, media_type):
+        image_dir_path = f'./{MEDIA_PATH}/{model.from_website}/{model.name}/image/'
+        image_path = f'{image_dir_path}{model.size}_{model.name}.{media_type}'
+        return image_dir_path, image_path
+
     @classmethod
     @database_sync_to_async
     def create_finish_animate(cls, animate: dict):
@@ -124,12 +132,16 @@ class MyselfBase(Base):
         :param animate:
         :return:
         """
-        image_type = use_io_get_image_format(animate['image'])
+
         model = MyselfFinishAnimateModel()
         model.name = animate['name']
         model.url = animate['url']
         model.info = animate['info']
-        model.image.save(f'{animate["name"]}.{image_type}', ContentFile(animate['image']))
+        # model.image.save(f'{animate["name"]}.{image_type}', ContentFile(animate['image']))
+        image_type = use_io_get_image_format(animate['image'])
+        model.image = f'{model.from_website}/{model.name}/image/{model.size}_{model.name}.{image_type}'
+        image_dir_path, image_path = cls._get_image_path(model=model, media_type=image_type)
+        cls.manual_save(model=model, content=animate['image'], dir_path=image_dir_path, path=image_path)
 
     @classmethod
     async def create_finish_animate_data_task(cls, animate: dict):
@@ -139,16 +151,17 @@ class MyselfBase(Base):
         :param animate:
         :return:
         """
+
         animate['image'] = await aiohttp_bytes(url=animate['image'])
         await cls.create_finish_animate(animate)
 
     @classmethod
     async def create_many_finish_animate(cls, data: list):
         """
-
         :param data:
         :return:
         """
+
         tasks = []
         for animate in data:
             if not await cls.filter_finish_animate(url=animate['url']):
@@ -163,6 +176,7 @@ class MyselfBase(Base):
         :param video:
         :return:
         """
+
         for episode in video:
             MyselfAnimateEpisodeInfoModel.objects.get_or_create(name=episode['name'], **kwargs, defaults={
                 'name': episode['name'],
@@ -178,22 +192,28 @@ class MyselfBase(Base):
         :param ts_list:
         :return:
         """
+
         models = []
         for ts_uri in ts_list:
             models.append(MyselfAnimateEpisodeTsModel(uri=ts_uri, **kwargs))
         MyselfAnimateEpisodeTsModel.objects.bulk_create(models)
 
-    @staticmethod
-    def update_or_create_animate_info_model(data: dict, image: bytes):
+    @classmethod
+    def update_or_create_animate_info_model(cls, data: dict, image: bytes):
         """
         更新或新增動漫資料。
         :param data:
         :param image:
         :return:
         """
-        image_type = use_io_get_image_format(image)
-        data['image'] = ImageFile(io.BytesIO(image), name=f'{data["name"]}.{image_type}')
+
+        # image_type = use_io_get_image_format(image)
+        # data['image'] = ImageFile(io.BytesIO(image), name=f'{data["name"]}.{image_type}')
         model, created = MyselfAnimateInfoModel.objects.update_or_create(url=data['url'], defaults=data)
+        image_type = use_io_get_image_format(image)
+        model.image = f'{model.from_website}/{model.name}/image/{model.size}_{model.name}.{image_type}'
+        image_dir_path, image_path = cls._get_image_path(model=model, media_type=image_type)
+        cls.manual_save(model=model, content=image, dir_path=image_dir_path, path=image_path)
         return model
 
     @classmethod
@@ -205,6 +225,7 @@ class MyselfBase(Base):
         :param model:
         :return:
         """
+
         model.url = new_url
         model.save()
 
@@ -243,6 +264,7 @@ class MyselfBase(Base):
         取得正在下載的動漫陣列清單。
         :return:
         """
+
         data = []
         for model in MyselfDownloadModel.objects.all():
             data.append(model.id)
@@ -256,6 +278,7 @@ class MyselfBase(Base):
         取得動漫資料 model。
         :return:
         """
+
         return MyselfAnimateEpisodeInfoModel.objects.select_related('owner').get(**kwargs)
 
     @staticmethod
@@ -266,6 +289,7 @@ class MyselfBase(Base):
         取得指定動漫有哪些集數正在下載的 model。
         :return:
         """
+
         return list(
             MyselfAnimateEpisodeInfoModel.objects.select_related('owner').filter(done=False, **kwargs))
 
@@ -276,6 +300,7 @@ class MyselfBase(Base):
         取得指定動漫某一集尚未下載的 ts uri 陣列清單。
         :return:
         """
+
         data = []
         for model in MyselfAnimateEpisodeTsModel.objects.select_related('owner').filter(done=False, **kwargs):
             data.append(model.uri)
@@ -289,6 +314,7 @@ class MyselfBase(Base):
         :param kwargs:
         :return:
         """
+
         data = []
         for model in MyselfAnimateEpisodeTsModel.objects.filter(**kwargs):
             data.append(f"file '{BASE_DIR}{MEDIA_PATH}/{model.ts}'")
@@ -301,6 +327,7 @@ class MyselfBase(Base):
         :param kwargs:
         :return:
         """
+
         return list(MyselfFinishAnimateModel.objects.filter(**kwargs))
 
     @classmethod
@@ -311,6 +338,7 @@ class MyselfBase(Base):
         :param kwargs:
         :return:
         """
+
         models = cls.animate_episode_info_model.objects.select_related('owner').filter(**kwargs)
         for model in models:
             cls.download_model.objects.filter(owner_id=model.pk).delete()
@@ -325,6 +353,7 @@ class MyselfBase(Base):
         """
         :return:
         """
+
         return MyselfFinishAnimateModel.objects.all()
 
     @classmethod
@@ -334,6 +363,7 @@ class MyselfBase(Base):
         刪除動滿某一集所有 ts 資料。
         :return:
         """
+
         MyselfAnimateEpisodeTsModel.objects.filter(**kwargs).delete()
 
     @classmethod
@@ -343,19 +373,25 @@ class MyselfBase(Base):
         刪除下載資料庫的資料。
         :return:
         """
+
         MyselfDownloadModel.objects.filter(**kwargs).delete()
 
-    @staticmethod
+    @classmethod
     @database_sync_to_async
-    def save_animate_episode_ts_file(ts_content: bytes, **kwargs):
+    def save_animate_episode_ts_file(cls, ts_content: bytes, **kwargs):
         """
         儲存動漫某一集的 ts 檔案。
         :param ts_content:
         :return:
         """
+
         model = MyselfAnimateEpisodeTsModel.objects.get(**kwargs)
         model.done = True
-        model.ts.save(model.uri, ContentFile(ts_content))
+        base_path = f'{model.owner.owner.from_website}/{model.owner.owner.name}/video/ts/{model.owner.name}'
+        model.ts = f'{base_path}/{model.uri}'
+        ts_path_dir = f'.{MEDIA_PATH}/{base_path}/'
+        ts_path = f'{ts_path_dir}{model.uri}'
+        cls.manual_save(model=model, content=ts_content, dir_path=ts_path_dir, path=ts_path)
 
     @staticmethod
     @database_sync_to_async
@@ -365,6 +401,7 @@ class MyselfBase(Base):
         :param video_path:
         :return:
         """
+
         model = MyselfAnimateEpisodeInfoModel.objects.get(**kwargs)
         model.done = True
         model.video = video_path
@@ -380,10 +417,25 @@ class MyselfBase(Base):
         :param page:
         :return:
         """
+
         paginator = Paginator(model, 15)
         page_obj = paginator.page(page if page else 1)
         serializer = MyselfFinishAnimateSerializer(page_obj, many=True)
         return MyPageNumberPagination.get_paginated(page_obj=page_obj, paginator=paginator, data=serializer.data)
+
+    @staticmethod
+    def manual_save(model, content: bytes, dir_path: str, path: str):
+        """
+        因為裝了 yt-dlp 的關係，會發生圖片無法儲存的問題。
+        https://stackoverflow.com/questions/50337960/django-1-11-7-django-compressor-argument-5-class-typeerror-expected-lp
+        只好手動解決了。
+        """
+
+        if not os.path.isdir(dir_path):
+            os.makedirs(dir_path)
+        with open(path, 'wb') as f:
+            f.write(content)
+        model.save()
 
 
 class MyBase:
@@ -504,6 +556,7 @@ class Anime1Base(Base):
         :param video_path:
         :return:
         """
+
         model = cls.animate_episode_info_model.objects.get(**kwargs)
         model.done = True
         model.video = video_path
@@ -517,6 +570,7 @@ class Anime1Base(Base):
         :param kwargs:
         :return:
         """
+
         models = cls.animate_episode_info_model.objects.select_related('owner').filter(**kwargs)
         for model in models:
             cls.download_model.objects.filter(owner_id=model.pk).delete()

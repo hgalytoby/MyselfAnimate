@@ -18,7 +18,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr class="align-middle" v-for="(animate, index) of downloadAnimateData" :key="animate.id">
+          <tr class="align-middle" v-for="(animate, index) of downloadAnimateArray" :key="animate.id">
           <td>
             <BootstrapIcon v-show="!filterDownloadCheckBox(animate.id)" @click="clickDownloadCheckBox(animate.id)"
                            icon="square"/>
@@ -69,12 +69,13 @@ export default {
   props: {
     animate: String,
     orderAction: String,
-    downloadAnimateData: Array,
+    downloadAnimateGetters: String,
     downloadCheckBox: Array
   },
   setup (props) {
     const store = useStore()
-    const downloadAnimateArray = computed(() => props.downloadAnimateData)
+    const downloadAnimateArray = computed(() => store.getters[props.downloadAnimateGetters])
+    console.log(downloadAnimateArray)
     const downloadCheckBoxArray = computed(() => props.downloadCheckBox)
     const checkBoxAll = computed(() => {
       if (downloadAnimateArray.value && downloadCheckBoxArray.value) {
