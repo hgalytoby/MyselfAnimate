@@ -7,7 +7,7 @@ import requests
 import aiohttp
 from bs4 import BeautifulSoup
 
-from Tools.db import DB
+# from Tools.db import DB
 from Tools.tools import aiohttp_text, badname, aiohttp_post_json
 from Tools.urls import Anime1AnimateUrl, Anime1Api, NewAnime1AnimateUrl, YoutubeUrl
 
@@ -306,6 +306,9 @@ class Anime1:
 
 if __name__ == '__main__':
     # season = Anime1.get_home_season_url()
-    print(Anime1.get_animate_info(url='https://anime1.me/?cat=823', data=[]))
+    # print(Anime1.get_animate_info(url='https://anime1.me/?cat=823', data=[]))
     # print(Anime1.get_animate_info(url='https://anime1.pw/?cat=23', data=[]))
     # v = '%7B%22c%22%3A%221000%22%2C%22e%22%3A%222%22%2C%22t%22%3A1642680563%2C%22p%22%3A0%2C%22s%22%3A%22543c4500fb3f2006cde612ad5052024f%22%7D'
+    print(unquote('https%3A//forum.gamer.com.tw/B.php%3Fbsn%3D60076'))
+    print(unquote('https%3A%2F%2Fforum.gamer.com.tw%2FB.php%3Fbsn%3D60076'))
+    # print(quote('https://forum.gamer.com.tw/B.php?bsn=60076'))

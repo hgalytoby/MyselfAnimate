@@ -1,8 +1,7 @@
 export const myselfApi = {
   weekAnimate: '/api/myself/week-animate/',
-  // animateInfo: (url) => `/api/myself/animate-info/?url=${url}`,
-  animateInfo: '/api/myself/animate-info/',
-  searchAnimate: '/api/myself/url-search/',
+  animateInfo: (url) => `/api/myself/animate-info/?url=${url}`,
+  searchAnimate: (url) => `/api/myself/url-search/?url=${url}`,
   finishList: '/api/myself/finish-list/',
   finishAnimate: '/api/myself/finish-animate/',
   animateEpisodeDone: '/api/myself/animate-episode-done/',

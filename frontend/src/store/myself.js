@@ -27,7 +27,7 @@ import {
   finishAnimateInitMutation
 } from '../variables/myself'
 import { myselfApi } from '../api'
-import { axiosDelete, axiosGet, axiosPost, toastData } from '../tools'
+import { axiosDelete, axiosGet, toastData } from '../tools'
 import {
   clickAllDownloadCheckBoxMutation,
   clickDownloadCheckBoxMutation,
@@ -61,7 +61,7 @@ export const actions = {
     axiosGet(myselfApi.weekAnimate, context, addWeekAnimateMutation)
   },
   [animateInfoAction] (context, value) {
-    axiosPost(myselfApi.animateInfo, value, context, addAnimateInfoMutation)
+    axiosGet(myselfApi.animateInfo(value), context, addAnimateInfoMutation)
   },
   [finishListAction] (context, value) {
     axiosGet(myselfApi.finishList, context, addFinishListMutation)
@@ -78,7 +78,7 @@ export const actions = {
     }
   },
   [searchAnimateAction] (context, value) {
-    axiosPost(myselfApi.searchAnimate, value, context, searchAnimateMutation)
+    axiosGet(myselfApi.searchAnimate(value), context, searchAnimateMutation)
   },
   [destroyManyAnimateAction] (context, value) {
     axiosDelete(myselfApi.destroyManyAnimate, value, context, destroyManyAnimateMutation)
@@ -152,7 +152,7 @@ export const mutations = {
         router.push({
           name: 'MyselfAnimate',
           query: {
-            url: JSON.stringify(value.url)
+            url: value.url
           }
         })
       }, 350)

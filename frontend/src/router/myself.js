@@ -14,7 +14,7 @@ export const myselfRoute = [
     component: Animate,
     name: 'MyselfAnimate',
     props ($route) {
-      return { query: $route.query }
+      return { url: encodeURIComponent($route.query.url) }
     }
   },
   {

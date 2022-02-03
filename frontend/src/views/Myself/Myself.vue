@@ -70,7 +70,7 @@ export default {
     store.dispatch(`myself/${weekAnimateAction}`)
     const daySwitch = ref('Monday')
     function searchAnimate () {
-      store.dispatch(`myself/${searchAnimateAction}`, searchText.value)
+      store.dispatch(`myself/${searchAnimateAction}`, encodeURIComponent(searchText.value))
     }
     function hoverDay (day) {
       daySwitch.value = day

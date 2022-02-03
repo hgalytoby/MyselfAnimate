@@ -1,4 +1,5 @@
-from django.db.models import Prefetch
+from urllib.parse import unquote
+
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from rest_framework import status
@@ -26,16 +27,17 @@ class MyselfWeekAnimateView(APIView):
 
 
 class MyselfAnimateInfoView(APIView):
-    def post(self, request):
-        animate_url = '&'.join([f'{key}{"=" if value else ""}{value}' for key, value in request.data.items()]).replace(
-            'url=', '')
+    def get(self, request):
+        animate_url = unquote(request.query_params.get('url'))
         if 'myself-bbs.com/' in animate_url:
-            animate_url = animate_url.split('myself-bbs.com/')[1]
+            animate_url = request.query_params.get('url').split('myself-bbs.com/')[1]
         data = DB.Cache.get_cache_data(key=animate_url)
         if data:
             model = DB.Myself.get_animate_info(url=data['url'])
         else:
-            data = Myself.animate_info(url=f'{MyselfUrl}{animate_url}'.replace('"', ''))
+            data = Myself.animate_info(url=f'{MyselfUrl}{animate_url}')
+            if not data or not data.get('image'):
+                raise ValueError
             DB.Cache.set_cache_data(key=animate_url, data=data, timeout=1800)
             image = req_bytes(url=data.pop('image'))
             video = data.pop('video')
@@ -46,19 +48,17 @@ class MyselfAnimateInfoView(APIView):
 
 
 class MyselfUrlAnimate(MyselfAnimateInfoView):
-    def post(self, request):
+    def get(self, request):
         try:
-            super(MyselfUrlAnimate, self).post(request)
+            super(MyselfUrlAnimate, self).get(request)
             return Response({
                 'result': True,
-                'url': '&'.join([f'{key}{"=" if value else ""}{value}' for key, value in request.data.items()]).replace(
-                    'url=', '')
+                'url': request.query_params.get('url')
             })
-        except (KeyError, TypeError,):
+        except ValueError:
             return Response({
                 'result': False,
-                'url': '&'.join([f'{key}{"=" if value else ""}{value}' for key, value in request.data.items()]).replace(
-                    'url=', '')
+                'url': request.query_params.get('url')
             })
 
 
