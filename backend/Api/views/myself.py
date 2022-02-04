@@ -28,6 +28,8 @@ class MyselfWeekAnimateView(APIView):
 
 class MyselfAnimateInfoView(APIView):
     def get(self, request):
+        if not request.query_params.get('url'):
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         animate_url = unquote(request.query_params.get('url'))
         if 'myself-bbs.com/' in animate_url:
             animate_url = request.query_params.get('url').split('myself-bbs.com/')[1]
@@ -50,12 +52,14 @@ class MyselfAnimateInfoView(APIView):
 class MyselfUrlAnimate(MyselfAnimateInfoView):
     def get(self, request):
         try:
+            if not request.query_params.get('url'):
+                raise ValueError
             super(MyselfUrlAnimate, self).get(request)
             return Response({
                 'result': True,
                 'url': request.query_params.get('url')
             })
-        except ValueError:
+        except (ValueError, TypeError):
             return Response({
                 'result': False,
                 'url': request.query_params.get('url')

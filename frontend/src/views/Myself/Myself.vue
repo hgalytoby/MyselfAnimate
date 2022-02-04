@@ -5,7 +5,7 @@
        v-model="searchText" title="貼上網址搜尋指定動漫" placeholder="貼上網址搜尋指定動漫">
     </div>
     <div class="col-1 d-flex justify-content-center">
-      <button type="button" class="btn btn-primary" title="搜尋" @click="searchAnimate">搜尋</button>
+      <button type="button" class="btn btn-primary" title="搜尋" @click="searchAnimate" :disabled="!searchText">搜尋</button>
     </div>
   </div>
   <ul class="nav nav-tabs" id="pills-tab" role="tablist">

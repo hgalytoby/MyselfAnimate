@@ -13,13 +13,13 @@ class MyselfFinishAnimateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MyselfFinishAnimateModel
-        fields = ('id', 'name', 'url', 'image', 'info')
+        fields = '__all__'
 
 
 class MyselfAnimateEpisodeInfoSerializer(BaseEpisodeInfoSerializer):
     class Meta:
         model = MyselfAnimateEpisodeInfoModel
-        fields = ('id', 'name', 'url', 'done', 'video')
+        exclude = ('owner',)
 
 
 class MyselfAnimateInfoSerializer(serializers.ModelSerializer):
