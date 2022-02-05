@@ -29,7 +29,7 @@ import { useStore } from 'vuex'
 import { downloadMyselfAnimateGetters } from '../variables/myself'
 import { ref } from 'vue'
 import { downloadAnime1AnimateGetters } from '../variables/anime1'
-import AnimateDownload from '../components/AnimateDownload'
+import AnimateDownload from './MyDownload/AnimateDownload'
 import TabModel from './MyDownload/TabModel'
 import { downloadCheckBoxState } from '../variables/my'
 

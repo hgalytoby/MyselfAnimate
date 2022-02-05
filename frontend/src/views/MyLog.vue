@@ -31,7 +31,7 @@ import {
   historyState,
   historyTable
 } from '../variables/my'
-import Log from '../components/Log'
+import Log from './MyLog/Log'
 
 export default {
   name: 'MyLog',

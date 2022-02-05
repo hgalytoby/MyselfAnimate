@@ -54,14 +54,14 @@
 </template>
 
 <script>
-import { sendSocketMessage } from '../hooks/useWS'
+import { sendSocketMessage } from '../../hooks/useWS'
 import { computed } from 'vue'
-import { startFancy } from '../tools'
+import { startFancy } from '../../tools'
 import {
   clickAllDownloadCheckBoxMutation,
   clickDownloadCheckBoxMutation,
   downloadCheckBoxMutation
-} from '../variables/my'
+} from '../../variables/my'
 import { useStore } from 'vuex'
 
 export default {
@@ -128,7 +128,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import '~@fancyapps/ui/dist/fancybox.css';
+  @import '../../../node_modules/@fancyapps/ui/dist/fancybox.css';
 
   .animate-name {
     text-overflow: ellipsis;

@@ -18,10 +18,10 @@
 </template>
 
 <script>
-import Pagination from './Pagination'
+import Pagination from '../../components/Pagination'
 import { computed, reactive } from 'vue'
 import { useStore } from 'vuex'
-import useWindowsFocus from '../hooks/useWindowsFocus'
+import useWindowsFocus from '../../hooks/useWindowsFocus'
 
 export default {
   name: 'Log',

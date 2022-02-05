@@ -32,7 +32,7 @@
 import { animateCollectAction, animateCollectState, destroyManyAnimateAction } from '../../variables/my'
 import { startFancy } from '../../tools'
 import useAnimateCollect from '../../hooks/uwsAnimateCollect'
-import CollectEpisode from '../../components/CollectEpisode'
+import CollectEpisode from './CollectEpisode'
 import { useStore } from 'vuex'
 
 export default {
