@@ -1,16 +1,28 @@
 import asyncio
 
-from channels.db import database_sync_to_async
+from channels.generic.websocket import AsyncWebsocketConsumer
 from rest_framework.utils import json
-
 from Tools.db import DB
 import copy
-
+from typing import Callable
 from Tools.myself import Myself
 from Tools.urls import MyselfFinishAnimateUrl, MyselfFinishAnimateBaseUrl
 
 
+class ManageType:
+    download_list: list
+    wait_download_list: list
+    clear_finish_animate_list: Callable
+    switch_download_order: Callable
+    delete_download_animate_list: Callable
+    update_download_value: Callable
+
+
 class Base:
+    parent: AsyncWebsocketConsumer
+    task_action: str
+    manage: ManageType
+
     async def download_tasks(self):
         """
         將現在正要下載的動漫資料傳給前端。
@@ -35,7 +47,7 @@ class MyselfManage(Base):
         self.parent = parent
         self.manage = manage
 
-    async def _finish_animate_update(self, *args, **kwargs):
+    async def _finish_animate_update(self, **kwargs):
         await self.parent.send(text_data=json.dumps({'msg': f'正在更新中', 'action': kwargs['action'], 'updating': True}))
         await DB.My.async_create_log(msg='Myself 更新完結動漫', action='update')
         await DB.My.save_settings_update_false(**kwargs['data'])
@@ -52,17 +64,17 @@ class MyselfManage(Base):
         await self.parent.send(
             text_data=json.dumps({'msg': '更新完成', 'action': kwargs['action'], 'updating': False}))
 
-    async def finish_animate_update(self, *args, **kwargs):
+    async def finish_animate_update(self, *arg, **kwargs):
         """
         更新完結動漫。
         :return:
         """
-        asyncio.create_task(self._finish_animate_update(*args, **kwargs))
+        asyncio.create_task(self._finish_animate_update(**kwargs))
 
-    async def animate_download(self, *args, **kwargs):
+    async def animate_download(self, **kwargs):
         """
         下載動漫集數。
-        :param data: dict -> 前端傳來要下載動漫的資料。
+        :param kwargs: dict -> 前端傳來要下載動漫的資料。
         :return:
         """
         await self.parent.send(
@@ -83,10 +95,10 @@ class MyselfManage(Base):
         except Exception as e:
             print(e)
 
-    async def search_animate(self, *args, **kwargs):
+    async def search_animate(self, **kwargs):
         """
         搜尋動漫。
-        :param data: dict -> 前端傳來要搜尋動漫的資料。
+        :param kwargs: dict -> 前端傳來要搜尋動漫的資料。
         :return:
         """
         settings_model = await DB.My.get_last_settings()
@@ -100,10 +112,10 @@ class MyselfManage(Base):
             serializer_data = await DB.Myself.search_finish_animate_paginator(model=model, page=kwargs.get('page'))
             await self.parent.send(text_data=json.dumps({'data': serializer_data, 'action': kwargs['action']}))
 
-    async def clear_finish_animate(self, *args, **kwargs):
+    async def clear_finish_animate(self, **kwargs):
         """
         清除已完成下載動漫資料。
-        :param data: dict -> 前端傳來要清除已完成下載動漫資料。
+        :param kwargs: dict -> 前端傳來要清除已完成下載動漫資料。
         :return:
         """
         print(kwargs)
@@ -112,10 +124,10 @@ class MyselfManage(Base):
         await self.manage.clear_finish_animate_list()
         await self.parent.send(text_data=json.dumps({'msg': '已清除已完成動漫', 'action': kwargs['action']}))
 
-    async def delete_download_animate(self, *args, **kwargs):
+    async def delete_download_animate(self, **kwargs):
         """
         刪除正在下載動漫資料。
-        :param data: dict -> 前端傳來要刪除正在下載動漫資料。
+        :param kwargs: dict -> 前端傳來要刪除正在下載動漫資料。
         :return:
         """
         DB.Cache.clear_cache()
@@ -125,10 +137,10 @@ class MyselfManage(Base):
         await self.manage.delete_download_animate_list(kwargs['deletes'])
         await self.parent.send(text_data=json.dumps({'msg': '已取消勾選的下載動漫', 'action': kwargs['action']}))
 
-    async def download_order(self, *args, **kwargs):
+    async def download_order(self, **kwargs):
         """
         更改動漫下載順序。
-        :param data: data: dict -> 前端傳來要更改動漫下載順序。
+        :param kwargs: data: dict -> 前端傳來要更改動漫下載順序。
         :return:
         """
         await self.manage.switch_download_order(data=kwargs)
@@ -143,10 +155,10 @@ class Anime1Manage(Base):
         self.parent = parent
         self.manage = manage
 
-    async def animate_download(self, *args, **kwargs):
+    async def animate_download(self, **kwargs):
         """
         下載動漫集數。
-        :param data: dict -> 前端傳來要下載動漫的資料。
+        :param kwargs: dict -> 前端傳來要下載動漫的資料。
         :return:
         """
         await self.parent.send(
@@ -166,10 +178,10 @@ class Anime1Manage(Base):
         except Exception as e:
             print(e)
 
-    async def clear_finish_animate(self, *args, **kwargs):
+    async def clear_finish_animate(self, **kwargs):
         """
         清除已完成下載動漫資料。
-        :param data: dict -> 前端傳來要清除已完成下載動漫資料。
+        :param kwargs: dict -> 前端傳來要清除已完成下載動漫資料。
         :return:
         """
         print(kwargs)
@@ -178,10 +190,10 @@ class Anime1Manage(Base):
         await self.manage.clear_finish_animate_list()
         await self.parent.send(text_data=json.dumps({'msg': '已清除已完成動漫', 'action': kwargs['action']}))
 
-    async def delete_download_animate(self, *args, **kwargs):
+    async def delete_download_animate(self, **kwargs):
         """
         刪除正在下載動漫資料。
-        :param data: dict -> 前端傳來要刪除正在下載動漫資料。
+        :param kwargs: dict -> 前端傳來要刪除正在下載動漫資料。
         :return:
         """
         DB.Cache.clear_cache()
@@ -190,10 +202,10 @@ class Anime1Manage(Base):
         await self.manage.delete_download_animate_list(kwargs['deletes'])
         await self.parent.send(text_data=json.dumps({'msg': '已取消勾選的下載動漫', 'action': kwargs['action']}))
 
-    async def download_order(self, *args, **kwargs):
+    async def download_order(self, **kwargs):
         """
         更改動漫下載順序。
-        :param data: data: dict -> 前端傳來要更改動漫下載順序。
+        :param kwargs: data: dict -> 前端傳來要更改動漫下載順序。
         :return:
         """
         await self.manage.switch_download_order(data=kwargs)

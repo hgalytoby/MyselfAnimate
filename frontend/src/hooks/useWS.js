@@ -43,6 +43,7 @@ export const connectSocket = () => {
       setToast(toastData.downloadAnimateFinish(receive.data))
     } else if (receive.action === 'connect') {
       createToast(...toastData.connectOk)
+    } else if (receive.action === 'storage') {
     } else {
       store.commit('ws/setWsRes', JSON.parse(msg.data))
     }

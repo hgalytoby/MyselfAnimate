@@ -1,10 +1,11 @@
 import json
 import asyncio
+import psutil
 from Tools.db import DB
 from Tools.download import MyselfDownloadManage, Anime1DownloadManage
 from channels.generic.websocket import AsyncWebsocketConsumer
-
 from WebSocket.actions import MyselfManage, Anime1Manage
+
 settings = DB.My.get_or_create_settings()
 myself_download_manage = MyselfDownloadManage(settings.myself_download_value)
 anime1_download_manage = Anime1DownloadManage(settings.anime1_download_value)
@@ -14,6 +15,7 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._storage = {}
         self.Myself = MyselfManage(parent=self, manage=myself_download_manage)
         self.Anime1 = Anime1Manage(parent=self, manage=anime1_download_manage)
         myself_download_manage.ws.append(self)
@@ -33,10 +35,26 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
             'connect': self.connect_action,
         }
 
+    async def storage(self):
+        while True:
+            _ = psutil.disk_usage('/')
+            _storage = {
+                'total': int(_.total / (2 ** 30)),
+                'used': int(_.used / (2 ** 30)),
+                'free': int(_.free / (2 ** 30)),
+            }
+            if self._storage != _storage:
+                self._storage = _storage
+                await self.send(text_data=json.dumps({
+                    'msg': f'硬碟空間',
+                    'data': self._storage,
+                    'action': 'storage'}))
+            await asyncio.sleep(1)
+
     async def connect_action(self, *args, **kwargs):
         await self.send(text_data=json.dumps({'action': 'connect', 'msg': f'連線成功!!'}))
 
-    async def update_download_value(self, *args, **kwargs):
+    async def update_download_value(self, **kwargs):
         await self.Myself.manage.update_download_value(value=kwargs['data']['myself_download_value'])
         await self.Anime1.manage.update_download_value(value=kwargs['data']['anime1_download_value'])
 
@@ -49,6 +67,7 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
         await DB.My.async_create_log(msg='已連線', action='connect')
         asyncio.create_task(self.Myself.download_tasks())
         asyncio.create_task(self.Anime1.download_tasks())
+        asyncio.create_task(self.storage())
 
     async def disconnect(self, close_code):
         """
