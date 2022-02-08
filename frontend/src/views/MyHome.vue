@@ -19,13 +19,77 @@
     <div class="fs-4">學習與研究!</div>
     <div class="fs-4">應在24小時內刪除影片。</div>
   </div>
+  <div style="height:600px;width: 600px;display: flex;flex-direction:column;">
+    <vue3-chart-js
+        :id="doughnutChart.id"
+        ref="chartRef"
+        :type="doughnutChart.type"
+        :data="doughnutChart.data"
+        :options="doughnutChart.options"
+    ></vue3-chart-js>
+
+  </div>
+  <button @click="updateChart">Update Chart</button>
 </template>
 
 <script>
+import Vue3ChartJs from '@j-t-mcc/vue3-chartjs'
+import { ref } from 'vue'
+
 export default {
   name: 'MyHome',
+  components: {
+    Vue3ChartJs
+  },
   setup () {
-    return {}
+    const chartRef = ref(null)
+    const doughnutChart = {
+      id: 'doughnut',
+      type: 'doughnut',
+      data: {
+        labels: ['剩餘空間', '使用空間'],
+        datasets: [
+          {
+            color: '#666',
+            backgroundColor: [
+              '#00D8FF',
+              '#DD1B16'
+            ],
+            data: [40, 20]
+          }
+        ]
+      },
+      options: {
+        animation: false,
+        plugins: {
+          legend: {
+            labels: {
+              color: 'black'
+            }
+          }
+        }
+      }
+    }
+
+    const updateChart = () => {
+      doughnutChart.data.datasets = [
+        {
+          backgroundColor: [
+            '#00D8FF',
+            '#DD1B16'
+          ],
+          data: [10, 20]
+        }
+      ]
+      chartRef.value.update()
+    }
+    const beforeRenderLogic = (event) => {}
+    return {
+      doughnutChart,
+      beforeRenderLogic,
+      updateChart,
+      chartRef
+    }
   }
 }
 </script>
