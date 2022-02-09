@@ -39,7 +39,7 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
         while True:
             _ = psutil.disk_usage('/')
             _storage = {
-                'total': int(_.total / (2 ** 30)),
+                # 'total': int(_.total / (2 ** 30)),
                 'used': int(_.used / (2 ** 30)),
                 'free': int(_.free / (2 ** 30)),
             }
@@ -50,6 +50,7 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
                     'data': self._storage,
                     'action': 'storage'}))
             await asyncio.sleep(1)
+
 
     async def connect_action(self, *args, **kwargs):
         await self.send(text_data=json.dumps({'action': 'connect', 'msg': f'連線成功!!'}))

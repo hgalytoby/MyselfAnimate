@@ -12,7 +12,11 @@ import {
   settingsState,
   systemAction,
   systemMutation,
-  systemState, settingsUpdateDownloadValueAction, settingsUpdateDownloadValueMutation
+  systemState,
+  settingsUpdateDownloadValueAction,
+  settingsUpdateDownloadValueMutation,
+  storageDoughnutChartMutation,
+  storageDoughnutChartState, storageDoughnutChartObj
 } from '../variables/my'
 import { myApi } from '../api'
 import { axiosGet, axiosPut, toastData } from '../tools'
@@ -26,7 +30,8 @@ export const state = {
   [settingsState]: {
     anime1_download_value: 2,
     myself_download_value: 2
-  }
+  },
+  [storageDoughnutChartState]: storageDoughnutChartObj
 }
 
 export const actions = {
@@ -73,6 +78,11 @@ export const mutations = {
       data: value
     })
     createToast(...toastData.settingsPutOk)
+  },
+  [storageDoughnutChartMutation] (state, value) {
+    state[storageDoughnutChartState].data.datasets[0].data = [value.used, value.free]
+    // state[storageDoughnutChartState].data.labels = ['剩餘空間', '使用空間']
+    // state[storageDoughnutChartState].options.plugins.title.display = true
   }
 }
 export const getters = {

@@ -21,20 +21,22 @@
   </div>
   <div style="height:600px;width: 600px;display: flex;flex-direction:column;">
     <vue3-chart-js
-        :id="doughnutChart.id"
-        ref="chartRef"
-        :type="doughnutChart.type"
-        :data="doughnutChart.data"
-        :options="doughnutChart.options"
+        v-show="storageDoughnutChart.data.datasets[0].data.length > 0"
+        :id="storageDoughnutChart.id"
+        ref="storageRef"
+        :type="storageDoughnutChart.type"
+        :data="storageDoughnutChart.data"
+        :options="storageDoughnutChart.options"
     ></vue3-chart-js>
-
   </div>
-  <button @click="updateChart">Update Chart</button>
 </template>
 
 <script>
 import Vue3ChartJs from '@j-t-mcc/vue3-chartjs'
-import { ref } from 'vue'
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+import { storageDoughnutChartState } from '../variables/my'
+import { storageRef } from '../hooks/useWS'
 
 export default {
   name: 'MyHome',
@@ -42,53 +44,11 @@ export default {
     Vue3ChartJs
   },
   setup () {
-    const chartRef = ref(null)
-    const doughnutChart = {
-      id: 'doughnut',
-      type: 'doughnut',
-      data: {
-        labels: ['剩餘空間', '使用空間'],
-        datasets: [
-          {
-            color: '#666',
-            backgroundColor: [
-              '#00D8FF',
-              '#DD1B16'
-            ],
-            data: [40, 20]
-          }
-        ]
-      },
-      options: {
-        animation: false,
-        plugins: {
-          legend: {
-            labels: {
-              color: 'black'
-            }
-          }
-        }
-      }
-    }
-
-    const updateChart = () => {
-      doughnutChart.data.datasets = [
-        {
-          backgroundColor: [
-            '#00D8FF',
-            '#DD1B16'
-          ],
-          data: [10, 20]
-        }
-      ]
-      chartRef.value.update()
-    }
-    const beforeRenderLogic = (event) => {}
+    const store = useStore()
+    const storageDoughnutChart = computed(() => store.state.my[storageDoughnutChartState])
     return {
-      doughnutChart,
-      beforeRenderLogic,
-      updateChart,
-      chartRef
+      storageDoughnutChart,
+      storageRef
     }
   }
 }
