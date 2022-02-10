@@ -19,37 +19,25 @@
     <div class="fs-4">學習與研究!</div>
     <div class="fs-4">應在24小時內刪除影片。</div>
   </div>
-  <div style="height:600px;width: 600px;display: flex;flex-direction:column;">
-    <vue3-chart-js
-        v-show="storageDoughnutChart.data.datasets[0].data.length > 0"
-        :id="storageDoughnutChart.id"
-        ref="storageRef"
-        :type="storageDoughnutChart.type"
-        :data="storageDoughnutChart.data"
-        :options="storageDoughnutChart.options"
-    ></vue3-chart-js>
+  <div class="row">
+    <Storage/>
+    <Download/>
   </div>
+
 </template>
 
 <script>
-import Vue3ChartJs from '@j-t-mcc/vue3-chartjs'
-import { computed } from 'vue'
-import { useStore } from 'vuex'
-import { storageDoughnutChartState } from '../variables/my'
-import { storageRef } from '../hooks/useWS'
+import Storage from './MyHome/Storage'
+import Download from './MyHome/Download'
 
 export default {
   name: 'MyHome',
   components: {
-    Vue3ChartJs
+    Download,
+    Storage
   },
   setup () {
-    const store = useStore()
-    const storageDoughnutChart = computed(() => store.state.my[storageDoughnutChartState])
-    return {
-      storageDoughnutChart,
-      storageRef
-    }
+    return {}
   }
 }
 </script>

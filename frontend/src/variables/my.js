@@ -46,8 +46,8 @@ export const storageDoughnutChartObj = {
     datasets: [
       {
         backgroundColor: [
-          '#00D8FF',
-          '#DD1B16'
+          'rgba(0,216,255,0.8)',
+          'rgba(221,27,22,0.8)'
         ],
         data: []
       }

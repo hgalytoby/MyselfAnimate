@@ -51,7 +51,6 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
                     'action': 'storage'}))
             await asyncio.sleep(1)
 
-
     async def connect_action(self, *args, **kwargs):
         await self.send(text_data=json.dumps({'action': 'connect', 'msg': f'連線成功!!'}))
 

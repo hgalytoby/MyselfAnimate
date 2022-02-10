@@ -81,8 +81,6 @@ export const mutations = {
   },
   [storageDoughnutChartMutation] (state, value) {
     state[storageDoughnutChartState].data.datasets[0].data = [value.used, value.free]
-    // state[storageDoughnutChartState].data.labels = ['剩餘空間', '使用空間']
-    // state[storageDoughnutChartState].options.plugins.title.display = true
   }
 }
 export const getters = {
