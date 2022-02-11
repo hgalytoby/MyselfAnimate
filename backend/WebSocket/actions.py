@@ -16,6 +16,7 @@ class ManageType:
     switch_download_order: Callable
     delete_download_animate_list: Callable
     update_download_value: Callable
+    download_count_send_ws: Callable
 
 
 class Base:
@@ -118,9 +119,9 @@ class MyselfManage(Base):
         :param kwargs: dict -> 前端傳來要清除已完成下載動漫資料。
         :return:
         """
-        print(kwargs)
         await DB.Myself.delete_download_finish_animate()
         await DB.My.async_create_log(msg='Myself 清除下載已完成', action='delete')
+        await self.manage.download_count_send_ws()
         await self.manage.clear_finish_animate_list()
         await self.parent.send(text_data=json.dumps({'msg': '已清除已完成動漫', 'action': kwargs['action']}))
 
@@ -131,7 +132,6 @@ class MyselfManage(Base):
         :return:
         """
         DB.Cache.clear_cache()
-        print(kwargs)
         await DB.Myself.delete_download_and_ts(download_model__id__in=kwargs['deletes'])
         await DB.My.async_create_log(msg='Myself 刪除已選取動漫', action='delete')
         await self.manage.delete_download_animate_list(kwargs['deletes'])
@@ -199,6 +199,7 @@ class Anime1Manage(Base):
         DB.Cache.clear_cache()
         await DB.Anime1.delete_download(download_model__id__in=kwargs['deletes'])
         await DB.My.async_create_log(msg='Anime1 刪除已選取動漫', action='delete')
+        await self.manage.download_count_send_ws()
         await self.manage.delete_download_animate_list(kwargs['deletes'])
         await self.parent.send(text_data=json.dumps({'msg': '已取消勾選的下載動漫', 'action': kwargs['action']}))
 

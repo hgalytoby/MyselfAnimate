@@ -2,11 +2,12 @@ import { useStore } from 'vuex'
 import { finishAnimateAction, finishAnimateUpdateButtonMutation } from '../variables/myself'
 import { setToast, toastData } from '../tools'
 import { createToast } from 'mosha-vue-toastify'
-import { settingsGetAction, storageDoughnutChartMutation } from '../variables/my'
+import { downloadBarChartMutation, settingsGetAction, storageDoughnutChartMutation } from '../variables/my'
 import { ref } from 'vue'
 const wsUrl = process.env.VUE_APP_WS === 'dev' ? 'ws://127.0.0.1:8000/ws/' : `ws://${location.host}/ws/`
 const socket = new WebSocket(wsUrl)
 export const storageRef = ref(null)
+export const DownloadRef = ref(null)
 
 export const sendSocketMessage = msg => {
   if (socket.readyState === 1) socket.send(JSON.stringify(msg))
@@ -46,7 +47,14 @@ export const connectSocket = () => {
       createToast(...toastData.connectOk)
     } else if (receive.action === 'storage') {
       store.commit(`my/${storageDoughnutChartMutation}`, receive.data)
-      storageRef.value.update()
+      if (storageRef.value) {
+        storageRef.value.update()
+      }
+    } else if (receive.action === 'downloadCount') {
+      store.commit(`my/${downloadBarChartMutation}`, receive.data)
+      if (storageRef.value) {
+        DownloadRef.value.update()
+      }
     } else {
       store.commit('ws/setWsRes', JSON.parse(msg.data))
     }

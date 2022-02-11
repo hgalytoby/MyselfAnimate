@@ -7,7 +7,7 @@ import requests
 import aiohttp
 from bs4 import BeautifulSoup
 
-# from Tools.db import DB
+from Tools.db import DB
 from Tools.tools import aiohttp_text, badname, aiohttp_post_json
 from Tools.urls import Anime1AnimateUrl, Anime1Api, NewAnime1AnimateUrl, YoutubeUrl
 

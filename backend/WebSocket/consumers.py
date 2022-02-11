@@ -51,8 +51,25 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
                     'action': 'storage'}))
             await asyncio.sleep(1)
 
+    async def animate_download_count(self):
+        myself_count = await DB.Myself.get_animate_download_done_count(done=True)
+        anime1_count = await DB.Anime1.get_animate_download_done_count(done=True)
+        total = sum([myself_count, anime1_count])
+        y_max = 10 if not total else total + max(myself_count, anime1_count)
+        await self.send(text_data=json.dumps({
+            'msg': f'下載完成數量',
+            'data': {
+                'values': [myself_count, anime1_count, total],
+                'y_max': y_max
+            },
+            'action': 'downloadCount'}))
+
     async def connect_action(self, *args, **kwargs):
         await self.send(text_data=json.dumps({'action': 'connect', 'msg': f'連線成功!!'}))
+        asyncio.create_task(self.Myself.download_tasks())
+        asyncio.create_task(self.Anime1.download_tasks())
+        asyncio.create_task(self.storage())
+        asyncio.create_task(self.animate_download_count())
 
     async def update_download_value(self, **kwargs):
         await self.Myself.manage.update_download_value(value=kwargs['data']['myself_download_value'])
@@ -65,9 +82,6 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
         """
         await self.accept()
         await DB.My.async_create_log(msg='已連線', action='connect')
-        asyncio.create_task(self.Myself.download_tasks())
-        asyncio.create_task(self.Anime1.download_tasks())
-        asyncio.create_task(self.storage())
 
     async def disconnect(self, close_code):
         """

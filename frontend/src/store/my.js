@@ -16,12 +16,13 @@ import {
   settingsUpdateDownloadValueAction,
   settingsUpdateDownloadValueMutation,
   storageDoughnutChartMutation,
-  storageDoughnutChartState, storageDoughnutChartObj
+  storageDoughnutChartState, downloadBarChartMutation, downloadBarChartState
 } from '../variables/my'
 import { myApi } from '../api'
 import { axiosGet, axiosPut, toastData } from '../tools'
 import { sendSocketMessage } from '../hooks/useWS'
 import { createToast } from 'mosha-vue-toastify'
+import { downloadChartObj, storageDoughnutChartObj } from '../variables/chart'
 
 export const state = {
   [logState]: [],
@@ -31,7 +32,8 @@ export const state = {
     anime1_download_value: 2,
     myself_download_value: 2
   },
-  [storageDoughnutChartState]: storageDoughnutChartObj
+  [storageDoughnutChartState]: storageDoughnutChartObj,
+  [downloadBarChartState]: downloadChartObj
 }
 
 export const actions = {
@@ -81,6 +83,14 @@ export const mutations = {
   },
   [storageDoughnutChartMutation] (state, value) {
     state[storageDoughnutChartState].data.datasets[0].data = [value.used, value.free]
+    state[storageDoughnutChartState].updated = true
+  },
+  [downloadBarChartMutation] (state, value) {
+    value.values.forEach((v, index) => {
+      state[downloadBarChartState].data.datasets[index].data = [v]
+    })
+    state[downloadBarChartState].options.scales.y.max = value.y_max
+    state[downloadBarChartState].updated = true
   }
 }
 export const getters = {

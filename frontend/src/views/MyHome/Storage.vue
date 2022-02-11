@@ -1,13 +1,13 @@
 <template>
   <div class="col-sm-4">
-  <vue3-chart-js
-    v-show="storageDoughnutChart.data.datasets[0].data.length > 0"
-    :id="storageDoughnutChart.id"
-    ref="storageRef"
-    :type="storageDoughnutChart.type"
-    :data="storageDoughnutChart.data"
-    :options="storageDoughnutChart.options"
-  />
+    <vue3-chart-js
+      v-show="storageDoughnutChart.updated"
+      :id="storageDoughnutChart.id"
+      ref="storageRef"
+      :type="storageDoughnutChart.type"
+      :data="storageDoughnutChart.data"
+      :options="storageDoughnutChart.options"
+    />
   </div>
 </template>
 

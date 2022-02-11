@@ -1,16 +1,23 @@
 <template>
-  <div class="col-sm-8">
-  <vue3-chart-js
-    :id="barChart.id"
-    :type="barChart.type"
-    :data="barChart.data"
-    :options="barChart.options"
-  />
+  <div class="col-sm-4">
+    <vue3-chart-js
+      v-show="downloadBarChart.updated"
+      :id="downloadBarChart.id"
+      ref="DownloadRef"
+      :type="downloadBarChart.type"
+      :data="downloadBarChart.data"
+      :options="downloadBarChart.options"
+      :height="downloadBarChart.height"
+    />
   </div>
 </template>
 
 <script>
 import Vue3ChartJs from '@j-t-mcc/vue3-chartjs'
+import { DownloadRef } from '../../hooks/useWS'
+import { useStore } from 'vuex'
+import { computed } from 'vue'
+import { downloadBarChartState } from '../../variables/my'
 
 export default {
   name: 'Download',
@@ -18,55 +25,11 @@ export default {
     Vue3ChartJs
   },
   setup () {
-    const barChart = {
-      type: 'bar',
-      options: {
-        min: 0,
-        max: 100,
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'top'
-          },
-          title: {
-            font: {
-              size: 24
-            },
-            color: 'black',
-            display: true,
-            text: '下載數量'
-          }
-        },
-        scales: {
-          y: {
-            min: 0,
-            max: 100,
-            ticks: {
-              callback: function (value) {
-                return `${value}`
-              }
-            }
-          }
-        }
-      },
-      data: {
-        labels: ['VueJs'],
-        datasets: [
-          {
-            label: 'Myself',
-            backgroundColor: ['rgba(252,137,63,0.8)'],
-            data: [10]
-          },
-          {
-            label: 'Anime1',
-            backgroundColor: ['rgba(255,25,25,0.8)'],
-            data: [30]
-          }
-        ]
-      }
-    }
+    const store = useStore()
+    const downloadBarChart = computed(() => store.state.my[downloadBarChartState])
     return {
-      barChart
+      downloadBarChart,
+      DownloadRef
     }
   }
 }

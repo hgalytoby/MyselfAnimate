@@ -81,7 +81,7 @@ class Base:
 
     @classmethod
     @database_sync_to_async
-    def get_total_download_animate_episode_models(cls) -> Union[QuerySet, List[MyselfDownloadModel]]:
+    def get_total_download_animate_episode_models(cls):
         """
         取得多個動漫集數資料與更新成下載中。
         :return:
@@ -92,6 +92,16 @@ class Base:
     @classmethod
     def get_animate_info(cls, **kwargs):
         return cls.animate_info_model.objects.get(**kwargs)
+
+    @classmethod
+    @database_sync_to_async
+    def get_animate_download_done_count(cls, **kwargs):
+        """
+        :param kwargs:
+        :return:
+        """
+
+        return cls.animate_episode_info_model.objects.filter(**kwargs).count()
 
     @classmethod
     @database_sync_to_async

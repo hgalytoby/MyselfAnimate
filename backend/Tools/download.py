@@ -128,6 +128,11 @@ class BaseDownloadManage:
                     'episode_name': task_data['episode_name'],
                 },
                 'action': 'download_animate_finish'}))
+            await self.download_count_send_ws()
+
+    async def download_count_send_ws(self):
+        for ws in self.ws:
+            await ws.animate_download_count()
 
 
 class MyselfDownloadManage(BaseDownloadManage):

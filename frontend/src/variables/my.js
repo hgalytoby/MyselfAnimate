@@ -5,6 +5,7 @@ export const historyState = 'historyState'
 export const downloadCheckBoxState = 'downloadCheckBoxState'
 export const animateCollectState = 'animateCollectState'
 export const storageDoughnutChartState = 'storageDoughnutChartState'
+export const downloadBarChartState = 'downloadBarChartState'
 
 export const logAction = 'logAction'
 export const systemAction = 'systemAction'
@@ -27,6 +28,7 @@ export const clickAllDownloadCheckBoxMutation = 'clickAllDownloadCheckBoxMutatio
 export const animateCollectMutation = 'animateCollectMutation'
 export const destroyManyAnimateMutation = 'destroyManyAnimateMutation'
 export const storageDoughnutChartMutation = 'storageDoughnutChartMutation'
+export const downloadBarChartMutation = 'downloadBarChartMutation'
 
 export const systemTable = {
   title: ['操作', '訊息', '時間'],
@@ -36,39 +38,4 @@ export const systemTable = {
 export const historyTable = {
   title: ['動漫網站', '動漫名字', '集數', '下載時間'],
   item: ['animate_website_name', 'animate_name', 'episode_name', 'download_date']
-}
-
-export const storageDoughnutChartObj = {
-  id: 'storage',
-  type: 'doughnut',
-  data: {
-    labels: ['剩餘空間', '使用空間'],
-    datasets: [
-      {
-        backgroundColor: [
-          'rgba(0,216,255,0.8)',
-          'rgba(221,27,22,0.8)'
-        ],
-        data: []
-      }
-    ]
-  },
-  options: {
-    animation: false,
-    plugins: {
-      legend: {
-        labels: {
-          color: 'black'
-        }
-      },
-      title: {
-        font: {
-          size: 24
-        },
-        color: 'black',
-        display: true,
-        text: '硬碟剩餘空間(GB)'
-      }
-    }
-  }
 }
