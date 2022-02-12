@@ -2,7 +2,12 @@ import { useStore } from 'vuex'
 import { finishAnimateAction, finishAnimateUpdateButtonMutation } from '../variables/myself'
 import { setToast, toastData } from '../tools'
 import { createToast } from 'mosha-vue-toastify'
-import { downloadBarChartMutation, settingsGetAction, storageDoughnutChartMutation } from '../variables/my'
+import {
+  downloadBarChartMutation,
+  downloadCheckBoxMutation,
+  settingsGetAction,
+  storageDoughnutChartMutation
+} from '../variables/my'
 import { ref } from 'vue'
 const wsUrl = process.env.VUE_APP_WS === 'dev' ? 'ws://127.0.0.1:8000/ws/' : `ws://${location.host}/ws/`
 const socket = new WebSocket(wsUrl)
@@ -38,6 +43,11 @@ export const connectSocket = () => {
     } else if (receive.action === 'search_myself_animate') {
       store.commit('myself/searchMyselfAnimateMutation', receive.data)
     } else if (receive.action === 'clear_finish_myself_animate') {
+    } else if (receive.action === 'clear_finish_anime1_animate') {
+    } else if (receive.action === 'delete_myself_download_animate') {
+      store.commit(`myself/${downloadCheckBoxMutation}`)
+    } else if (receive.action === 'delete_anime1_download_animate') {
+      store.commit(`anime1/${downloadCheckBoxMutation}`)
     } else if (receive.action === 'download_order_myself_animate') {
     } else if (receive.action === 'download_anime1_animate_array') {
       store.commit('anime1/downloadAnime1AnimateMutation', receive.data)

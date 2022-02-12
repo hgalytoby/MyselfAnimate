@@ -25,22 +25,18 @@
 <script>
 import { sendSocketMessage } from '../../hooks/useWS'
 import { computed } from 'vue'
-import { useStore } from 'vuex'
-import { downloadCheckBoxMutation } from '../../variables/my'
 import { toastData } from '../../tools'
 import { createToast } from 'mosha-vue-toastify'
 
 export default {
   name: 'TabModel',
   props: {
-    animate: String,
     target: String,
     clearAction: String,
     deleteAction: String,
     downloadCheckBox: Array
   },
   setup (props) {
-    const store = useStore()
     const downloadCheckBoxArray = computed(() => props.downloadCheckBox)
     const clearFinishDownload = () => {
       sendSocketMessage({
@@ -53,7 +49,6 @@ export default {
         action: props.deleteAction,
         deletes: downloadCheckBoxArray.value
       })
-      store.commit(`${props.animate}/${downloadCheckBoxMutation}`)
       createToast(...toastData.deleteAnimateOk)
     }
     return {

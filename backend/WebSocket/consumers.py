@@ -32,6 +32,7 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
             'delete_anime1_download_animate': self.Anime1.delete_download_animate,
             'download_order_anime1_animate': self.Anime1.download_order,
             'update_download_value': self.update_download_value,
+            'animate_download_count': self.animate_download_count,
             'connect': self.connect_action,
         }
 
