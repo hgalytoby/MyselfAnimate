@@ -9,7 +9,7 @@ from WebSocket.actions import MyselfManage, Anime1Manage
 settings = DB.My.get_or_create_settings()
 myself_download_manage = MyselfDownloadManage(settings.myself_download_value)
 anime1_download_manage = Anime1DownloadManage(settings.anime1_download_value)
-all_ws = []
+ws_array = []
 
 
 class AsyncChatConsumer(AsyncWebsocketConsumer):
@@ -70,7 +70,7 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
 
     @staticmethod
     async def update_animate_download_count(*args, **kwargs):
-        for ws in all_ts:
+        for ws in ws_array:
             await ws.animate_download_count()
 
     async def connect_action(self, *args, **kwargs):
