@@ -44,6 +44,7 @@ export const connectSocket = () => {
       store.commit('myself/searchMyselfAnimateMutation', receive.data)
     } else if (receive.action === 'clear_finish_myself_animate') {
     } else if (receive.action === 'clear_finish_anime1_animate') {
+    } else if (receive.action === 'clear_finish_anime1_animate') {
     } else if (receive.action === 'delete_myself_download_animate') {
       store.commit(`myself/${downloadCheckBoxMutation}`)
     } else if (receive.action === 'delete_anime1_download_animate') {
@@ -65,6 +66,7 @@ export const connectSocket = () => {
       if (storageRef.value) {
         DownloadRef.value.update()
       }
+    } else if (receive.action === 'update_animate_download_count') {
     } else {
       store.commit('ws/setWsRes', JSON.parse(msg.data))
     }

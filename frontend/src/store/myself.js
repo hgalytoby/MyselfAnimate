@@ -41,6 +41,7 @@ import {
 } from '../variables/my'
 import router from '../router'
 import { createToast } from 'mosha-vue-toastify'
+import { sendSocketMessage } from '../hooks/useWS'
 
 export const state = {
   [weekAnimateState]: {},
@@ -164,6 +165,9 @@ export const mutations = {
     const _ = context[animateCollectState].data[value.dataIndex]
     _.episode_info_model = _.episode_info_model.filter((item) => value.data.deleteArray.indexOf(item.id) === -1)
     value.data.deleteArray.length = 0
+    sendSocketMessage({
+      action: 'update_animate_download_count'
+    })
   }
 }
 

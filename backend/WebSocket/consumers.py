@@ -9,6 +9,7 @@ from WebSocket.actions import MyselfManage, Anime1Manage
 settings = DB.My.get_or_create_settings()
 myself_download_manage = MyselfDownloadManage(settings.myself_download_value)
 anime1_download_manage = Anime1DownloadManage(settings.anime1_download_value)
+all_ts = []
 
 
 class AsyncChatConsumer(AsyncWebsocketConsumer):
@@ -16,6 +17,7 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._storage = {}
+        all_ts.append(self)
         self.Myself = MyselfManage(parent=self, manage=myself_download_manage)
         self.Anime1 = Anime1Manage(parent=self, manage=anime1_download_manage)
         myself_download_manage.ws.append(self)
@@ -33,6 +35,7 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
             'download_order_anime1_animate': self.Anime1.download_order,
             'update_download_value': self.update_download_value,
             'animate_download_count': self.animate_download_count,
+            'update_animate_download_count': self.update_animate_download_count,
             'connect': self.connect_action,
         }
 
@@ -52,7 +55,7 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
                     'action': 'storage'}))
             await asyncio.sleep(1)
 
-    async def animate_download_count(self):
+    async def animate_download_count(self, *args, **kwargs):
         myself_count = await DB.Myself.get_animate_download_done_count(done=True)
         anime1_count = await DB.Anime1.get_animate_download_done_count(done=True)
         total = sum([myself_count, anime1_count])
@@ -64,6 +67,11 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
                 'y_max': y_max
             },
             'action': 'downloadCount'}))
+
+    @staticmethod
+    async def update_animate_download_count(*args, **kwargs):
+        for ws in all_ts:
+            await ws.animate_download_count()
 
     async def connect_action(self, *args, **kwargs):
         await self.send(text_data=json.dumps({'action': 'connect', 'msg': f'連線成功!!'}))

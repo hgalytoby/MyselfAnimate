@@ -24,6 +24,7 @@ import {
   downloadCheckBoxMutation,
   downloadCheckBoxState
 } from '../variables/my'
+import { sendSocketMessage } from '../hooks/useWS'
 
 export const state = {
   [animateListState]: [],
@@ -102,6 +103,9 @@ export const mutations = {
     context[animateCollectState].data[value.dataIndex].episode_info_model = context[animateCollectState].data[value.dataIndex].episode_info_model.filter(
       (item) => value.data.deleteArray.indexOf(item.id) === -1)
     value.data.deleteArray.length = 0
+    sendSocketMessage({
+      action: 'update_animate_download_count'
+    })
   }
 }
 

@@ -13,7 +13,7 @@
     <div v-for="animate in animateArray" :key=animate
          :class="animate.upper === downloadSwitch ? 'show active' : ''" class="tab-pane fade"
          :id="`pills-${animate.upper}`" role="tabpanel" :aria-labelledby="`pills-${animate.upper}-tab`">
-      <TabModel :animate="animate.lower" :target="`${animate.lower}-target`"
+      <TabModel :target="`${animate.lower}-target`"
                 :clear-action="`clear_finish_${animate.lower}_animate`"
                 :delete-action="`delete_${animate.lower}_download_animate`"
                 :download-check-box="animate.downloadCheckBoxArray"/>
