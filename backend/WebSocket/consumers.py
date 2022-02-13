@@ -9,7 +9,7 @@ from WebSocket.actions import MyselfManage, Anime1Manage
 settings = DB.My.get_or_create_settings()
 myself_download_manage = MyselfDownloadManage(settings.myself_download_value)
 anime1_download_manage = Anime1DownloadManage(settings.anime1_download_value)
-all_ts = []
+all_ws = []
 
 
 class AsyncChatConsumer(AsyncWebsocketConsumer):
