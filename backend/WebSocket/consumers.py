@@ -17,7 +17,7 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._storage = {}
-        all_ts.append(self)
+        ws_array.append(self)
         self.Myself = MyselfManage(parent=self, manage=myself_download_manage)
         self.Anime1 = Anime1Manage(parent=self, manage=anime1_download_manage)
         myself_download_manage.ws.append(self)

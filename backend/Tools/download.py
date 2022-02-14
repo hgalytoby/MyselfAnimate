@@ -15,6 +15,7 @@ from project.settings import MEDIA_PATH, ROOT_MEDIA_PATH
 class BaseDownloadManage:
     update_tasks: Callable
     download_animate_script: Callable
+    switch_db_function: Callable
 
     def __init__(self, max_value):
         self.download_list = []
@@ -24,7 +25,6 @@ class BaseDownloadManage:
         self.now = 0
         self.ws = []
         self.max = max_value
-        self.switch_db_function = NotImplemented
 
     async def clear_finish_animate_list(self):
         """
@@ -54,12 +54,21 @@ class BaseDownloadManage:
         #             self.tasks_dict[item['id']].cancel()
         #         self.download_list.remove(item)
 
-    async def update_download_value(self, value):
+    async def update_download_value(self, value: int):
+        """
+        更新最大下載數量
+        :param value:
+        :return:
+        """
         if self.max != value:
             self.max = value
             await self.cancel_all_task()
 
     async def cancel_all_task(self):
+        """
+        刪除動漫要取消協程與清空陣列。
+        :return:
+        """
         for task in list(self.tasks_dict.values()):
             task.cancel()
         self.wait_download_list.clear()
@@ -109,6 +118,10 @@ class BaseDownloadManage:
                         self.wait_download_list[_], self.wait_download_list[_ - 1]
 
     async def main_task(self):
+        """
+        主要執行下載的腳本的方法
+        :return:
+        """
         while True:
             if self.wait_download_list and self.max > self.now:
                 self.now += 1
@@ -119,7 +132,12 @@ class BaseDownloadManage:
                 pass
             await asyncio.sleep(0.1)
 
-    async def animate_finish_send_ws(self, task_data):
+    async def animate_finish_send_ws(self, task_data: dict):
+        """
+        下載完成時 WebSocket 要送訊息給全部的前端。
+        :param task_data:
+        :return:
+        """
         for ws in self.ws:
             await ws.send(text_data=json.dumps({
                 'msg': f'下載完成',
@@ -131,6 +149,10 @@ class BaseDownloadManage:
         await self.download_count_send_ws()
 
     async def download_count_send_ws(self):
+        """
+        送給全部的 Websocket 訊息更新下載數量數據圖。
+        :return:
+        """
         for ws in self.ws:
             await ws.animate_download_count()
 
