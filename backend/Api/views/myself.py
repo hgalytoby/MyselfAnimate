@@ -110,7 +110,7 @@ class MyselfAnimateInfoEpisodeView(ListAPIView):
         return Response(serializer.data)
 
 
-class MyselfAnimateEpisodeDoneView(BaseAnimateEpisodeDone, ListAPIView):
+class MyselfAnimateEpisodeDoneView(BaseAnimateEpisodeDone):
     serializer_class = MyselfAnimateInfoSerializer
     queryset = MyselfAnimateInfoModel.objects.all()
     pagination_class = MyPageNumberPagination

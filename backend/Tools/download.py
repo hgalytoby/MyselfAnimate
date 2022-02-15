@@ -296,6 +296,10 @@ class MyselfDownloadManage(BaseDownloadManage):
         self.now -= 1
 
     async def update_tasks(self):
+        """
+        更新協程任務。
+        :return:
+        """
         download_models = await DB.Myself.get_total_download_animate_episode_models()
         self.wait_download_list += await DB.Myself.get_download_animate_episode_data_list(
             download_models=download_models)
@@ -325,6 +329,13 @@ class Anime1DownloadManage(BaseDownloadManage):
         threading.Thread(target=self.main, args=()).start()
 
     async def download_animate(self, task_data, animate_url, cookies):
+        """
+        下載動漫
+        :param task_data:
+        :param animate_url:
+        :param cookies:
+        :return:
+        """
         _headers = {
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36',
             'cookie': cookies
@@ -356,7 +367,17 @@ class Anime1DownloadManage(BaseDownloadManage):
             print(e)
 
     def _youtube_download(self, task_data):
+        """
+        Thread Youtube 下載
+        :param task_data:
+        :return:
+        """
         def callback(_):
+            """
+            Youtube 下載狀況
+            :param _:
+            :return:
+            """
             task_data['progress_value'] = int(_['downloaded_bytes'] / _['total_bytes'] * 100)
 
         task_data.update({'status': '下載中'})
@@ -375,16 +396,31 @@ class Anime1DownloadManage(BaseDownloadManage):
             task_data['done'] = True
 
     async def youtube_download(self, task_data):
+        """
+        Youtube 下載方法
+        :param task_data:
+        :return:
+        """
         threading.Thread(target=self._youtube_download, args=(task_data,)).start()
         while not task_data['done']:
             await asyncio.sleep(0.1)
 
     async def wait_cache_set_html(self, animate_name):
+        """
+        等網頁快取資料。
+        :param animate_name:
+        :return:
+        """
         while animate_name in self._cache:
             await asyncio.sleep(0.1)
         self._cache.update({animate_name: True})
 
     async def download_animate_script(self, task_data):
+        """
+        下載動漫腳本。
+        :param task_data:
+        :return:
+        """
         try:
             if not task_data['done']:
                 if YoutubeUrl in task_data['url']:
@@ -416,11 +452,19 @@ class Anime1DownloadManage(BaseDownloadManage):
         self.now -= 1
 
     async def update_tasks(self):
+        """
+        更新協程任務。
+        :return:
+        """
         download_models = await DB.Anime1.get_total_download_animate_episode_models()
         self.wait_download_list += await DB.Anime1.get_download_animate_episode_data_list(
             download_models=download_models)
 
     async def main_task(self):
+        """
+        主要方法。
+        :return:
+        """
         await self.update_tasks()
         await super(Anime1DownloadManage, self).main_task()
 

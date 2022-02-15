@@ -42,14 +42,6 @@ animate_table = {
 
 class Myself:
     @staticmethod
-    def fix_myself_url(query_params):
-        try:
-            loads = json.loads(query_params.get('url'))
-        except json.decoder.JSONDecodeError as e:
-            loads = {k: v for k, v in query_params.items()}
-        return loads
-
-    @staticmethod
     def week_animate() -> dict:
         """
         爬首頁的每周更新表。

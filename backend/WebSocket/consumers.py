@@ -40,6 +40,10 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
         }
 
     async def storage(self):
+        """
+        硬碟空間傳送給前端。
+        :return:
+        """
         while True:
             _ = psutil.disk_usage('/')
             _storage = {
@@ -56,6 +60,12 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
             await asyncio.sleep(1)
 
     async def animate_download_count(self, *args, **kwargs):
+        """
+        全部動漫下載數量送給前端。
+        :param args:
+        :param kwargs:
+        :return:
+        """
         myself_count = await DB.Myself.get_animate_download_done_count(done=True)
         anime1_count = await DB.Anime1.get_animate_download_done_count(done=True)
         total = sum([myself_count, anime1_count])
@@ -70,10 +80,22 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
 
     @staticmethod
     async def update_animate_download_count(*args, **kwargs):
+        """
+        所有 websocket 送全部動漫下載數量訊息給前端。
+        :param args:
+        :param kwargs:
+        :return:
+        """
         for ws in ws_array:
             await ws.animate_download_count()
 
     async def connect_action(self, *args, **kwargs):
+        """
+        一連線就要做的事情。
+        :param args:
+        :param kwargs:
+        :return:
+        """
         await self.send(text_data=json.dumps({'action': 'connect', 'msg': f'連線成功!!'}))
         asyncio.create_task(self.Myself.download_tasks())
         asyncio.create_task(self.Anime1.download_tasks())
@@ -81,6 +103,11 @@ class AsyncChatConsumer(AsyncWebsocketConsumer):
         asyncio.create_task(self.animate_download_count())
 
     async def update_download_value(self, **kwargs):
+        """
+        更新動漫同時下載數量。
+        :param kwargs:
+        :return:
+        """
         await self.Myself.manage.update_download_value(value=kwargs['data']['myself_download_value'])
         await self.Anime1.manage.update_download_value(value=kwargs['data']['anime1_download_value'])
 

@@ -55,7 +55,7 @@ class Anime1AnimateInfoEpisodeView(ListAPIView):
         return Response(serializer.data)
 
 
-class Anime1AnimateEpisodeDoneView(BaseAnimateEpisodeDone, ListAPIView):
+class Anime1AnimateEpisodeDoneView(BaseAnimateEpisodeDone):
     serializer_class = Anime1AnimateInfoSerializer
     queryset = Anime1AnimateInfoModel.objects.all()
     pagination_class = MyPageNumberPagination
