@@ -4,7 +4,7 @@ from Api.views import MyselfWeekAnimateView, MyselfAnimateInfoView, MyselfAnimat
     MyselfFinishAnimateView, MyselfAnimateEpisodeInfoView, MyselfDownloadView, MyselfAnimateEpisodeDoneView, \
     MySystemView, MyHistoryView, MyLogView, Anime1AnimateListView, Anime1AnimateInfoView, TestView, \
     Anime1AnimateInfoEpisodeView, Anime1AnimateEpisodeDoneView, MyselfUrlAnimate, MySettingsView, Anime1MenuSeasonView, \
-    Anime1SeasonView, MyselfDestroyManyAnimate, Anime1DestroyManyAnimate
+    Anime1SeasonView, MyselfDestroyManyAnimate, Anime1DestroyManyAnimateView
 from project.settings import DEBUG
 
 app_name = 'api'
@@ -17,7 +17,9 @@ myself_api = [
     path('myself/finish-animate/', MyselfFinishAnimateView.as_view()),
     path('myself/animate-episode-info/<str:pk>/', MyselfAnimateEpisodeInfoView.as_view()),
     path('myself/download/<str:pk>/', MyselfDownloadView.as_view()),
-    path('myself/animate-episode-done/', MyselfAnimateEpisodeDoneView.as_view()),
+    path('myself/animate-episode-done/', MyselfAnimateEpisodeDoneView.as_view({
+        'get': 'list',
+    })),
     path('myself/url-search/', MyselfUrlAnimate.as_view()),
     path('myself/destroy-many-animate/', MyselfDestroyManyAnimate.as_view()),
 
@@ -31,13 +33,27 @@ my_api = [
 ]
 
 anime1_api = [
-    path('anime1/animate-list/', Anime1AnimateListView.as_view()),
-    path('anime1/animate-info/', Anime1AnimateInfoView.as_view()),
-    path('anime1/animate-info/<str:animate_id>/episode-info/', Anime1AnimateInfoEpisodeView.as_view()),
-    path('anime1/animate-episode-done/', Anime1AnimateEpisodeDoneView.as_view()),
-    path('anime1/home-menu/', Anime1MenuSeasonView.as_view()),
-    path('anime1/season/<str:season>/', Anime1SeasonView.as_view()),
-    path('anime1/destroy-many-animate/', Anime1DestroyManyAnimate.as_view()),
+    path('anime1/animate-list/', Anime1AnimateListView.as_view({
+        'get': 'list',
+    })),
+    path('anime1/animate-info/', Anime1AnimateInfoView.as_view({
+        'post': 'create',
+    })),
+    path('anime1/animate-info/<str:animate_id>/episode-info/', Anime1AnimateInfoEpisodeView.as_view({
+        'get': 'list',
+    })),
+    path('anime1/animate-episode-done/', Anime1AnimateEpisodeDoneView.as_view({
+        'get': 'list',
+    })),
+    path('anime1/home-menu/', Anime1MenuSeasonView.as_view({
+        'get': 'list',
+    })),
+    path('anime1/season/<str:season>/', Anime1SeasonView.as_view({
+        'get': 'list',
+    })),
+    path('anime1/destroy-many-animate/', Anime1DestroyManyAnimateView.as_view({
+        'delete': 'destroy',
+    })),
 ]
 
 test_api = [

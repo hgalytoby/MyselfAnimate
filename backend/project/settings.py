@@ -161,3 +161,7 @@ MEDIA_PATH = '/static/uploads'
 ROOT_MEDIA_PATH = f"{BASE_DIR}{MEDIA_PATH}/"
 
 DOWNLOAD_MAX_VALUE = 2
+
+SWAGGER_SETTINGS = {
+    "DEFAULT_AUTO_SCHEMA_CLASS": "Tools.swagger.CustomAutoSchema",
+}

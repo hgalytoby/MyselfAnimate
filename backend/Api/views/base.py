@@ -1,8 +1,8 @@
 from django.db.models import Prefetch, Model
-from rest_framework.generics import ListAPIView
+from rest_framework.viewsets import ModelViewSet
 
 
-class BaseAnimateEpisodeDone(ListAPIView):
+class BaseAnimateEpisodeDone(ModelViewSet):
     animate_episode_info_model: Model
     animate_info_model: Model
 
