@@ -1,33 +1,40 @@
 from urllib.parse import unquote
-
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, DestroyAPIView
+from rest_framework.viewsets import ModelViewSet
 from Api.serializers import MyselfFinishAnimateSerializer, MyselfAnimateEpisodeInfoSerializer, \
-    MyselfAnimateInfoSerializer, MyselfDownloadSerializer
+    MyselfAnimateInfoSerializer
 from Api.views.base import BaseAnimateEpisodeDone
-from Database.models.myself import MyselfFinishAnimateModel, MyselfAnimateEpisodeInfoModel, MyselfAnimateEpisodeTsModel, \
-    MyselfDownloadModel, MyselfAnimateInfoModel
+from Database.models.myself import MyselfFinishAnimateModel, MyselfAnimateEpisodeInfoModel, \
+    MyselfAnimateInfoModel
 from Tools.db import DB, MyPageNumberPagination
 from Tools.myself import Myself
+from Tools.swagger import MyselfWeekAnimateSwagger, MyselfAnimateInfoSwagger, MyselfUrlAnimateSwagger, \
+    MyselfFinishListSwagger, MyselfFinishAnimateSwagger, MyselfAnimateEpisodeInfoEpisodeSwagger, \
+    MyselfAnimateEpisodeDoneSwagger, MyselfDestroyManyAnimateSwagger
 from Tools.tools import req_bytes
 from Tools.urls import MyselfUrl
 
 
-class MyselfWeekAnimateView(APIView):
+@method_decorator(**MyselfWeekAnimateSwagger.rs)
+class MyselfWeekAnimateView(ModelViewSet):
+    my_tags = ['Myself 每週動漫資料']
+
     @method_decorator(cache_page(300))
-    def get(self, request):
+    def list(self, request, *args, **kwargs):
         data = Myself.week_animate()
         if data:
             return Response(data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-class MyselfAnimateInfoView(APIView):
-    def get(self, request):
+@method_decorator(**MyselfAnimateInfoSwagger.rs)
+class MyselfAnimateInfoView(ModelViewSet):
+    my_tags = ['Myself 動漫資料']
+
+    def list(self, request, *args, **kwargs):
         if not request.query_params.get('url'):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         animate_url = unquote(request.query_params.get('url'))
@@ -49,12 +56,15 @@ class MyselfAnimateInfoView(APIView):
         return Response(serializer.data)
 
 
-class MyselfUrlAnimate(MyselfAnimateInfoView):
-    def get(self, request):
+@method_decorator(**MyselfUrlAnimateSwagger.rs)
+class MyselfUrlAnimate(ModelViewSet):
+    my_tags = ['Myself 搜尋動漫']
+
+    def list(self, request, *args, **kwargs):
         try:
             if not request.query_params.get('url'):
                 raise ValueError
-            super(MyselfUrlAnimate, self).get(request)
+            super(MyselfUrlAnimate, self).list(request, *args, **kwargs)
             return Response({
                 'result': True,
                 'url': request.query_params.get('url')
@@ -66,19 +76,24 @@ class MyselfUrlAnimate(MyselfAnimateInfoView):
             })
 
 
-class MyselfFinishListView(APIView):
+@method_decorator(**MyselfFinishListSwagger.rs)
+class MyselfFinishListView(ModelViewSet):
+    my_tags = ['Myself 完結動漫列表資料']
+
     @method_decorator(cache_page(300))
-    def get(self, request):
+    def list(self, request, *args, **kwargs):
         data = Myself.finish_list()
         if data:
             return Response(data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-class MyselfFinishAnimateView(ListAPIView):
+@method_decorator(**MyselfFinishAnimateSwagger.rs)
+class MyselfFinishAnimateView(ModelViewSet):
     serializer_class = MyselfFinishAnimateSerializer
     queryset = MyselfFinishAnimateModel.objects.all()
     pagination_class = MyPageNumberPagination
+    my_tags = ['Myself 已下載的完結動漫資料']
 
     def list(self, request, *args, **kwargs):
         settings = DB.My.get_or_create_settings()
@@ -87,20 +102,11 @@ class MyselfFinishAnimateView(ListAPIView):
         return Response({})
 
 
-class MyselfAnimateEpisodeInfoView(RetrieveUpdateAPIView):
+@method_decorator(**MyselfAnimateEpisodeInfoEpisodeSwagger.rs)
+class MyselfAnimateInfoEpisodeView(ModelViewSet):
     serializer_class = MyselfAnimateEpisodeInfoSerializer
     queryset = MyselfAnimateEpisodeInfoModel.objects.select_related('owner').all()
-
-    def put(self, request, *args, **kwargs):
-        if request.data.get('download'):
-            model = MyselfAnimateEpisodeInfoModel.objects.get(pk=kwargs.get('pk'))
-            MyselfAnimateEpisodeTsModel.objects.filter(owner=model).delete()
-        return self.update(request, *args, **kwargs)
-
-
-class MyselfAnimateInfoEpisodeView(ListAPIView):
-    serializer_class = MyselfAnimateEpisodeInfoSerializer
-    queryset = MyselfAnimateEpisodeInfoModel.objects.select_related('owner').all()
+    my_tags = ['Myself 動漫集數資料']
 
     def list(self, request, *args, **kwargs):
         model = MyselfAnimateEpisodeInfoModel.objects.filter(owner_id=kwargs.get('animate_id'))
@@ -110,21 +116,21 @@ class MyselfAnimateInfoEpisodeView(ListAPIView):
         return Response(serializer.data)
 
 
+@method_decorator(**MyselfAnimateEpisodeDoneSwagger.rs)
 class MyselfAnimateEpisodeDoneView(BaseAnimateEpisodeDone):
     serializer_class = MyselfAnimateInfoSerializer
     queryset = MyselfAnimateInfoModel.objects.all()
     pagination_class = MyPageNumberPagination
     animate_info_model = MyselfAnimateInfoModel
     animate_episode_info_model = MyselfAnimateEpisodeInfoModel
+    my_tags = ['Myself 動漫下載完畢資料']
 
 
-class MyselfDownloadView(DestroyAPIView):
-    serializer_class = MyselfDownloadSerializer
-    queryset = MyselfDownloadModel.objects.all()
+@method_decorator(**MyselfDestroyManyAnimateSwagger.d)
+class MyselfDestroyManyAnimate(ModelViewSet):
+    my_tags = ['Myself 刪除多筆動漫']
 
-
-class MyselfDestroyManyAnimate(APIView):
-    def delete(self, request):
+    def destroy(self, request, *args, **kwargs):
         delete_list = request.data.get('deleteArray')
         DB.Myself.delete_animate_episode(id__in=delete_list)
         DB.My.create_log(msg='Myself 刪除已選取動漫', action='delete')

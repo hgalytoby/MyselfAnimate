@@ -1,7 +1,7 @@
 from django.urls import path
 
 from Api.views import MyselfWeekAnimateView, MyselfAnimateInfoView, MyselfAnimateInfoEpisodeView, MyselfFinishListView, \
-    MyselfFinishAnimateView, MyselfAnimateEpisodeInfoView, MyselfDownloadView, MyselfAnimateEpisodeDoneView, \
+    MyselfFinishAnimateView, MyselfAnimateEpisodeDoneView, \
     MySystemView, MyHistoryView, MyLogView, Anime1AnimateListView, Anime1AnimateInfoView, TestView, \
     Anime1AnimateInfoEpisodeView, Anime1AnimateEpisodeDoneView, MyselfUrlAnimate, MySettingsView, Anime1MenuSeasonView, \
     Anime1SeasonView, MyselfDestroyManyAnimate, Anime1DestroyManyAnimateView
@@ -10,18 +10,30 @@ from project.settings import DEBUG
 app_name = 'api'
 
 myself_api = [
-    path('myself/week-animate/', MyselfWeekAnimateView.as_view()),
-    path('myself/animate-info/', MyselfAnimateInfoView.as_view()),
-    path('myself/animate-info/<str:animate_id>/episode-info/', MyselfAnimateInfoEpisodeView.as_view()),
-    path('myself/finish-list/', MyselfFinishListView.as_view()),
-    path('myself/finish-animate/', MyselfFinishAnimateView.as_view()),
-    path('myself/animate-episode-info/<str:pk>/', MyselfAnimateEpisodeInfoView.as_view()),
-    path('myself/download/<str:pk>/', MyselfDownloadView.as_view()),
+    path('myself/week-animate/', MyselfWeekAnimateView.as_view({
+        'get': 'list'
+    })),
+    path('myself/animate-info/', MyselfAnimateInfoView.as_view({
+        'get': 'list'
+    })),
+    path('myself/animate-info/<str:animate_id>/episode-info/', MyselfAnimateInfoEpisodeView.as_view({
+        'get': 'list'
+    })),
+    path('myself/finish-list/', MyselfFinishListView.as_view({
+        'get': 'list'
+    })),
+    path('myself/finish-animate/', MyselfFinishAnimateView.as_view({
+        'get': 'list'
+    })),
     path('myself/animate-episode-done/', MyselfAnimateEpisodeDoneView.as_view({
         'get': 'list',
     })),
-    path('myself/url-search/', MyselfUrlAnimate.as_view()),
-    path('myself/destroy-many-animate/', MyselfDestroyManyAnimate.as_view()),
+    path('myself/url-search/', MyselfUrlAnimate.as_view({
+        'get': 'list'
+    })),
+    path('myself/destroy-many-animate/', MyselfDestroyManyAnimate.as_view({
+        'delete': 'destroy',
+    })),
 
 ]
 

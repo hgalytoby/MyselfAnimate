@@ -24,6 +24,51 @@ class BaseSwagger:
                                                              operation_description='- url id: ')}
 
 
+class MyselfWeekAnimateSwagger:
+    rs = {'name': 'list', 'decorator': swagger_auto_schema(operation_summary='Myself 首頁每週動漫資料',
+                                                           operation_description='''
+                                                            ''')}
+
+
+class MyselfAnimateInfoSwagger:
+    rs = {'name': 'list', 'decorator': swagger_auto_schema(operation_summary='Myself 動漫資料',
+                                                           operation_description='''
+                                                            ''')}
+
+
+class MyselfUrlAnimateSwagger:
+    rs = {'name': 'list', 'decorator': swagger_auto_schema(operation_summary='Myself 搜尋動漫',
+                                                           operation_description='''
+                                                            ''')}
+
+
+class MyselfFinishListSwagger:
+    rs = {'name': 'list', 'decorator': swagger_auto_schema(operation_summary='Myself 完結列表',
+                                                           operation_description='''
+                                                            ''')}
+
+
+class MyselfFinishAnimateSwagger:
+    rs = {'name': 'list', 'decorator': swagger_auto_schema(operation_summary='Myself 已下載的完結動漫資料',
+                                                           operation_description='''
+                                                            ''')}
+
+
+class MyselfAnimateEpisodeInfoEpisodeSwagger:
+    rs = {'name': 'list', 'decorator': swagger_auto_schema(operation_summary='Myself 動漫集數資料',
+                                                           operation_description='''
+                                                            ''')}
+
+class MyselfAnimateEpisodeDoneSwagger:
+    rs = {'name': 'list', 'decorator': swagger_auto_schema(operation_summary='所有 Myself 動漫下載完畢資料',
+                                                           operation_description='''
+                                                            ''')}
+
+class MyselfDestroyManyAnimateSwagger:
+    d = {'name': 'destroy', 'decorator': swagger_auto_schema(operation_summary='刪除多筆已下載動漫資料',
+                                                             operation_description='')}
+
+
 class Anime1AnimateSwagger:
     rs = {'name': 'list', 'decorator': swagger_auto_schema(operation_summary='所有 Anime1 首頁動漫資料',
                                                            operation_description='''
