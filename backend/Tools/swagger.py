@@ -59,10 +59,12 @@ class MyselfAnimateEpisodeInfoEpisodeSwagger:
                                                            operation_description='''
                                                             ''')}
 
+
 class MyselfAnimateEpisodeDoneSwagger:
     rs = {'name': 'list', 'decorator': swagger_auto_schema(operation_summary='所有 Myself 動漫下載完畢資料',
                                                            operation_description='''
                                                             ''')}
+
 
 class MyselfDestroyManyAnimateSwagger:
     d = {'name': 'destroy', 'decorator': swagger_auto_schema(operation_summary='刪除多筆已下載動漫資料',
@@ -108,3 +110,31 @@ class Anime1SeasonSwagger:
 class Anime1DestroyManyAnimateSwagger:
     d = {'name': 'destroy', 'decorator': swagger_auto_schema(operation_summary='刪除多筆已下載動漫資料',
                                                              operation_description='')}
+
+
+class MySystemSwagger:
+    rs = {'name': 'list', 'decorator': swagger_auto_schema(operation_summary='所有系統資料',
+                                                           operation_description='''
+                                                            ''')}
+
+
+class MyHistorySwagger:
+    rs = {'name': 'list', 'decorator': swagger_auto_schema(operation_summary='所有歷史資料',
+                                                           operation_description='''
+                                                            ''')}
+
+
+class MyLogSwagger:
+    rs = {'name': 'list', 'decorator': swagger_auto_schema(operation_summary='所有日誌資料',
+                                                           operation_description='''
+                                                            ''')}
+
+
+class MySettingsSwagger:
+    rs = {'name': 'list', 'decorator': swagger_auto_schema(operation_summary='所有設定資料',
+                                                           operation_description='''
+                                                            ''')}
+    u = {'name': 'retrieve', 'decorator': swagger_auto_schema(operation_summary='更新設定資料',
+                                                              operation_description='''
+                                                                - url id: 
+                                                                ''')}

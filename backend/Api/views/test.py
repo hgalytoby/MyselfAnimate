@@ -15,6 +15,8 @@ from Tools.urls import Anime1AnimateUrl
 
 
 class TestView(APIView):
+    schema = None
+
     def get(self, request):
         cache_db = caches['default']
         cache_db.clear()

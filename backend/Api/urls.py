@@ -38,10 +38,20 @@ myself_api = [
 ]
 
 my_api = [
-    path('my/log/system/', MySystemView.as_view()),
-    path('my/log/history/', MyHistoryView.as_view()),
-    path('my/log/', MyLogView.as_view()),
-    path('my/settings/', MySettingsView.as_view()),
+    path('my/log/system/', MySystemView.as_view({
+        'get': 'list',
+        'post': 'create',
+    })),
+    path('my/log/history/', MyHistoryView.as_view({
+        'get': 'list',
+    })),
+    path('my/log/', MyLogView.as_view({
+        'get': 'list',
+    })),
+    path('my/settings/', MySettingsView.as_view({
+        'get': 'list',
+        'put': 'update',
+    })),
 ]
 
 anime1_api = [
