@@ -235,7 +235,7 @@ class Anime1:
         """
         {'l': '//korone.v.anime1.me/968/12b.mp4', 's': {'src': '//korone.v.anime1.me/968/12b.mp4', 'type': 'video/mp4'}}
         """
-        return f'https:{res_json["l"]}', cookies
+        return f'https:{res_json["s"]["src"]}', cookies
 
     @staticmethod
     async def get_api_key_and_value_v2(data):
