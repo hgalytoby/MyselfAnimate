@@ -1,5 +1,7 @@
 ## Demo 2022/01/08
-頁面刻板還在學習，目前先做功能出來，此專案還有 Bug 要修。
+目前有新的想法想做的更大一點，所以此專案只是做練習的。
+
+這是我學習 Vue 後與 Django 結合的專案。
 
 看影片了解一下此專案有哪些功能。
 
@@ -10,6 +12,7 @@
 研究完畢請將下載的影片刪除。
 
 謝謝。
+
 
 ### 點擊圖片可以在 Youtube 上觀看。
 [![Demo](https://i.imgur.com/6G1kPWD.png)](https://youtu.be/ZW70RJYAwek)
@@ -36,10 +39,6 @@
 # 目前狀況
 ## 只有基本下載與網頁觀看影片
 - `docker compose build`
-- `docker-compose up` 
+- `docker compose up` 
 - 我試過沒有問題了。
 
-# 問題
-- 自己學 HTML CSS JavaScript 都還沒很熟我就直接學 Vue 了，遇到前端問題會卡很久。
-- 版面設計 RWD 還在學習中。
-- 尚未開發的功能。
